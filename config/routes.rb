@@ -4,7 +4,7 @@ Rails.application.routes.draw do
     resources :categories, only: :index do
       resources :stages, only: :index do
         resources :tasks do
-          collection do
+          member do
             get 'mark_as_completed'
             get 'start_task'
           end
