@@ -1,4 +1,6 @@
 Rails.application.routes.draw do
-  get '/categories', to: 'categories#index'
+  scope :api, defaults: { format: :json } do
+    resources :categories, only: :index
+  end
   # For details on the DSL available within this file, see https://guides.rubyonrails.org/routing.html
 end
