@@ -1,11 +1,7 @@
 class TasksController < ApplicationController
 
-  def mark_as_completed
+  def mark_as_completed; end
 
-  end
+  def start_task; end
 
-  def start_task
-
-  end
-    
 end
