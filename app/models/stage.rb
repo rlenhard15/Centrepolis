@@ -5,4 +5,7 @@ class Stage < ApplicationRecord
   def completed_tasks_for_stage
     tasks.completed_tasks
   end
+  def tasks_for_category
+    tasks    
+  end
 end
