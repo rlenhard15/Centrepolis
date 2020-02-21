@@ -1,5 +1,5 @@
 class StagesController < ApplicationController
-  before_action :set_category_id, only: :index
+  before_action :set_category, only: :index
 
   # GET /stages
   def index
@@ -9,7 +9,7 @@ class StagesController < ApplicationController
   end
 
   private
-  def set_category_id
+  def set_category
     @category = Category.find(params[:category_id])
   end
 end
