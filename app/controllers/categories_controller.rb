@@ -4,6 +4,6 @@ class CategoriesController < ApplicationController
   def index
     @categories = Category.all
 
-    render json: @categories.to_json(methods: [:list_of_sub_categories, :status_of_category, :list_of_stages])
+    render json: @categories.to_json(methods: :status_of_category, include: {sub_categories: {include: :stages}})
   end
 end
