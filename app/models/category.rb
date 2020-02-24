@@ -24,7 +24,7 @@ class Category < ApplicationRecord
 
   def check_completed_stage
     sub_categories.map do |sub_category|
-      sub_category.stages.map {|stage| stage.tasks.count == stage.completed_tasks_for_stage.count }
+      sub_category.completed_stage?
     end
   end
 end
