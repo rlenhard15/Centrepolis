@@ -19,12 +19,12 @@ class Category < ApplicationRecord
   private
 
   def count_stage
-    sub_categories.map {|sub_category| sub_category.stages.count }.reduce(:+)
+    sub_categories.map {|sub_category| sub_category.count_stages }.reduce(:+)
   end
 
   def check_completed_stage
     sub_categories.map do |sub_category|
-      sub_category.stages.map {|stage| stage.tasks.count == stage.completed_tasks_for_stage.count }
+      sub_category.stages.map {|stage| stage.tasks_for_stage == stage.completed_tasks_for_stage }
     end
   end
 end
