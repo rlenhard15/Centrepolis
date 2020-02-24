@@ -3,12 +3,7 @@ class Stage < ApplicationRecord
   has_many :tasks
 
   def completed_tasks_for_stage
-    tasks.completed_tasks.count
+    tasks.completed_tasks
   end
-
-  def tasks_for_stage
-    tasks.count
-  end
-
 
 end
