@@ -4,7 +4,7 @@ class StagesController < ApplicationController
   def index
     @stages = @sub_category.stages
 
-    render json: @stages.to_json(methods: :tasks_for_stage)
+    render json: @stages.to_json(include: :tasks)
   end
 
 

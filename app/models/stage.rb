@@ -6,7 +6,4 @@ class Stage < ApplicationRecord
     tasks.completed_tasks
   end
 
-  def tasks_for_stage
-    tasks
-  end
 end
