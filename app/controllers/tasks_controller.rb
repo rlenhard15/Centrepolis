@@ -1,6 +1,5 @@
 class TasksController < ApplicationController
   before_action :set_task, only: [:show, :update, :destroy]
-  before_action :set_stage, only: [:index, :create]
 
   def index
     @tasks = @stage.tasks
@@ -36,13 +35,8 @@ class TasksController < ApplicationController
   private
 
     def set_task
-      @task = set_stage.tasks.find(params[:id])
-    end
-
-    def set_stage
-      @category = Category.find(params[:category_id])
-      @sub_category = @category.sub_categories.find(params[:sub_category_id])
-      @stage = @sub_category.stages.find(params[:stage_id])
+      @stage = Stage.find(params[:stage_id])
+      @task = @stage.tasks.find(params[:id])
     end
 
     # Only allow a trusted parameter "white list" through.
