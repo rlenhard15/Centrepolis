@@ -1,28 +1,26 @@
 class TasksController < ApplicationController
-  before_action :tasks_params, only: [:show, :update, :destroy]
+  before_action :set_task, only: [:show, :update, :destroy]
+  before_action :set_stage, only: [:index, :create]
 
-  # GET /game_statistics
   def index
-    @tasks = Task.all
+    @tasks = @stage.tasks
     render json: @tasks
+  end
 
-  # GET /game_statistics/1
   def show
     render json: @task
   end
 
-  # POST /game_statistics
   def create
-    @task = Task.new(tasks_params)
-
+    @task = @stage.tasks.new(tasks_params)
     if @task.save
-      render json: @task, status: :created, location: @task
+      render json: @task, status: :created
     else
       render json: @task.errors, status: :unprocessable_entity
     end
   end
 
-  # PATCH/PUT /game_statistics/1
+
   def update
     if @task.update(tasks_params)
       render json: @task
@@ -31,23 +29,24 @@ class TasksController < ApplicationController
     end
   end
 
-  # DELETE /game_statistics/1
   def destroy
     @task.destroy
   end
 
-  def mark_as_completed; end
-
-  def start_task; end
-
   private
-    # Use callbacks to share common setup or constraints between actions.
-    def set_game_statistic
-      @task = Task.find(params[:id])
+
+    def set_task
+      @task = set_stage.tasks.find(params[:id])
+    end
+
+    def set_stage
+      @category = Category.find(params[:category_id])
+      @sub_category = @category.sub_categories.find(params[:sub_category_id])
+      @stage = @sub_category.stages.find(params[:stage_id])
     end
 
     # Only allow a trusted parameter "white list" through.
     def tasks_params
-      params.permit(:title, :stage_id, :user_id, :status )
+      params.permit(:title, :status, :user_id )
     end
 end
