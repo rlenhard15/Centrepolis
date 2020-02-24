@@ -19,7 +19,7 @@ class Category < ApplicationRecord
   private
 
   def count_stage
-    sub_categories.map {|sub_category| sub_category.stages.count }.reduce(:+)
+    sub_categories.map {|sub_category| sub_category.count_stages }.reduce(:+)
   end
 
   def check_completed_stage
