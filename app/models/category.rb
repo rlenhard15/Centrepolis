@@ -2,7 +2,7 @@ class Category < ApplicationRecord
   has_many :sub_categories
 
   def list_of_sub_categories
-    sub_categories.map { |sub_category| sub_category.title }
+    sub_categories.map { |sub_category| sub_category }
   end
 
   def list_of_stages
