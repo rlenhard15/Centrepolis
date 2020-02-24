@@ -7,7 +7,6 @@ class StagesController < ApplicationController
     render json: @stages.to_json(include: :tasks)
   end
 
-
   private
 
   def set_sub_category
