@@ -23,8 +23,6 @@ class Category < ApplicationRecord
   end
 
   def check_completed_stage
-    sub_categories.map do |sub_category|
-      sub_category.completed_stage?
-    end
+    sub_categories.map {|sub_category| sub_category.completed_stage? }
   end
 end
