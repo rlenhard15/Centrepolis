@@ -33,10 +33,6 @@ class TasksController < ApplicationController
     @task.destroy
   end
 
-  def mark_as_completed; end
-
-  def start_task; end
-
   private
 
     def set_task
