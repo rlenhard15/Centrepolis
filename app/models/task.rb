@@ -4,7 +4,4 @@ class Task < ApplicationRecord
 
   enum status: [:started, :completed]
 
-  scope :completed_tasks, -> {
-    where(status: :completed)
-  }
 end
