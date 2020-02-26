@@ -8,7 +8,7 @@ class User < ApplicationRecord
 
   def payload
     {
-      auth_token: JWTWrapper.encode(user_id: id),
+      auth_token: JwtWrapper.encode(user_id: id),
     }.merge(user_info)
   end
 

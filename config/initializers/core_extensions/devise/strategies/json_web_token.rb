@@ -19,7 +19,7 @@ module Devise
       end
 
       def decoded_token
-        JWTWrapper.decode(token_from_header) rescue nil
+        JwtWrapper.decode(token_from_header) rescue nil
       end
 
       def claims

@@ -1,6 +1,5 @@
 # frozen_string_literal: true
-
-module JWTWrapper
+module JwtWrapper
   module_function
 
   def encode(payload, expiration = nil)
