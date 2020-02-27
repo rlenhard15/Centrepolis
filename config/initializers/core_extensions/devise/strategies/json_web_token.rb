@@ -7,10 +7,14 @@ module Devise
 
       def authenticate!
         failed = check_fail
-        failed ? failed : (success! User.find_by_id(claims['user_id']))
+        (failed || get_user.nil) ? failed : (success! @user)
       end
 
       protected
+
+      def get_user
+        @user = User.find_by_id(claims['user_id'])
+      end
 
       def token_from_header
         strategy, token = request.headers['Authorization'].split(' ')

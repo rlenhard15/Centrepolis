@@ -11,7 +11,6 @@ module Users
       password_confirmation
     ].freeze
 
-
     def create
       build_resource(sign_up_params)
       if resource.save
