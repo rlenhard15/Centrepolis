@@ -7,13 +7,13 @@ module Devise
 
       def authenticate!
         failed = check_fail
-        (failed || get_user.nil) ? failed : (success! @user)
+        (failed || current_user.nil?) ? failed : (success! user)
       end
 
       protected
 
-      def get_user
-        @user = User.find_by_id(claims['user_id'])
+      def current_user
+        @user ||= User.find_by_id(claims['user_id'])
       end
 
       def token_from_header
