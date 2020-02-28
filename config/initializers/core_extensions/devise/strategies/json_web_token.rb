@@ -7,7 +7,7 @@ module Devise
 
       def authenticate!
         failed = check_fail
-        (failed || current_user.nil?) ? failed : (success! user)
+        (failed || current_user.nil?) ? failed : (success! @user)
       end
 
       protected
