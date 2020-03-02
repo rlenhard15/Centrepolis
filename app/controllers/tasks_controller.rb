@@ -2,14 +2,15 @@ class TasksController < ApplicationController
   before_action :set_stage
   before_action :set_task, only: [:show, :update, :destroy]
 
-  api :GET, 'api/categories/:category_id/sub_categories/:sub_category_id/stages/:stage_id/tasks'
-  param :category_id, Integer, desc: "id of category"
-  param :sub_category_id, Integer, desc: "id of sub_category"
-  param :stage_id, Integer, desc: "id of stage"
-  description <<-DESC
+  api :GET, 'api/categories/:category_id/sub_categories/:sub_category_id/stages/:stage_id/tasks', "Tasks list of a certain stage"
+  param :category_id, Integer, desc: "id of category",  required: true
+  param :sub_category_id, Integer, desc: "id of sub_category",  required: true
+  param :stage_id, Integer, desc: "id of stage",  required: true
 
+  description <<-DESC
   === Request headers
     Authentication - string - required
+      Example of Authentication header : "bearer"(must be in all Authentication header) + "eyJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjo3fQ.ChsmjEoBVIuCmQ2gjq3oqx5QBaCviHeiEWtGY1UOvAw"
 
   === Success response body
   [
@@ -30,16 +31,17 @@ class TasksController < ApplicationController
     render json: @tasks
   end
 
-  api :GET, 'api/categories/:category_id/sub_categories/:sub_category_id/stages/:stage_id/tasks/:id'
-  param :category_id, Integer, desc: "id of category"
-  param :sub_category_id, Integer, desc: "id of sub_category"
-  param :stage_id, Integer, desc: "id of stage"
-  param :id, Integer, desc: "id of task"
+  api :GET, 'api/categories/:category_id/sub_categories/:sub_category_id/stages/:stage_id/tasks/:id', "Request for a certain task"
+  param :category_id, Integer, desc: "id of category",  required: true
+  param :sub_category_id, Integer, desc: "id of sub_category",  required: true
+  param :stage_id, Integer, desc: "id of stage",  required: true
+  param :id, Integer, desc: "id of task",  required: true
 
   description <<-DESC
 
-    === Request headers
-      Authentication - string - required
+  === Request headers
+    Authentication - string - required
+      Example of Authentication header : "bearer"(must be in all Authentication header) + "eyJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjo3fQ.ChsmjEoBVIuCmQ2gjq3oqx5QBaCviHeiEWtGY1UOvAw"
 
     === Success response body
     {
@@ -57,19 +59,20 @@ class TasksController < ApplicationController
     render json: @task
   end
 
-  api :POST, 'api/categories/:category_id/sub_categories/:sub_category_id/stages/:stage_id/tasks'
-  param :category_id, Integer, desc: "id of category"
-  param :sub_category_id, Integer, desc: "id of sub_category"
-  param :stage_id, Integer, desc: "id of stage"
+  api :POST, 'api/categories/:category_id/sub_categories/:sub_category_id/stages/:stage_id/tasks', "Create new task for user"
+  param :category_id, Integer, desc: "id of category",  required: true
+  param :sub_category_id, Integer, desc: "id of sub_category",  required: true
+  param :stage_id, Integer, desc: "id of stage",  required: true
 
   param :title, String, desc: 'Name of task', required: true
   param :user_id, Integer, desc: 'user who performs task', required: true
-  param :status, Integer, desc: 'execution stage of task', required: true
+  param :status, Integer, desc: 'value must be only: 0 (means started) or 1 (means completed)', required: true
 
   description <<-DESC
 
-    === Request headers
-      Authentication - string - required
+  === Request headers
+    Authentication - string - required
+      Example of Authentication header : "bearer"(must be in all Authentication header) + "eyJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjo3fQ.ChsmjEoBVIuCmQ2gjq3oqx5QBaCviHeiEWtGY1UOvAw"
 
     === Success response body
     {
@@ -93,25 +96,26 @@ class TasksController < ApplicationController
     end
   end
 
-  api :PUT, 'api/categories/:category_id/sub_categories/:sub_category_id/stages/:stage_id/tasks/:id'
-  param :category_id, Integer, desc: "id of category"
-  param :sub_category_id, Integer, desc: "id of sub_category"
-  param :stage_id, Integer, desc: "id of stage"
-  param :id, Integer, desc: "id of task"
+  api :PUT, 'api/categories/:category_id/sub_categories/:sub_category_id/stages/:stage_id/tasks/:id', "Update info of a certain task"
+  param :category_id, Integer, desc: "id of category",  required: true
+  param :sub_category_id, Integer, desc: "id of sub_category",  required: true
+  param :stage_id, Integer, desc: "id of stage",  required: true
+  param :id, Integer, desc: "id of task",  required: true
 
   param :title, String, desc: 'Name of task', required: true
   param :user_id, Integer, desc: 'user who performs task', required: true
-  param :status, String, desc: 'execution stage of task', required: true
+  param :status, Integer, desc: 'value must be only: 0 (means started) or 1 (means completed)', required: true
 
   description <<-DESC
 
-    === Request headers
-      Authentication - string - required
+  === Request headers
+    Authentication - string - required
+      Example of Authentication header : "bearer"(must be in all Authentication header) + "eyJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjo3fQ.ChsmjEoBVIuCmQ2gjq3oqx5QBaCviHeiEWtGY1UOvAw"
 
     === Success response body
     {
        "id": 37,
-       "title": "example task",
+       "title": "Title of task",
        "stage_id": 8,
        "created_at": "2020-03-02T16:30:43.044Z",
        "updated_at": "2020-03-02T16:30:43.044Z",
@@ -128,16 +132,17 @@ class TasksController < ApplicationController
     end
   end
 
-  api :DELETE, 'api/categories/:category_id/sub_categories/:sub_category_id/stages/:stage_id/tasks/:id'
-  param :category_id, Integer, desc: "id of category"
-  param :sub_category_id, Integer, desc: "id of sub_category"
-  param :stage_id, Integer, desc: "id of stage"
-  param :id, Integer, desc: "id of task"
+  api :DELETE, 'api/categories/:category_id/sub_categories/:sub_category_id/stages/:stage_id/tasks/:id', "Delete task"
+  param :category_id, Integer, desc: "id of category", required: true
+  param :sub_category_id, Integer, desc: "id of sub_category", required: true
+  param :stage_id, Integer, desc: "id of stage", required: true
+  param :id, Integer, desc: "id of task", required: true
 
   description <<-DESC
 
-    === Request headers
-      Authentication - string - required
+  === Request headers
+    Authentication - string - required
+      Example of Authentication header : "bearer"(must be in all Authentication header) + "eyJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjo3fQ.ChsmjEoBVIuCmQ2gjq3oqx5QBaCviHeiEWtGY1UOvAw"
 
     === Success response body
     {

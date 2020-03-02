@@ -11,8 +11,8 @@ module Users
       password_confirmation
     ].freeze
 
-    api :POST, '/users/sign_up'
-    param :user, Hash, required: true do
+    api :POST, '/users/sign_up', 'User registration'
+    param :user, Array, required: true do
       param :email, String, desc: 'Unique email ', required: true
       param :password, String, desc: 'Password', required: true
       param :password_confirmation, String, desc: 'Password Confirmation', required: true
