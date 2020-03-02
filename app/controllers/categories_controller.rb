@@ -5,7 +5,7 @@ class CategoriesController < ApplicationController
 
   === Request headers
     Authentication - string - required
-      Example of Authentication header : "bearer"(must be in all Authentication header) + "eyJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjo3fQ.ChsmjEoBVIuCmQ2gjq3oqx5QBaCviHeiEWtGY1UOvAw"
+      Example of Authentication header : "bearer"(must be in all Authentication headers) + "eyJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjo3fQ.ChsmjEoBVIuCmQ2gjq3oqx5QBaCviHeiEWtGY1UOvAw"
 
   === Params
     Params are absent
