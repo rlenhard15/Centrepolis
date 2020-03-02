@@ -7,7 +7,23 @@ module Users
 
     # before_action :configure_sign_in_params, only: [:create]
 
-    # POST /resource/sign_in
+    api :POST, '/users/sign_in'
+    param :user, Hash, required: true do
+      param :email, String, desc: 'Email of existing user', required: true
+      param :password, String, desc: 'Password', required: true
+    end
+    description <<-DESC
+      === Success response body
+      {
+        "auth_token": "Token",
+        "user": {
+          "id": 48,
+          "email": "user_example5@gmail.com",
+          "created_at": "2020-03-02T12:43:28.691Z",
+          "updated_at": "2020-03-02T12:43:28.691Z"
+        }
+      }
+    DESC
     def create
       user = User.find_for_database_authentication(
         email: params[:user][:email]
