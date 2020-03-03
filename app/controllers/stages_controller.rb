@@ -9,7 +9,7 @@ class StagesController < ApplicationController
 
   === Request headers
     Authentication - string - required
-      Example of Authentication header : "Beared TOKEN_FETCHED_FROM_SERVER_DURING_REGISTRATION"
+      Example of Authentication header : "bearer TOKEN_FETCHED_FROM_SERVER_DURING_REGISTRATION"
 
   === Success response body
   [
