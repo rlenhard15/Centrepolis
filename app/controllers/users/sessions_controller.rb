@@ -8,7 +8,7 @@ module Users
     # before_action :configure_sign_in_params, only: [:create]
 
     api :POST, '/users/sign_in', "User login"
-    param :user, Hash, required: true do
+    param :user, Object, required: true do
       param :email, String, desc: 'Email of existing user', required: true
       param :password, String, desc: 'Password', required: true
     end
