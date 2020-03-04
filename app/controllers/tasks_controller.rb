@@ -43,16 +43,16 @@ class TasksController < ApplicationController
     Authentication - string - required
       Example of Authentication header : "bearer TOKEN_FETCHED_FROM_SERVER_DURING_REGISTRATION"
 
-    === Success response body
-    {
-       "id": 37,
-       "title": "example task",
-       "stage_id": 8,
-       "created_at": "2020-03-02T16:30:43.044Z",
-       "updated_at": "2020-03-02T16:30:43.044Z",
-       "user_id": 48,
-       "status": "started"
-    }
+  === Success response body
+  {
+     "id": 37,
+     "title": "example task",
+     "stage_id": 8,
+     "created_at": "2020-03-02T16:30:43.044Z",
+     "updated_at": "2020-03-02T16:30:43.044Z",
+     "user_id": 48,
+     "status": "started"
+  }
 
   DESC
   def show
@@ -74,16 +74,16 @@ class TasksController < ApplicationController
     Authentication - string - required
       Example of Authentication header : "bearer TOKEN_FETCHED_FROM_SERVER_DURING_REGISTRATION"
 
-    === Success response body
-    {
-       "id": 37,
-       "title": "example task",
-       "stage_id": 8,
-       "created_at": "2020-03-02T16:30:43.044Z",
-       "updated_at": "2020-03-02T16:30:43.044Z",
-       "user_id": 48,
-       "status": "started"
-    }
+  === Success response body
+  {
+     "id": 37,
+     "title": "Example task",
+     "stage_id": 8,
+     "created_at": "2020-03-02T16:30:43.044Z",
+     "updated_at": "2020-03-02T16:30:43.044Z",
+     "user_id": 48,
+     "status": "started"
+  }
 
   DESC
 
@@ -112,16 +112,16 @@ class TasksController < ApplicationController
     Authentication - string - required
       Example of Authentication header : "bearer TOKEN_FETCHED_FROM_SERVER_DURING_REGISTRATION"
 
-    === Success response body
-    {
-       "id": 37,
-       "title": "Title of task",
-       "stage_id": 8,
-       "created_at": "2020-03-02T16:30:43.044Z",
-       "updated_at": "2020-03-02T16:30:43.044Z",
-       "user_id": 48,
-       "status": "completed"
-    }
+  === Success response body
+  {
+     "id": 37,
+     "title": "Title of task",
+     "stage_id": 8,
+     "created_at": "2020-03-02T16:30:43.044Z",
+     "updated_at": "2020-03-02T16:30:43.044Z",
+     "user_id": 48,
+     "status": "completed"
+  }
 
   DESC
   def update
@@ -132,7 +132,7 @@ class TasksController < ApplicationController
     end
   end
 
-  api :DELETE, 'api/categories/:category_id/sub_categories/:sub_category_id/stages/:stage_id/tasks/:id', "Delete task"
+  api :DELETE, 'api/categories/:category_id/sub_categories/:sub_category_id/stages/:stage_id/tasks/:id', 'Delete task'
   param :category_id, Integer, desc: "id of category", required: true
   param :sub_category_id, Integer, desc: "id of sub_category", required: true
   param :stage_id, Integer, desc: "id of stage", required: true
@@ -144,10 +144,11 @@ class TasksController < ApplicationController
     Authentication - string - required
       Example of Authentication header : "bearer TOKEN_FETCHED_FROM_SERVER_DURING_REGISTRATION"
 
-    === Success response body
-    {
-       "message": "Successfully destroyed"
-    }
+  === Success response body
+  {
+     "message": "Successfully destroyed"
+  }
+
   DESC
 
   def destroy

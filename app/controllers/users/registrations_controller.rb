@@ -12,7 +12,7 @@ module Users
     ].freeze
 
     api :POST, '/users/sign_up', 'User registration'
-    param :user, Object, required: true do
+    param :user, Hash, required: true do
       param :email, String, desc: 'Unique email ', required: true
       param :password, String, desc: 'Password', required: true
       param :password_confirmation, String, desc: 'Password Confirmation', required: true
@@ -23,7 +23,7 @@ module Users
         "auth_token": "Token",
         "user": {
           "id": 48,
-          "email": "user_example5@gmail.com",
+          "email": "user_example@gmail.com",
           "created_at": "2020-03-02T12:43:28.691Z",
           "updated_at": "2020-03-02T12:43:28.691Z"
         }

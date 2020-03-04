@@ -8,7 +8,7 @@ module Users
     # before_action :configure_sign_in_params, only: [:create]
 
     api :POST, '/users/sign_in', "User login"
-    param :user, Object, required: true do
+    param :user, Hash, required: true do
       param :email, String, desc: 'Email of existing user', required: true
       param :password, String, desc: 'Password', required: true
     end
@@ -18,7 +18,7 @@ module Users
         "auth_token": "Token",
         "user": {
           "id": 48,
-          "email": "user_example5@gmail.com",
+          "email": "user_example@gmail.com",
           "created_at": "2020-03-02T12:43:28.691Z",
           "updated_at": "2020-03-02T12:43:28.691Z"
         }
