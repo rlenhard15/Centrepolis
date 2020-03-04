@@ -18,7 +18,7 @@ module Devise
 
       def token_from_header
         strategy, token = request.headers['Authorization'].split(' ')
-        return nil if (strategy || '').downcase != 'bearer'
+        return nil if (strategy || '').downcase != 'Bearer'
         token
       end
 
