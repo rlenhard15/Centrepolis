@@ -2,7 +2,7 @@ require 'rails_helper'
 
 RSpec.describe Category, type: :model do
   describe "Create record" do
-    let!(:category) { Category.create(title: "Movies")}
+    let!(:category) { create(:category)}
 
     it "Created record" do
       expect(category.errors).to be_empty
