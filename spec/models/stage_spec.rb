@@ -9,6 +9,10 @@ RSpec.describe Stage, type: :model do
     it "Created record" do
       expect(stage.errors).to be_empty
     end
+
+    it "has one stage after create one" do
+      expect(Stage.count).to eq(1)
+    end
   end
 
   describe "Associations" do

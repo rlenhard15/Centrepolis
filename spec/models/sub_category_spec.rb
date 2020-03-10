@@ -8,6 +8,10 @@ RSpec.describe SubCategory, type: :model do
     it "Created record" do
       expect(sub_category.errors).to be_empty
     end
+
+    it "has one sub_category after create one" do
+      expect(SubCategory.count).to eq(1)
+    end
   end
 
   describe "Associations" do

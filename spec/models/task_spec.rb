@@ -11,6 +11,10 @@ RSpec.describe Task, type: :model do
     it "Created record" do
       expect(task.errors).to be_empty
     end
+
+    it "has one task after create one" do
+      expect(Task.count).to eq(1)
+    end
   end
 
   describe "Associations" do
