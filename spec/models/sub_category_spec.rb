@@ -2,8 +2,8 @@ require 'rails_helper'
 
 RSpec.describe SubCategory, type: :model do
   describe "Create record" do
-    let!(:category) {create(:category)}
-    let!(:sub_category) {create(:sub_category, category_id: category.id)}
+    let!(:category)     { create(:category) }
+    let!(:sub_category) { create(:sub_category, category_id: category.id) }
 
     it "has one sub_category after create one" do
       expect(SubCategory.count).to eq(1)

@@ -14,7 +14,7 @@ RSpec.describe Stage, type: :model do
       expect(stage.errors).to be_empty
     end
   end
-  
+
   describe "Associations" do
     it { should belong_to(:sub_category) }
     it { should have_many(:tasks) }
