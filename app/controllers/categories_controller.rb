@@ -1,6 +1,47 @@
 class CategoriesController < ApplicationController
 
-  # GET /categories
+  api :GET, 'api/categories', "List of categories with related records subcategories and stages"
+  description <<-DESC
+
+  === Request headers
+    Authentication - string - required
+      Example of Authentication header : "bearer TOKEN_FETCHED_FROM_SERVER_DURING_REGISTRATION"
+
+  === Params
+    Params are absent
+
+  === Success response body
+  [
+    {
+      "id": 3,
+      "title": "Title of category",
+      "created_at": "2020-02-20T15:32:46.379Z",
+      "updated_at": "2020-02-20T15:32:46.379Z",
+      "sub_categories": [
+        {
+           "id": 1,
+           "title": "Title of sub category",
+           "category_id": 3,
+           "created_at": "2020-02-20T15:40:49.793Z",
+           "updated_at": "2020-02-20T15:40:49.793Z",
+           "stages": [
+             {
+                "id": 5,
+                "title": "Title of stage",
+                "sub_category_id": 1,
+                "created_at": "2020-02-20T15:44:10.603Z",
+                "updated_at": "2020-02-20T15:44:10.603Z"
+             },
+             ...
+            ]
+        },
+        ...
+      ]
+    },
+    ...
+  ]
+  DESC
+
   def index
     @categories = Category.all
 

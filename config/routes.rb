@@ -1,4 +1,5 @@
 Rails.application.routes.draw do
+  apipie
   devise_for :users, skip: %i[sessions registrations passwords]
   devise_scope :user do
     post '/users/sign_in', to: 'users/sessions#create'
