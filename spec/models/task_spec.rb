@@ -12,7 +12,7 @@ RSpec.describe Task, type: :model do
       expect(Task.count).to eq(1)
     end
 
-    it "Created record" do
+    it "recieve errors if created record invalid" do
       expect(task.errors).to be_empty
     end
   end

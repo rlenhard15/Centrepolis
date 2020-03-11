@@ -9,7 +9,7 @@ RSpec.describe SubCategory, type: :model do
       expect(SubCategory.count).to eq(1)
     end
 
-    it "Created record" do
+    it "recieve errors if created record invalid" do
       expect(sub_category.errors).to be_empty
     end
   end

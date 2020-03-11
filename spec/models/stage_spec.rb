@@ -10,7 +10,7 @@ RSpec.describe Stage, type: :model do
       expect(Stage.count).to eq(1)
     end
 
-    it "Created record" do
+    it "recieve errors if created record invalid" do
       expect(stage.errors).to be_empty
     end
   end
