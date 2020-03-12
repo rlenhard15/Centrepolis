@@ -13,7 +13,7 @@ RSpec.describe User, type: :model do
       expect(user_1).to_not be_valid
     end
 
-    context 'when email is  unique' do
+    context 'when email is unique' do
       it "is not valid without uniq email" do
         expect(User.new(email: "example@gmail.com", password: "qwerty")).to_not be_valid
       end
@@ -21,10 +21,10 @@ RSpec.describe User, type: :model do
   end
 
   describe "Method 'payload'" do
-    let!(:user) {create(:user, email: "test_user@gmail.com")}
+    let!(:user)       {create(:user, email: "test_user@gmail.com")}
     let!(:auth_token) {JwtWrapper.encode(user_id: user.id)}
 
-    it "return info about user" do
+    it 'return user`s auth_token and email' do
       payload = user.payload
       payload[:user].delete('created_at')
       payload[:user].delete('updated_at')
@@ -43,7 +43,7 @@ RSpec.describe User, type: :model do
   describe "Method 'user_info'" do
     let!(:user) { create(:user, email: "test_user@gmail.com") }
 
-    it "return info about user" do
+    it "return email of user" do
       user_info = user.user_info
       user_info[:user].delete('created_at')
       user_info[:user].delete('updated_at')
