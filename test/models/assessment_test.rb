@@ -1,6 +1,6 @@
 require 'test_helper'
 
-class AccessmentTest < ActiveSupport::TestCase
+class AssessmentTest < ActiveSupport::TestCase
   # test "the truth" do
   #   assert true
   # end
