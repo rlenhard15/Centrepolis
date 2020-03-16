@@ -1,7 +1,7 @@
-class AccessmentsController < ApplicationController
-  before_action :set_accessment, only: :show
+class AssessmentsController < ApplicationController
+  before_action :set_assessment, only: :show
 
-  api :GET, 'api/accessments', "List of accessments names"
+  api :GET, 'api/assessments', "List of assessments names"
   description <<-DESC
 
   === Request headers
@@ -13,20 +13,20 @@ class AccessmentsController < ApplicationController
   === Success response body
   [
     {
-      "name": "First_accessment"
+      "name": "First_assessment"
     },
     ...
   ]
   DESC
 
   def index
-    @accessments = Accessment.all
+    @assessments = Assessment.all
 
-    render json: @accessments.to_json(only: :name)
+    render json: @assessments.to_json(only: :name)
   end
 
-  api :GET, 'api/accessments/:id', "Request for a certain accessment and related categories, sub_categories and stages"
-  param :id, Integer, desc: "id of accessment",  required: true
+  api :GET, 'api/assessments/:id', "Request for a certain assessment and related categories, sub_categories and stages"
+  param :id, Integer, desc: "id of assessment",  required: true
 
   description <<-DESC
 
@@ -37,7 +37,7 @@ class AccessmentsController < ApplicationController
   === Success response body
   {
     "id": 1,
-    "name": "First accessment",
+    "name": "First assessment",
     "created_at": "2020-03-14T20:13:27.006Z",
     "updated_at": "2020-03-14T20:13:27.006Z",
     "description": [
@@ -75,12 +75,12 @@ class AccessmentsController < ApplicationController
 
   DESC
   def show
-    render json: @accessment.as_json(methods: :description)
+    render json: @assessment.as_json(methods: :description)
   end
 
   private
 
   def set_accessment
-    @accessment = Accessment.find(params[:id])
+    @assessment = Assessment.find(params[:id])
   end
 end

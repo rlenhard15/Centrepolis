@@ -1,4 +1,4 @@
-class Accessment < ApplicationRecord
+class Assessment < ApplicationRecord
   has_many :categories
 
   def description
