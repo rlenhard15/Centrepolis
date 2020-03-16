@@ -1,4 +1,4 @@
 class Category < ApplicationRecord
-  belongs_to :accessment
+  belongs_to :assessment
   has_many :sub_categories
 end
