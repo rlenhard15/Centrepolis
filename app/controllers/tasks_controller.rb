@@ -2,7 +2,8 @@ class TasksController < ApplicationController
   before_action :set_stage
   before_action :set_task, only: [:show, :update, :destroy]
 
-  api :GET, 'api/categories/:category_id/sub_categories/:sub_category_id/stages/:stage_id/tasks', "Tasks list of a certain stage"
+  api :GET, 'api/assessments/:assessment_id/categories/:category_id/sub_categories/:sub_category_id/stages/:stage_id/tasks', "Tasks list of a certain stage"
+  param :assessment_id, Integer, desc: "id of assessment",  required: true
   param :category_id, Integer, desc: "id of category",  required: true
   param :sub_category_id, Integer, desc: "id of sub_category",  required: true
   param :stage_id, Integer, desc: "id of stage",  required: true
@@ -31,7 +32,8 @@ class TasksController < ApplicationController
     render json: @tasks
   end
 
-  api :GET, 'api/categories/:category_id/sub_categories/:sub_category_id/stages/:stage_id/tasks/:id', "Request for a certain task"
+  api :GET, 'api/assessments/:assessment_id/categories/:category_id/sub_categories/:sub_category_id/stages/:stage_id/tasks/:id', "Request for a certain task"
+  param :assessment_id, Integer, desc: "id of assessment",  required: true
   param :category_id, Integer, desc: "id of category",  required: true
   param :sub_category_id, Integer, desc: "id of sub_category",  required: true
   param :stage_id, Integer, desc: "id of stage",  required: true
@@ -59,7 +61,8 @@ class TasksController < ApplicationController
     render json: @task
   end
 
-  api :POST, 'api/categories/:category_id/sub_categories/:sub_category_id/stages/:stage_id/tasks', "Create new task for user"
+  api :POST, 'api/assessments/:assessment_id/categories/:category_id/sub_categories/:sub_category_id/stages/:stage_id/tasks', "Create new task for user"
+  param :assessment_id, Integer, desc: "id of assessment",  required: true
   param :category_id, Integer, desc: "id of category",  required: true
   param :sub_category_id, Integer, desc: "id of sub_category",  required: true
   param :stage_id, Integer, desc: "id of stage",  required: true
@@ -96,7 +99,8 @@ class TasksController < ApplicationController
     end
   end
 
-  api :PUT, 'api/categories/:category_id/sub_categories/:sub_category_id/stages/:stage_id/tasks/:id', "Update info of a certain task"
+  api :PUT, 'api/assessments/:assessment_id/categories/:category_id/sub_categories/:sub_category_id/stages/:stage_id/tasks/:id', "Update info of a certain task"
+  param :assessment_id, Integer, desc: "id of assessment",  required: true
   param :category_id, Integer, desc: "id of category",  required: true
   param :sub_category_id, Integer, desc: "id of sub_category",  required: true
   param :stage_id, Integer, desc: "id of stage",  required: true
@@ -132,7 +136,8 @@ class TasksController < ApplicationController
     end
   end
 
-  api :DELETE, 'api/categories/:category_id/sub_categories/:sub_category_id/stages/:stage_id/tasks/:id', 'Delete task'
+  api :DELETE, 'api/assessments/:assessment_id/categories/:category_id/sub_categories/:sub_category_id/stages/:stage_id/tasks/:id', 'Delete task'
+  param :assessment_id, Integer, desc: "id of assessment",  required: true
   param :category_id, Integer, desc: "id of category", required: true
   param :sub_category_id, Integer, desc: "id of sub_category", required: true
   param :stage_id, Integer, desc: "id of stage", required: true
