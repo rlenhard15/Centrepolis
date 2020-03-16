@@ -7,11 +7,12 @@ Rails.application.routes.draw do
   end
 
   scope :api, defaults: { format: :json } do
-    resources :assessments, only: %i[index show]
-    resources :categories, only: :index do
-      resources :sub_categories, only: :index do
-        resources :stages, only: :index do
-          resources :tasks
+    resources :assessments, only: %i[index show] do
+      resources :categories, only: :index do
+        resources :sub_categories, only: :index do
+          resources :stages, only: :index do
+            resources :tasks
+          end
         end
       end
     end
