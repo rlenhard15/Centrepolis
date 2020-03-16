@@ -32,7 +32,7 @@ class AssessmentsController < ApplicationController
 
   === Request headers
     Authentication - string - required
-      Example of Authentication header : "bearer TOKEN_FETCHED_FROM_SERVER_DURING_REGISTRATION"
+      Example of Authentication header : "Bearer TOKEN_FETCHED_FROM_SERVER_DURING_REGISTRATION"
 
   === Success response body
   {
@@ -75,7 +75,7 @@ class AssessmentsController < ApplicationController
   DESC
 
   def show
-    render json: @assessment.as_json(methods: :description)
+    render json: @assessment.as_json(methods: :description_with_child_models)
   end
 
   private
