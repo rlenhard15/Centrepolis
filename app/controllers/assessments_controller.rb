@@ -8,7 +8,7 @@ class AssessmentsController < ApplicationController
     Authentication - string - required
       Example of Authentication header : "bearer TOKEN_FETCHED_FROM_SERVER_DURING_REGISTRATION"
   === Params
-    Params are absent
+    Params are absentbefore_action :set_assessment, only: :show
 
   === Success response body
   [
@@ -72,15 +72,15 @@ class AssessmentsController < ApplicationController
     ]
   }
 
-
   DESC
+
   def show
     render json: @assessment.as_json(methods: :description)
   end
 
   private
 
-  def set_accessment
+  def set_assessment
     @assessment = Assessment.find(params[:id])
   end
 end
