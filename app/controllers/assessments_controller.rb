@@ -8,7 +8,7 @@ class AssessmentsController < ApplicationController
     Authentication - string - required
       Example of Authentication header : "bearer TOKEN_FETCHED_FROM_SERVER_DURING_REGISTRATION"
   === Params
-    Params are absentbefore_action :set_assessment, only: :show
+    Params are absent
 
   === Success response body
   [
