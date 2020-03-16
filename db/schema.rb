@@ -25,7 +25,7 @@ ActiveRecord::Schema.define(version: 2020_03_16_121230) do
     t.string "title"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
-    t.integer "accessment_id"
+    t.integer "assessment_id"
   end
 
   create_table "stages", force: :cascade do |t|
