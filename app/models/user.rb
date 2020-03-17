@@ -6,6 +6,11 @@ class User < ApplicationRecord
 
   has_many :tasks, dependent: :destroy
 
+  USER_TYPES = [
+    ADMIN = 'Admin',
+    CUSTOMER = 'Customer'
+  ].freeze
+
   def payload
     {
       auth_token: JwtWrapper.encode(user_id: id),
@@ -16,5 +21,13 @@ class User < ApplicationRecord
     {
       user: as_json
     }
+  end
+
+  def admin?
+    type == ADMIN
+  end
+
+  def customer?
+    type == CUSTOMER
   end
 end
