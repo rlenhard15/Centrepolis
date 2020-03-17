@@ -6,7 +6,7 @@ RSpec.describe User, type: :model do
   end
 
   describe "Method 'payload'" do
-    let!(:user)       { create(:user, email: "test_user@gmail.com") }
+    let!(:user)       { create(:user, email: "test_user@gmail.com", type: "Admin", created_by: 1 ) }
     let!(:auth_token) { JwtWrapper.encode(user_id: user.id) }
 
     it 'return user`s auth_token and email' do
@@ -18,15 +18,20 @@ RSpec.describe User, type: :model do
         { auth_token: auth_token,
           user: {
             "id"=> user.id,
-            "email"=> "test_user@gmail.com"
-          }
+            "email"=> "test_user@gmail.com",
+            "first_name"=> user.first_name,
+            "last_name"=> user.last_name,
+            "company_name"=> user.company_name,
+            "created_by"=> 1
+          },
+          :user_type => "Admin"
         }
       )
     end
   end
 
   describe "Method 'user_info'" do
-    let!(:user) { create(:user, email: "test_user@gmail.com") }
+    let!(:user) { create(:user, email: "test_user@gmail.com", type: "Admin", created_by: 1 ) }
 
     it "return email of user" do
       user_info = user.user_info
@@ -37,10 +42,41 @@ RSpec.describe User, type: :model do
         {
           user: {
             "id"=> user.id,
-            "email"=> "test_user@gmail.com"
-          }
+            "email"=> "test_user@gmail.com",
+            "first_name"=> user.first_name,
+            "last_name"=> user.last_name,
+            "company_name"=> user.company_name,
+            "created_by"=> 1
+          },
+          :user_type => "Admin"
         }
       )
+    end
+  end
+
+  describe "Method 'admin?'" do
+    let!(:admin) {create(:user, type:'Admin')}
+    let!(:customer) {create(:user, type:'Customer')}
+
+    it "return true if user's type 'Admin'" do
+      expect(admin.admin?).to eq(true)
+    end
+
+    it "return false if user's type isn't 'Admin'" do
+      expect(customer.admin?).to eq(false)
+    end
+  end
+
+  describe "Method 'customer?'" do
+    let!(:admin) {create(:user, type:'Admin')}
+    let!(:customer) {create(:user, type:'Customer')}
+
+    it "return true if user's type 'Customer'" do
+      expect(customer.customer?).to eq(true)
+    end
+
+    it "return false if user's type isn't 'Admin'" do
+      expect(admin.customer?).to eq(false)
     end
   end
 end
