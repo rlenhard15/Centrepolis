@@ -19,6 +19,7 @@ class User < ApplicationRecord
 
   def user_info
     {
+      user_type: type,
       user: as_json
     }
   end
