@@ -7,6 +7,7 @@ require File.expand_path('../config/environment', __dir__)
 # Prevent database truncation if the environment is production
 abort("The Rails environment is running in production mode!") if Rails.env.production?
 require 'rspec/rails'
+require 'support/model_helpers'
 
 require 'devise'
 # Add additional requires below this line. Rails is not loaded until this point!
@@ -58,6 +59,7 @@ RSpec.configure do |config|
   # https://relishapp.com/rspec/rspec-rails/docs
   config.infer_spec_type_from_file_location!
   config.include FactoryBot::Syntax::Methods
+  config.include ModelHelpers, :type => :model
   # Filter lines from Rails gems in backtraces.
   config.filter_rails_from_backtrace!
   # arbitrary gems may also be filtered via:
