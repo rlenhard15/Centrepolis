@@ -27,8 +27,4 @@ class User < ApplicationRecord
   def admin?
     type == ADMIN
   end
-
-  def customer?
-    type == CUSTOMER
-  end
 end

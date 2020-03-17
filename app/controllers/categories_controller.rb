@@ -1,14 +1,13 @@
 class CategoriesController < ApplicationController
+  before_action :set_assessment, only: :index
 
-  api :GET, 'api/categories', "List of categories with related records subcategories and stages"
+  api :GET, '/api/assessments/:assessment_id/categories', "List of categories with related records subcategories and stages"
+  param :assessment_id, Integer, desc: "id of assessment",  required: true
   description <<-DESC
 
   === Request headers
     Authentication - string - required
       Example of Authentication header : "Bearer TOKEN_FETCHED_FROM_SERVER_DURING_REGISTRATION"
-
-  === Params
-    Params are absent
 
   === Success response body
   [
@@ -43,8 +42,14 @@ class CategoriesController < ApplicationController
   DESC
 
   def index
-    @categories = Category.all
+    @categories = @assessment.categories
 
     render json: @categories.to_json(include: {sub_categories: {include: :stages}})
+  end
+
+  private
+
+  def set_assessment
+    @assessment = Assessment.find(params[:assessment_id])
   end
 end

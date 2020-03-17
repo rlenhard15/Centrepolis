@@ -1,7 +1,8 @@
 class StagesController < ApplicationController
   before_action :set_sub_category, only: :index
 
-  api :GET, 'api/categories/:category_id/sub_categories/:sub_category_id/stages', "List of stages with related records tasks"
+  api :GET, 'api/assessments/:assessment_id/categories/:category_id/sub_categories/:sub_category_id/stages', "List of stages with related records tasks"
+  param :assessment_id, Integer, desc: "id of assessment",  required: true
   param :category_id, Integer, desc: "id of category",  required: true
   param :sub_category_id, Integer, desc: "id of sub_category",  required: true
 
