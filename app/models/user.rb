@@ -23,4 +23,8 @@ class User < ApplicationRecord
       user: as_json
     }
   end
+
+  def admin?
+    type == ADMIN
+  end
 end
