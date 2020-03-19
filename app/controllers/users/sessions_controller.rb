@@ -16,11 +16,16 @@ module Users
       === Success response body
       {
         "auth_token": "Token",
+        "user_type": "Admin",
         "user": {
           "id": 48,
-          "email": "user_example@gmail.com",
+          "email": "admin_example@gmail.com",
           "created_at": "2020-03-02T12:43:28.691Z",
-          "updated_at": "2020-03-02T12:43:28.691Z"
+          "updated_at": "2020-03-02T12:43:28.691Z",
+          "first_name": "David",
+          "last_name": "Smith",
+          "company_name": null,
+          "created_by": null
         }
       }
     DESC

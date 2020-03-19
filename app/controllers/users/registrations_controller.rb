@@ -7,13 +7,17 @@ module Users
 
     KEYS_FOR_SIGNUP = %i[
       email
+      first_name
+      last_name
       password
       password_confirmation
     ].freeze
 
-    api :POST, '/users/sign_up', 'User registration'
+    api :POST, '/users/sign_up', 'Admin registration'
     param :user, Hash, required: true do
-      param :email, String, desc: 'Unique email ', required: true
+      param :email, String, desc: 'Unique email', required: true
+      param :first_name, String, desc: 'First name of user', required: true
+      param :last_name, String, desc: 'Last name of user', required: true
       param :password, String, desc: 'Password', required: true
       param :password_confirmation, String, desc: 'Password Confirmation', required: true
     end
@@ -21,21 +25,26 @@ module Users
       === Success response body
       {
         "auth_token": "Token",
+        "user_type": "Admin",
         "user": {
           "id": 48,
-          "email": "user_example@gmail.com",
+          "email": "admin_example@gmail.com",
           "created_at": "2020-03-02T12:43:28.691Z",
-          "updated_at": "2020-03-02T12:43:28.691Z"
+          "updated_at": "2020-03-02T12:43:28.691Z",
+          "first_name": "David",
+          "last_name": "Smith",
+          "company_name": null,
+          "created_by": null
         }
       }
     DESC
     def create
-      build_resource(sign_up_params)
-      if resource.save
-        render json: resource.payload
+      @admin = Admin.new(sign_up_params)
+      if @admin.save
+        render json: @admin.payload
       else
         render json:
-          bad_request_params(resource.errors), status: :bad_request
+          bad_request_params(@admin.errors), status: :bad_request
       end
     end
 
