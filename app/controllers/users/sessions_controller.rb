@@ -22,8 +22,8 @@ module Users
           "email": "admin_example@gmail.com",
           "created_at": "2020-03-02T12:43:28.691Z",
           "updated_at": "2020-03-02T12:43:28.691Z",
-          "first_name": null,
-          "last_name": null,
+          "first_name": "Devid",
+          "last_name": "Smith",
           "company_name": null,
           "created_by": null
         }
