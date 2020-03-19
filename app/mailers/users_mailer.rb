@@ -6,7 +6,7 @@ class UsersMailer < ApplicationMailer
   default from: -> { ENV['SENDER_EMAIL'] }
 
   def email_for_restore_password
-    @token = @customer.send(:set_reset_password_token)
+    @token = @customer.send(:reset_password)
     mail(to: @customer.email, subject: "You've been invited to Trello forms")
   end
 
