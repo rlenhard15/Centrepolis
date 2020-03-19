@@ -7,13 +7,17 @@ module Users
 
     KEYS_FOR_SIGNUP = %i[
       email
+      first_name
+      last_name
       password
       password_confirmation
     ].freeze
 
-    api :POST, '/users/admin_sign_up', 'Admin registration'
+    api :POST, '/users/sign_up', 'Admin registration'
     param :user, Hash, required: true do
-      param :email, String, desc: 'Unique email ', required: true
+      param :email, String, desc: 'Unique email', required: true
+      param :first_name, String, desc: 'First name of user', required: true
+      param :last_name, String, desc: 'Last name of user', required: true
       param :password, String, desc: 'Password', required: true
       param :password_confirmation, String, desc: 'Password Confirmation', required: true
     end
@@ -27,8 +31,8 @@ module Users
           "email": "admin_example@gmail.com",
           "created_at": "2020-03-02T12:43:28.691Z",
           "updated_at": "2020-03-02T12:43:28.691Z",
-          "first_name": null,
-          "last_name": null,
+          "first_name": "David",
+          "last_name": "Smith",
           "company_name": null,
           "created_by": null
         }

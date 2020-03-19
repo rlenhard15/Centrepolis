@@ -3,7 +3,7 @@ Rails.application.routes.draw do
   devise_for :users, skip: %i[sessions registrations passwords]
   devise_scope :user do
     post '/users/sign_in', to: 'users/sessions#create'
-    post '/users/admin_sign_up', to: 'users/registrations#create'
+    post '/users/sign_up', to: 'users/registrations#create'
   end
 
   post '/admins/create_customer', to: 'admins/users#create'
