@@ -26,6 +26,7 @@ gem 'bootsnap', '>= 1.4.2', require: false
 # gem 'rack-cors'
 
 gem 'jwt'
+gem 'pundit'
 gem 'apipie-rails'
 
 group :development, :test do

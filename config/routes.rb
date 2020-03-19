@@ -6,6 +6,8 @@ Rails.application.routes.draw do
     post '/users/admin_sign_up', to: 'users/registrations#create'
   end
 
+  post '/admins/create_customer', to: 'admins/users#create'
+
   scope :api, defaults: { format: :json } do
     resources :assessments, only: %i[index show] do
       resources :categories, only: :index do
