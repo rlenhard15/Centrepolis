@@ -22,11 +22,12 @@ module Admins
     DESC
 
     def create
-      @customer = Customer.new( user_params.merge({
-                                  password: customer_random_password,
-                                  created_by: current_user.id
-                                })
-                              )
+      @customer = Customer.new(
+        user_params.merge({
+          password: customer_random_password,
+          created_by: current_user.id
+        })
+      )
       authorize @customer
 
       if @customer.save
