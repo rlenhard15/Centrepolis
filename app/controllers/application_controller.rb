@@ -7,8 +7,7 @@ class ApplicationController < ActionController::API
     render json:
       {
         notice: 'You do not have permission to perform this action'
-      },
-      status: 403
+      }, status: 403
   end
-  
+
 end

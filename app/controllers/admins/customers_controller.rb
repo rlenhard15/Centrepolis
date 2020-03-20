@@ -1,5 +1,5 @@
 module Admins
-  class UsersController < ApplicationController
+  class CustomersController < ApplicationController
 
     api :POST, '/admins/create_customer', 'Admin create account for customer and invite his on email'
     param :user, Hash, required: true do
@@ -23,16 +23,13 @@ module Admins
 
     def create
       @customer = Customer.new( user_params.merge({
-                                password: customer_random_password,
-                                created_by: current_user.id
+                                  password: customer_random_password,
+                                  created_by: current_user.id
                                 })
                               )
-      authorize @customer, policy_class: UserPolicy
+      authorize @customer
 
       if @customer.save
-        UsersMailer.with(
-          customer: @customer
-        ).email_for_restore_password.deliver
         render json: @customer, status: :created
       else
         render json: @customer.errors, status: :unprocessable_entity
@@ -42,12 +39,11 @@ module Admins
     private
 
     def user_params
-      params.require(:user).permit(:email)
+      params.require(:customer).permit(:email)
     end
 
     def customer_random_password
-      password_length = 8
-      password = Devise.friendly_token.first(password_length)
+      password = Devise.friendly_token.first(8)
     end
   end
 end
