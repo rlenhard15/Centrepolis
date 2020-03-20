@@ -7,6 +7,9 @@ module Users
     param :reset_password_token, String, desc: 'Reset password token fetched from link in mail', required: true
     param :password, String, desc: 'New password', required: true
     param :password_confirmation, String, desc: 'New password confirmation', required: true
+    param :company_name, String, desc: 'Сustomer company name', required: true
+    param :first_name, String, desc: 'First name of customer', required: true
+    param :last_name, String, desc: 'Last name of customer', required: true
 
     description <<-DESC
       === Success response body
@@ -19,9 +22,9 @@ module Users
           "created_by": 1,
           "created_at": "2020-03-20T10:45:02.522Z",
           "updated_at": "2020-03-20T10:46:25.226Z",
-          "first_name": null,
-          "last_name": null,
-          "company_name": null
+          "first_name": "Xu",
+          "last_name": "Xian",
+          "company_name": "MSI"
         }
       }
     DESC
@@ -29,7 +32,7 @@ module Users
     def update
       self.resource = resource_class.reset_password_by_token(update_password_params)
 
-      if resource.errors.empty?
+      if resource.errors.empty? && resource.update(update_customer_params)
         resource.unlock_access! if unlockable?(resource)
         if Devise.sign_in_after_reset_password
           resource.after_database_authentication
@@ -57,7 +60,20 @@ module Users
     end
 
     def update_password_params
-      params.permit(:reset_password_token, :password, :password_confirmation)
+      params.permit( :reset_password_token,
+                     :password,
+                     :password_confirmation,
+                     :company_name,
+                     :first_name,
+                     :last_name
+                   )
+    end
+
+    def update_customer_params
+      params.permit( :company_name,
+                     :first_name,
+                     :last_name
+                   )
     end
 
   end
