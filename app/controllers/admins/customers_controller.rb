@@ -4,6 +4,7 @@ module Admins
     api :POST, 'api/customers', 'Admin create account for customer and invite his on email'
     param :user, Hash, required: true do
       param :email, String, desc: 'Unique email for customer', required: true
+      param :company_name, String, desc: 'Unique company name for customer', required: true
     end
     description <<-DESC
       === Success response body
@@ -15,7 +16,7 @@ module Admins
           "updated_at": "2020-03-02T12:43:28.691Z",
           "first_name": null,
           "last_name": null,
-          "company_name": null,
+          "company_name": "MSI",
           "created_by": 1
         }
       }
@@ -40,7 +41,7 @@ module Admins
     private
 
     def user_params
-      params.require(:customer).permit(:email)
+      params.require(:customer).permit(:email, :company_name)
     end
 
     def customer_random_password

@@ -7,7 +7,6 @@ module Users
     param :reset_password_token, String, desc: 'Reset password token fetched from link in mail', required: true
     param :password, String, desc: 'New password', required: true
     param :password_confirmation, String, desc: 'New password confirmation', required: true
-    param :company_name, String, desc: 'Сustomer company name', required: true
     param :first_name, String, desc: 'First name of customer', required: true
     param :last_name, String, desc: 'Last name of customer', required: true
 
@@ -70,8 +69,7 @@ module Users
     end
 
     def update_customer_params
-      params.permit( :company_name,
-                     :first_name,
+      params.permit( :first_name,
                      :last_name
                    )
     end
