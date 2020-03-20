@@ -4,6 +4,7 @@ Rails.application.routes.draw do
   devise_scope :user do
     post '/users/sign_in', to: 'users/sessions#create'
     post '/users/sign_up', to: 'users/registrations#create'
+    put '/users/password', to: 'users/passwords#update'
   end
 
   post '/admins/create_customer', to: 'admins/users#create'
