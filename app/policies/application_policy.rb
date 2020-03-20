@@ -7,23 +7,27 @@ class ApplicationPolicy
   end
 
   def index?
-    false
+    admin?
   end
 
   def show?
-    false
+    admin?
   end
 
   def create?
-    false
+    admin?
   end
 
   def update?
-    false
+    admin?
   end
 
   def destroy?
-    false
+    admin?
+  end
+
+  def admin?
+    user.admin?
   end
 
   class Scope
@@ -35,7 +39,11 @@ class ApplicationPolicy
     end
 
     def resolve
-      scope.all
+      return scope.none unless user
+
+      if user.admin?
+        scope.all
+      end
     end
   end
 end

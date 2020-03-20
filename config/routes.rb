@@ -7,9 +7,8 @@ Rails.application.routes.draw do
     put '/users/password', to: 'users/passwords#update'
   end
 
-  post '/admins/create_customer', to: 'admins/customers#create'
-
   scope :api, defaults: { format: :json } do
+    resources :customers, only: :create, module: 'admins'
     resources :assessments, only: %i[index show] do
       resources :categories, only: :index do
         resources :sub_categories, only: :index do

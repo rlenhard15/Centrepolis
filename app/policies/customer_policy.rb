@@ -11,14 +11,10 @@ class CustomerPolicy < ApplicationPolicy
       return scope.none unless user
 
       if user.admin?
-        scope.all
+        scope.user.customers
       else
         scope.none
       end
     end
-  end
-
-  def create?
-    user.admin?
   end
 end

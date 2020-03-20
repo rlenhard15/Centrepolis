@@ -1,7 +1,7 @@
 module Admins
   class CustomersController < ApplicationController
 
-    api :POST, '/admins/create_customer', 'Admin create account for customer and invite his on email'
+    api :POST, 'api/customers', 'Admin create account for customer and invite his on email'
     param :user, Hash, required: true do
       param :email, String, desc: 'Unique email for customer', required: true
     end
