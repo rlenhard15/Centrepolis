@@ -59,20 +59,18 @@ module Users
     end
 
     def update_password_params
-      params.permit( :reset_password_token,
+      params.permit(
+                     :reset_password_token,
                      :password,
-                     :password_confirmation,
-                     :company_name,
-                     :first_name,
-                     :last_name
+                     :password_confirmation
                    )
     end
 
     def update_customer_params
-      params.permit( :first_name,
+      params.permit(
+                     :first_name,
                      :last_name
                    )
     end
-
   end
 end

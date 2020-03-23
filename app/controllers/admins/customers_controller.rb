@@ -45,7 +45,7 @@ module Admins
     end
 
     def customer_random_password
-      password = Devise.friendly_token.first(8)
+      Devise.friendly_token.first(8)
     end
   end
 end
