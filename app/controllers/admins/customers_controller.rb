@@ -1,6 +1,12 @@
 module Admins
   class CustomersController < ApplicationController
 
+    def index
+      @customers = policy_scope(Customer)
+
+      render json: @customers
+    end
+
     api :POST, 'api/customers', 'Admin create account for customer and invite his on email'
     param :user, Hash, required: true do
       param :email, String, desc: 'Unique email for customer', required: true
