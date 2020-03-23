@@ -1,6 +1,32 @@
 module Admins
   class CustomersController < ApplicationController
 
+    api :GET, 'api/customers', "List of customers for current admin"
+    description <<-DESC
+
+    === Request headers
+      Authentication - string - required
+        Example of Authentication header : "Bearer TOKEN_FETCHED_FROM_SERVER_DURING_REGISTRATION"
+
+    === Params
+      Params are absent
+
+    === Success response body
+    [
+      {
+        "id": 289,
+        "email": "example_customer@gmail.com",
+        "created_at": "2020-03-23T11:40:16.388Z",
+        "updated_at": "2020-03-23T11:40:56.214Z",
+        "first_name": "Xu",
+        "last_name": "Xian",
+        "company_name": "MSI",
+        "created_by": 1
+      },
+      ...
+    ]
+
+    DESC
     def index
       @customers = policy_scope(Customer)
 
