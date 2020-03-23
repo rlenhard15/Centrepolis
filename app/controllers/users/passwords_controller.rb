@@ -67,10 +67,7 @@ module Users
     end
 
     def update_customer_params
-      params.permit(
-                     :first_name,
-                     :last_name
-                   )
+      params.permit(:first_name, :last_name)
     end
   end
 end

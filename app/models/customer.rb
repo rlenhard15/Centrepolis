@@ -7,7 +7,7 @@ class Customer < User
 
   def send_email
     UsersMailer.with(
-      customer: Customer.last
+      customer: self
     ).email_for_restore_password.deliver_later
   end
 end

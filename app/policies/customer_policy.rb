@@ -11,7 +11,7 @@ class CustomerPolicy < ApplicationPolicy
       return scope.none unless user
 
       if user.admin?
-        scope.user.customers
+        scope.where(created_by: user.id)
       else
         scope.none
       end
