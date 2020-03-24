@@ -4,9 +4,11 @@ Rails.application.routes.draw do
   devise_scope :user do
     post '/users/sign_in', to: 'users/sessions#create'
     post '/users/sign_up', to: 'users/registrations#create'
+    put '/users/password', to: 'users/passwords#update'
   end
 
   scope :api, defaults: { format: :json } do
+    resources :customers, only: :create, module: 'admins'
     resources :assessments, only: %i[index show] do
       resources :categories, only: :index do
         resources :sub_categories, only: :index do
