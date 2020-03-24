@@ -1,7 +1,7 @@
 module Admins
   class CustomersController < ApplicationController
 
-    api :GET, 'api/customers', "List of customers for current admin"
+    api :GET, 'api/customers', " Only admin can view the list of customers, which he registered"
     description <<-DESC
 
     === Request headers
@@ -14,7 +14,7 @@ module Admins
     === Success response body
     [
       {
-        "id": 289,
+        "id": 49,
         "email": "example_customer@gmail.com",
         "created_at": "2020-03-23T11:40:16.388Z",
         "updated_at": "2020-03-23T11:40:56.214Z",
@@ -28,17 +28,23 @@ module Admins
 
     DESC
     def index
-      @customers = policy_scope(Customer)
+      authorize current_user, policy_class: CustomerPolicy
 
-      render json: @customers
+      render json: policy_scope(Customer)
     end
 
-    api :POST, 'api/customers', 'Admin create account for customer and invite his on email'
+    api :POST, 'api/customers', 'Only admin can create account for customer and invite his on email'
     param :user, Hash, required: true do
       param :email, String, desc: 'Unique email for customer', required: true
       param :company_name, String, desc: 'Unique company name for customer', required: true
     end
+
     description <<-DESC
+
+      === Request headers
+        Authentication - string - required
+          Example of Authentication header : "Bearer TOKEN_FETCHED_FROM_SERVER_DURING_REGISTRATION"
+
       === Success response body
       {
         "user": {
