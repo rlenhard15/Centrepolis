@@ -1,12 +1,13 @@
 module Admins
   class CustomersController < ApplicationController
 
-    api :GET, 'api/customers', " Only admin can view the list of customers, which he registered"
+    api :GET, 'api/customers', "Only admin can see list of customers"
     description <<-DESC
 
     === Request headers
-      Authentication - string - required
-        Example of Authentication header : "Bearer TOKEN_FETCHED_FROM_SERVER_DURING_REGISTRATION"
+      Only admin can perform this action
+        Authentication - string - required
+          Example of Authentication header : "Bearer TOKEN_FETCHED_FROM_SERVER_DURING_REGISTRATION"
 
     === Params
       Params are absent
@@ -42,8 +43,9 @@ module Admins
     description <<-DESC
 
       === Request headers
-        Authentication - string - required
-          Example of Authentication header : "Bearer TOKEN_FETCHED_FROM_SERVER_DURING_REGISTRATION"
+        Only admin can perform this action
+          Authentication - string - required
+            Example of Authentication header : "Bearer TOKEN_FETCHED_FROM_SERVER_DURING_REGISTRATION"
 
       === Success response body
       {
