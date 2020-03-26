@@ -1,4 +1,5 @@
 class Customer < User
+  has_many :sub_category_progresses, dependent: :destroy
   belongs_to :admin, foreign_key: "created_by"
 
   after_create :send_email
