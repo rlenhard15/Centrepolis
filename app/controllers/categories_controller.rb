@@ -1,8 +1,8 @@
 class CategoriesController < ApplicationController
-  before_action :set_assessment
-  before_action :set_category, :selected_customer, only: :show
+  before_action :set_assessment, :set_customer
+  before_action :set_category, :status_sub_categories_for_customer, only: :show
 
-  api :GET, '/api/assessments/:assessment_id/categories', "List of categories with related records subcategories and stages and for customer subcategories with current status"
+  api :GET, '/api/assessments/:assessment_id/categories', "List of categories"
   param :assessment_id, Integer, desc: "id of assessment",  required: true
   description <<-DESC
 
@@ -15,56 +15,10 @@ class CategoriesController < ApplicationController
   [
     {
       "id": 3,
-      "title": "Title of category",
-      "created_at": "2020-02-20T15:32:46.379Z",
-      "updated_at": "2020-02-20T15:32:46.379Z",
-      "sub_categories": [
-        {
-           "id": 1,
-           "title": "Title of sub category",
-           "category_id": 3,
-           "created_at": "2020-02-20T15:40:49.793Z",
-           "updated_at": "2020-02-20T15:40:49.793Z",
-           "stages": [
-             {
-                "id": 5,
-                "title": "Title of stage",
-                "sub_category_id": 1,
-                "created_at": "2020-02-20T15:44:10.603Z",
-                "updated_at": "2020-02-20T15:44:10.603Z"
-             },
-             ...
-            ]
-        },
-        ...
-      ]
-    },
-    ...
-  ]
-  === Success response body for customer
-  [
-    {
-      "id": 3,
-      "title": "Title of category",
+      "title": "Category",
       "created_at": "2020-02-20T15:32:46.379Z",
       "updated_at": "2020-03-16T14:12:47.759Z",
-      "assessment_id": 1,
-      "sub_categories": [
-        {
-          "id": 2,
-          "title": "Title of sub category",
-          "category_id": 3,
-          "created_at": "2020-02-20T15:41:13.107Z",
-          "updated_at": "2020-02-20T15:41:13.107Z",
-          "sub_category_status": [
-            {
-              "current_stage": 3,
-              "total_stages": 4
-            }
-          ]
-        },
-        ...
-      ]
+      "assessment_id": 1
     },
     ...
   ]
@@ -75,8 +29,9 @@ class CategoriesController < ApplicationController
     render json: policy_scope(Category).current_assessment(@assessment.id)
   end
 
-  api :GET, 'api/assessments/:id', "Request for a certain assessment and related categories, sub_categories and stages"
-  param :id, Integer, desc: "id of assessment",  required: true
+  api :GET, '/api/assessments/:assessment_id/categories/:id', "Request for a certain category with sub_categories, stages and current stages"
+  param :id, Integer, desc: "id of category", required: true
+  param :assessment_id, Integer, desc: "id of assessment", required: true
 
   description <<-DESC
 
@@ -85,43 +40,61 @@ class CategoriesController < ApplicationController
       Example of Authentication header : "Bearer TOKEN_FETCHED_FROM_SERVER_DURING_REGISTRATION"
 
   === Success response body
-  [
-    [
-        {
-            "sub_category": {
-                "id": 1,
-                "title": "science fiction",
-                "category_id": 3,
-                "created_at": "2020-02-20T15:40:49.793Z",
-                "updated_at": "2020-02-20T15:40:49.793Z"
-            },
-            "stages": [
-                {
-                    "id": 5,
-                    "title": "first",
-                    "created_at": "2020-02-20T15:44:10.603Z",
-                    "updated_at": "2020-03-25T15:00:03.466Z",
-                    "position": 1,
-                    "sub_category_id": 1
-                },
-                ...
-            ],
-            "current_stage_id": 7
-        }
+  {
+    "id": 3,
+    "title": "Category",
+    "created_at": "2020-02-20T15:32:46.379Z",
+    "updated_at": "2020-03-16T14:12:47.759Z",
+    "assessment_id": 1,
+    "desc_info_for_category": [
+      {
+        "id": 1,
+        "title": "SubCategory",
+        "category_id": 3,
+        "created_at": "2020-02-20T15:40:49.793Z",
+        "updated_at": "2020-02-20T15:40:49.793Z",
+        "stages": [
+          {
+            "id": 5,
+            "title": "Stage",
+            "created_at": "2020-02-20T15:44:10.603Z",
+            "updated_at": "2020-03-25T15:00:03.466Z",
+            "position": 1,
+            "sub_category_id": 1
+          },
+          ...
+        ]
+      },
+      ...
     ],
-    ...
-  ]
+    "current_stages": [
+      {
+        "id": 18,
+        "customer_id": 324,
+        "sub_category_id": 1,
+        "current_stage_id": 7,
+        "created_at": "2020-03-26T16:33:34.308Z",
+        "updated_at": "2020-03-27T10:18:01.872Z"
+      },
+      ...
+    ]
+  }
 
   DESC
 
   def show
-    render json: @category.sub_categories_status(@customer_id)
+    render json: @category.as_json(methods: :desc_info_for_category).merge({current_stages: @progresses})
   end
 
   private
 
-  def selected_customer
+  def set_customer
     raise Pundit::NotAuthorizedError unless @customer_id = current_user.admin? ? params[:id_customer] : current_user.id
+  end
+
+  def status_sub_categories_for_customer
+    @customer = User.find(@customer_id)
+    @progresses = @customer.sub_category_progresses
   end
 
   def set_category
