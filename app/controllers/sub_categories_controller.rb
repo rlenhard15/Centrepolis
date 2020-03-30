@@ -32,6 +32,10 @@ class SubCategoriesController < ApplicationController
 
   private
 
+  def authorize_user!
+    authorize SubCategory
+  end
+
   def set_sub_category_progress
     @sub_category_progress = current_user.sub_category_progresses.where(
       sub_category_id: params[:id]
