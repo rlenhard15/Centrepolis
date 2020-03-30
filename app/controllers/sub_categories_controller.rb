@@ -1,4 +1,8 @@
 class SubCategoriesController < ApplicationController
+
+  before_action :authorize_user!,
+                :set_sub_category_progress
+
   api :POST, 'api/assessments/:assessment_id/categories/:category_id/sub_categories/:id/update_progress?current_stage_id=:current_stage_id', 'Only customer can update progress'
 
   param :assessment_id, Integer, desc: 'ID of current assessment', required: true
@@ -19,10 +23,6 @@ class SubCategoriesController < ApplicationController
     }
   DESC
   def update_progress
-    authorize SubCategoryProgress.new, policy_class: SubCategoryPolicy
-
-    set_sub_category_progress
-
     if @sub_category_progress.update(current_stage_id: params[:current_stage_id])
       render json: { body: 'Progress updates successfully' }, status: 200
     else
@@ -35,10 +35,7 @@ class SubCategoriesController < ApplicationController
   def set_sub_category_progress
     @sub_category_progress = current_user.sub_category_progresses.where(
       sub_category_id: params[:id]
-    ).first || current_user.sub_category_progresses.create(
-      sub_category_id: params[:id],
-      current_stage_id: params[:current_stage_id]
-    )
+    ).first_or_create
   end
 
 end
