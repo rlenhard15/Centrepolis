@@ -30,10 +30,10 @@ ActiveRecord::Schema.define(version: 2020_03_26_160353) do
 
   create_table "stages", force: :cascade do |t|
     t.string "title"
+    t.integer "sub_category_id"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
     t.integer "position"
-    t.integer "sub_category_id"
   end
 
   create_table "sub_categories", force: :cascade do |t|
