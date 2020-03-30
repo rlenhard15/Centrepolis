@@ -32,6 +32,7 @@ class CategoriesController < ApplicationController
   api :GET, '/api/assessments/:assessment_id/categories/:id', "Request for a certain category with sub_categories, stages and current stages"
   param :id, Integer, desc: "id of category", required: true
   param :assessment_id, Integer, desc: "id of assessment", required: true
+  param :id_customer, Integer, desc: "id of customer if current_user is admin", required: true
 
   description <<-DESC
 
