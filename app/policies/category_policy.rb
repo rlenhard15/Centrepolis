@@ -13,7 +13,7 @@ class CategoryPolicy < ApplicationPolicy
       if user.admin?
         scope.all
       elsif user.customer?
-        scope.eager_load(sub_categories: :sub_category_progresses).where("sub_category_progresses.customer_id = ?", user.id)
+        scope.all
       end
     end
   end
