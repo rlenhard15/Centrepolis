@@ -32,7 +32,7 @@ class CategoriesController < ApplicationController
   api :GET, '/api/assessments/:assessment_id/categories/:id', "Request for a certain category with sub_categories, stages and current stages"
   param :id, Integer, desc: "id of category", required: true
   param :assessment_id, Integer, desc: "id of assessment", required: true
-  param :id_customer, Integer, desc: "id of customer if current_user is admin", required: true
+  param :id_customer, Integer, desc: "id of customer, required if current_user is admin", required: true
 
   description <<-DESC
 
@@ -94,8 +94,7 @@ class CategoriesController < ApplicationController
   end
 
   def status_sub_categories_for_customer
-    @customer = User.find(@customer_id)
-    @progresses = @customer.sub_category_progresses
+    @progresses = User.find(@customer_id).sub_category_progresses
   end
 
   def set_category
