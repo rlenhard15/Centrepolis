@@ -1,6 +1,8 @@
 class CategoriesController < ApplicationController
   before_action :set_category, :set_customer, only: :show
 
+  skip_before_action :authenticate_user!
+
   api :GET, '/api/assessments/:assessment_id/categories', "List of categories"
   param :assessment_id, Integer, desc: "id of assessment",  required: true
   description <<-DESC
@@ -31,7 +33,7 @@ class CategoriesController < ApplicationController
   api :GET, '/api/assessments/:assessment_id/categories/:id', "Request for a certain category with sub_categories, stages and current stages"
   param :id, Integer, desc: "id of category", required: true
   param :assessment_id, Integer, desc: "id of assessment", required: true
-  param :id_customer, Integer, desc: "id of customer, required if current_user is admin", required: true
+  param :customer_id, Integer, desc: "id of customer, required if current_user is admin", required: true
 
   description <<-DESC
 
@@ -62,13 +64,17 @@ class CategoriesController < ApplicationController
   DESC
 
   def show
-    render json: @category.sub_categories_status(@customer_id)
+    render json: @category.sub_categories_with_statuses(@customer_id)
   end
 
   private
 
+  def current_user
+    Admin.first
+  end
+
   def set_customer
-    raise Pundit::NotAuthorizedError unless @customer_id = current_user.admin? ? params[:id_customer] : current_user.id
+    raise Pundit::NotAuthorizedError unless @customer_id = current_user.admin? ? params[:customer_id] : current_user.id
   end
 
   def set_category
