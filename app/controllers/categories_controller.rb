@@ -1,5 +1,4 @@
 class CategoriesController < ApplicationController
-  before_action :set_assessment
   before_action :set_category, :set_customer, only: :show
 
   api :GET, '/api/assessments/:assessment_id/categories', "List of categories"
@@ -26,7 +25,7 @@ class CategoriesController < ApplicationController
   DESC
 
   def index
-    render json: policy_scope(Category).for_assessment(@assessment.id)
+    render json: policy_scope(Category).for_assessment(params[:assessment_id])
   end
 
   api :GET, '/api/assessments/:assessment_id/categories/:id', "Request for a certain category with sub_categories, stages and current stages"
@@ -43,25 +42,17 @@ class CategoriesController < ApplicationController
   === Success response body
   [
     {
-      "sub_category": {
-        "id": 1,
-        "title": "SubCategory",
-        "category_id": 3,
-        "created_at": "2020-02-20T15:40:49.793Z",
-        "updated_at": "2020-02-20T15:40:49.793Z"
-      },
+      "title_sub_category": "First sub_category",
       "stages": [
         {
           "id": 5,
-          "title": "Stage",
-          "created_at": "2020-02-20T15:44:10.603Z",
-          "updated_at": "2020-03-25T15:00:03.466Z",
-          "position": 1,
-          "sub_category_id": 1
+          "title": "First stage"
         },
-        ...
-      ],
-      "current_stage_id": 5
+        ...,
+        {
+          "current_stage_id": 5
+        }
+      ]
     },
     ...
   ]
@@ -79,10 +70,6 @@ class CategoriesController < ApplicationController
   end
 
   def set_category
-    @category = policy_scope(Category).for_assessment(@assessment.id).find(params[:id])
-  end
-
-  def set_assessment
-    @assessment = Assessment.find(params[:assessment_id])
+    @category = policy_scope(Category).for_assessment(params[:assessment_id]).find(params[:id])
   end
 end
