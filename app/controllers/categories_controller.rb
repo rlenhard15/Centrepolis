@@ -41,45 +41,30 @@ class CategoriesController < ApplicationController
       Example of Authentication header : "Bearer TOKEN_FETCHED_FROM_SERVER_DURING_REGISTRATION"
 
   === Success response body
-  {
-    "id": 3,
-    "title": "Category",
-    "created_at": "2020-02-20T15:32:46.379Z",
-    "updated_at": "2020-03-16T14:12:47.759Z",
-    "assessment_id": 1,
-    "desc_info_for_category": [
-      {
+  [
+    {
+      "sub_category": {
         "id": 1,
         "title": "SubCategory",
         "category_id": 3,
         "created_at": "2020-02-20T15:40:49.793Z",
-        "updated_at": "2020-02-20T15:40:49.793Z",
-        "stages": [
-          {
-            "id": 5,
-            "title": "Stage",
-            "created_at": "2020-02-20T15:44:10.603Z",
-            "updated_at": "2020-03-25T15:00:03.466Z",
-            "position": 1,
-            "sub_category_id": 1
-          },
-          ...
-        ]
+        "updated_at": "2020-02-20T15:40:49.793Z"
       },
-      ...
-    ],
-    "current_stages": [
-      {
-        "id": 18,
-        "customer_id": 324,
-        "sub_category_id": 1,
-        "current_stage_id": 7,
-        "created_at": "2020-03-26T16:33:34.308Z",
-        "updated_at": "2020-03-27T10:18:01.872Z"
-      },
-      ...
-    ]
-  }
+      "stages": [
+        {
+          "id": 5,
+          "title": "Stage",
+          "created_at": "2020-02-20T15:44:10.603Z",
+          "updated_at": "2020-03-25T15:00:03.466Z",
+          "position": 1,
+          "sub_category_id": 1
+        },
+        ...
+      ],
+      "current_stage_id": 5
+    },
+    ...
+  ]
 
   DESC
 
