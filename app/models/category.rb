@@ -2,11 +2,19 @@ class Category < ApplicationRecord
   belongs_to :assessment
   has_many :sub_categories, dependent: :destroy
 
-  scope :current_assessment, ->(assessment_id) {
+  scope :for_assessment, ->(assessment_id) {
     where(assessment_id: assessment_id)
   }
 
-  def desc_info_for_category
-    sub_categories.as_json({ include: :stages })
+  def sub_categories_status(user_id)
+    sub_categories.map do |sub_category|
+      sub_category.sub_category_progresses.where("sub_category_progresses.customer_id = ?", user_id).map do |progress|
+        {
+          sub_category: sub_category,
+          stages: sub_category.stages,
+          current_stage_id: progress.current_stage_id
+        }
+      end.inject
+    end
   end
 end

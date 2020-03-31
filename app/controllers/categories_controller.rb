@@ -1,6 +1,6 @@
 class CategoriesController < ApplicationController
-  before_action :set_assessment, :set_customer
-  before_action :set_category, :status_sub_categories_for_customer, only: :show
+  before_action :set_assessment
+  before_action :set_category, :set_customer, only: :show
 
   api :GET, '/api/assessments/:assessment_id/categories', "List of categories"
   param :assessment_id, Integer, desc: "id of assessment",  required: true
@@ -26,7 +26,7 @@ class CategoriesController < ApplicationController
   DESC
 
   def index
-    render json: policy_scope(Category).current_assessment(@assessment.id)
+    render json: policy_scope(Category).for_assessment(@assessment.id)
   end
 
   api :GET, '/api/assessments/:assessment_id/categories/:id', "Request for a certain category with sub_categories, stages and current stages"
@@ -84,7 +84,7 @@ class CategoriesController < ApplicationController
   DESC
 
   def show
-    render json: @category.as_json(methods: :desc_info_for_category).merge({current_stages: @progresses})
+    render json: @category.sub_categories_status(@customer_id)
   end
 
   private
@@ -93,12 +93,8 @@ class CategoriesController < ApplicationController
     raise Pundit::NotAuthorizedError unless @customer_id = current_user.admin? ? params[:id_customer] : current_user.id
   end
 
-  def status_sub_categories_for_customer
-    @progresses = User.find(@customer_id).sub_category_progresses
-  end
-
   def set_category
-    @category = policy_scope(Category).current_assessment(@assessment.id).find(params[:id])
+    @category = policy_scope(Category).for_assessment(@assessment.id).find(params[:id])
   end
 
   def set_assessment
