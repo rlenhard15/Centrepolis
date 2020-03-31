@@ -43,13 +43,13 @@ class CategoriesController < ApplicationController
   [
     {
       "sub_category": {
-        "title": "science fiction",
+        "title": "Sub category",
         "current_stage_id": 15
       },
       "stages": [
         {
           "id": 5,
-          "title": "first"
+          "title": "Stage"
         },
         ...
       ]
