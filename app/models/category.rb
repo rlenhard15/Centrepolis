@@ -11,7 +11,8 @@ class Category < ApplicationRecord
     select("sub_categories.title, sub_categories.id, sub_category_progresses.current_stage_id AS current_stage_id").
     map do |sc|
       {
-        title: sc.title,
+        title_category: self.title,
+        title_sub_category: sc.title,
         current_stage_id: sc.current_stage_id,
         stages: sc.stages
       }

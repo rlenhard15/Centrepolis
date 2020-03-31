@@ -16,7 +16,7 @@ class CategoriesController < ApplicationController
   [
     {
       "id": 3,
-      "title": "Category",
+      "title": "First category",
       "created_at": "2020-02-20T15:32:46.379Z",
       "updated_at": "2020-03-16T14:12:47.759Z",
       "assessment_id": 1
@@ -44,7 +44,8 @@ class CategoriesController < ApplicationController
   === Success response body
   [
     {
-      "title": "First sub category",
+      "title_category": "First category",
+      "title_sub_category": "First sub category",
       "current_stage_id": 5,
       "stages": [
         {
