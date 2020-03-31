@@ -42,30 +42,37 @@ class CategoriesController < ApplicationController
       Example of Authentication header : "Bearer TOKEN_FETCHED_FROM_SERVER_DURING_REGISTRATION"
 
   === Success response body
-  [
-    {
-      "title_category": "First category",
-      "title_sub_category": "First sub category",
-      "current_stage_id": 5,
-      "stages": [
-        {
-          "id": 5,
-          "title": "First stage",
-          "created_at": "2020-02-20T15:44:10.603Z",
-          "updated_at": "2020-03-25T15:00:03.466Z",
-          "position": 1,
-          "sub_category_id": 1
-        },
-        ...
-      ]
-    },
-    ...
-  ]
+  {
+    "id": 3,
+    "title": "Category",
+    "created_at": "2020-02-20T15:32:46.379Z",
+    "updated_at": "2020-03-16T14:12:47.759Z",
+    "assessment_id": 1,
+    "sub_categories_with_statuses": [
+      {
+        "title_sub_category": "Sub category",
+        "current_stage_id": 5,
+        "stages": [
+          {
+            "id": 5,
+            "title": "Stage",
+            "created_at": "2020-02-20T15:44:10.603Z",
+            "updated_at": "2020-03-25T15:00:03.466Z",
+            "position": 1,
+            "sub_category_id": 1
+          },
+          ...
+        ]
+      },
+      ...
+    ]
+  }
 
   DESC
 
   def show
-    render json: @category.sub_categories_with_statuses(@customer_id)
+    @category.customer_id = @customer_id
+    render json: @category.to_json(methods: :sub_categories_with_statuses)
   end
 
   private
