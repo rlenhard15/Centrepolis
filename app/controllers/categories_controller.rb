@@ -42,16 +42,16 @@ class CategoriesController < ApplicationController
   === Success response body
   [
     {
-      "title_sub_category": "First sub_category",
+      "sub_category": {
+        "title": "science fiction",
+        "current_stage_id": 15
+      },
       "stages": [
         {
           "id": 5,
-          "title": "First stage"
+          "title": "first"
         },
-        ...,
-        {
-          "current_stage_id": 5
-        }
+        ...
       ]
     },
     ...

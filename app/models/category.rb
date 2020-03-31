@@ -13,8 +13,8 @@ class Category < ApplicationRecord
     select("sub_categories.*, sub_category_progresses.current_stage_id AS current_stage_id").
     map do |sc|
       {
-        title_sub_category: sc.title,
-        stages: sc.stages.as_json(only: [:id, :title]).push(current_stage_id: sc.current_stage_id)
+        sub_category: sc.as_json(only: :title).merge(current_stage_id: sc.current_stage_id),
+        stages: sc.stages.as_json(only: [:id, :title])
       }
     end
   end
