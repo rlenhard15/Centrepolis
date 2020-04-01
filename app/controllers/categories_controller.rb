@@ -1,8 +1,6 @@
 class CategoriesController < ApplicationController
   before_action :set_category, :set_customer, only: :show
 
-  skip_before_action :authenticate_user!
-
   api :GET, '/api/assessments/:assessment_id/categories', "List of categories"
   param :assessment_id, Integer, desc: "id of assessment",  required: true
   description <<-DESC
@@ -78,12 +76,8 @@ class CategoriesController < ApplicationController
 
   private
 
-  def current_user
-    Admin.first
-  end
-
   def set_customer
-    raise Pundit::NotAuthorizedError unless @customer_id = current_user.admin? ? (current_user.customers.ids & [params[:customer_id]]).first : current_user.id
+    raise Pundit::NotAuthorizedError unless @customer_id = current_user.admin? ? (current_user.customers.ids & [params[:customer_id].to_i]).first : current_user.id
   end
 
   def set_category
