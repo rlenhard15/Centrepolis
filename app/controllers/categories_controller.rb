@@ -71,8 +71,9 @@ class CategoriesController < ApplicationController
   DESC
 
   def show
-    @category.customer_id = @customer_id
-    render json: @category.to_json(methods: :sub_categories_with_statuses)
+    render json: @category.as_json.merge(
+      sub_categories: @category.sub_categories_with_statuses(@customer_id)
+    )
   end
 
   private
@@ -82,7 +83,7 @@ class CategoriesController < ApplicationController
   end
 
   def set_customer
-    raise Pundit::NotAuthorizedError unless @customer_id = current_user.admin? ? params[:customer_id] : current_user.id
+    raise Pundit::NotAuthorizedError unless @customer_id = current_user.admin? ? (current_user.customers.ids & [params[:customer_id]]).first : current_user.id
   end
 
   def set_category

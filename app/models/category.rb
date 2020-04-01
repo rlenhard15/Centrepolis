@@ -1,12 +1,11 @@
 class Category < ApplicationRecord
-  attr_accessor :customer_id
 
   belongs_to :assessment
   has_many :sub_categories, dependent: :destroy
 
   scope :for_assessment, ->(assessment_id) { where(assessment_id: assessment_id) }
 
-  def sub_categories_with_statuses
+  def sub_categories_with_statuses(customer_id)
     sub_categories.
     includes(:stages).
     joins(Arel.sql("LEFT JOIN sub_category_progresses ON (sub_category_progresses.sub_category_id = sub_categories.id AND sub_category_progresses.customer_id = #{customer_id})")).
