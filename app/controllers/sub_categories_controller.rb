@@ -51,6 +51,6 @@ class SubCategoriesController < ApplicationController
   end
 
   def set_risk
-    @category = Category.find(params[:category_id]).assessment_risk(current_user.id)
+    Assessment.find(params[:assessment_id]).assessment_risk(current_user.id)
   end
 end

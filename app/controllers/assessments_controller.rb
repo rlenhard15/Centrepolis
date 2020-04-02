@@ -15,7 +15,11 @@ class AssessmentsController < ApplicationController
   === Success response body
   [
     {
-      "name": "First_assessment"
+      "id": 4,
+      "name": "CRL (Commercial Readiness Level)",
+      "created_at": "2020-04-01T17:29:50.528Z",
+      "updated_at": "2020-04-01T17:29:50.528Z",
+      "risk_value": "3.92156862745098"
     },
     ...
   ]
@@ -24,7 +28,7 @@ class AssessmentsController < ApplicationController
   def index
     @assessments = policy_scope(Assessment)
 
-    render json: @assessments.to_json.merge(with_value_risk(@customer_id))
+    render json: @assessments.with_assessment_progresses(@customer_id)
   end
 
   api :GET, 'api/assessments/:id', "Request for a certain assessment and related categories, sub_categories and stages"
@@ -51,7 +55,7 @@ class AssessmentsController < ApplicationController
         "accessment_id": 1,
         "sub_categories": [
           {
-            "id": 1,sub_categories_with_statuses
+            "id": 1,
             "title": "First sub_category",
             "category_id": 3,
             "created_at": "2020-02-20T15:40:49.793Z",
