@@ -1,4 +1,5 @@
 class AssessmentsController < ApplicationController
+  before_action :set_customer, only: :index
   before_action :set_assessment, only: :show
 
   api :GET, 'api/assessments', "List of assessments names"
@@ -7,7 +8,7 @@ class AssessmentsController < ApplicationController
   === Request headers
     Authentication - string - required
       Example of Authentication header : "Bearer TOKEN_FETCHED_FROM_SERVER_DURING_REGISTRATION"
-      
+
   === Params
     Params are absent
 
@@ -21,9 +22,9 @@ class AssessmentsController < ApplicationController
   DESC
 
   def index
-    @assessments = Assessment.all
+    @assessments = policy_scope(Assessment)
 
-    render json: @assessments.to_json(only: :name)
+    render json: @assessments.to_json.merge(with_value_risk(@customer_id))
   end
 
   api :GET, 'api/assessments/:id', "Request for a certain assessment and related categories, sub_categories and stages"
@@ -50,7 +51,7 @@ class AssessmentsController < ApplicationController
         "accessment_id": 1,
         "sub_categories": [
           {
-            "id": 1,
+            "id": 1,sub_categories_with_statuses
             "title": "First sub_category",
             "category_id": 3,
             "created_at": "2020-02-20T15:40:49.793Z",
@@ -80,6 +81,10 @@ class AssessmentsController < ApplicationController
   end
 
   private
+
+  def set_customer
+    raise Pundit::NotAuthorizedError unless @customer_id = current_user.admin? ? (current_user.customers.ids & [params[:customer_id].to_i]).first : current_user.id
+  end
 
   def set_assessment
     @assessment = Assessment.find(params[:id])
