@@ -2,8 +2,8 @@ class SubCategoriesController < ApplicationController
 
   before_action :authorize_user!,
                 :set_sub_category_progress,
+                :set_assessment,
                 :set_assessment_progress
-
 
   api :POST, 'api/assessments/:assessment_id/categories/:category_id/sub_categories/:id/update_progress?current_stage_id=:current_stage_id', 'Only customer can update progress'
 
@@ -25,10 +25,10 @@ class SubCategoriesController < ApplicationController
     }
   DESC
   def update_progress
-    if @sub_category_progress.update(current_stage_id: params[:current_stage_id]) && @assessment_progress.update(risk_value: set_risk)
+    if @sub_category_progress.update(current_stage_id: params[:current_stage_id]) && @assessment_progress.update(risk_value: assessment_risk_value)
       render json: { body: "Progress updates successfully" }, status: 200
     else
-      render json: @sub_category_progress.errors, status: :unprocessable_entity
+      render json: [@sub_category_progress.errors, @assessment_progress.errors], status: :unprocessable_entity
     end
   end
 
@@ -40,7 +40,7 @@ class SubCategoriesController < ApplicationController
 
   def set_assessment_progress
     @assessment_progress = current_user.assessment_progresses.where(
-      assessment_id: params[:assessment_id]
+      assessment_id: @assessment.id
     ).first_or_create
   end
 
@@ -50,7 +50,11 @@ class SubCategoriesController < ApplicationController
     ).first_or_create
   end
 
-  def set_risk
-    Assessment.find(params[:assessment_id]).assessment_risk(current_user.id)
+  def assessment_risk_value
+    @assessment.assessment_risk(current_user.id)
+  end
+
+  def set_assessment
+    @assessment = Assessment.find(params[:assessment_id])
   end
 end
