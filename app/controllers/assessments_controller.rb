@@ -3,14 +3,14 @@ class AssessmentsController < ApplicationController
   before_action :set_assessment, only: :show
 
   api :GET, 'api/assessments', "List of assessments names"
+  param :customer_id, Integer, desc: "id of customer, required if current_user is admin", required: true
+
   description <<-DESC
 
   === Request headers
+  Only admin and customer can perform this action
     Authentication - string - required
       Example of Authentication header : "Bearer TOKEN_FETCHED_FROM_SERVER_DURING_REGISTRATION"
-
-  === Params
-    Params are absent
 
   === Success response body
   [

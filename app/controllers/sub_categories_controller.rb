@@ -26,7 +26,7 @@ class SubCategoriesController < ApplicationController
   DESC
   def update_progress
     if @sub_category_progress.update(current_stage_id: params[:current_stage_id]) && @assessment_progress.update(risk_value: set_risk)
-      render json: @assessment_progress, status: 200
+      render json: { body: "Progress updates successfully" }, status: 200
     else
       render json: @sub_category_progress.errors, status: :unprocessable_entity
     end
