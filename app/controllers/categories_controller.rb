@@ -41,23 +41,23 @@ class CategoriesController < ApplicationController
 
   === Success response body
   {
-    "id": 3,
+    "id": 6,
     "title": "Category",
-    "created_at": "2020-02-20T15:32:46.379Z",
-    "updated_at": "2020-03-16T14:12:47.759Z",
-    "assessment_id": 1,
-    "sub_categories_with_statuses": [
+    "created_at": "2020-04-01T17:29:50.614Z",
+    "updated_at": "2020-04-01T17:29:50.614Z",
+    "assessment_id": 4,
+    "sub_categories": [
       {
         "title_sub_category": "Sub category",
-        "current_stage_id": 5,
+        "current_stage_id": 19,
         "stages": [
           {
-            "id": 5,
+            "id": 16,
             "title": "Stage",
-            "created_at": "2020-02-20T15:44:10.603Z",
-            "updated_at": "2020-03-25T15:00:03.466Z",
+            "created_at": "2020-04-01T17:29:50.707Z",
+            "updated_at": "2020-04-01T17:29:50.707Z",
             "position": 1,
-            "sub_category_id": 1
+            "sub_category_id": 6
           },
           ...
         ]

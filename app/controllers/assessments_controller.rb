@@ -16,7 +16,7 @@ class AssessmentsController < ApplicationController
   [
     {
       "id": 4,
-      "name": "CRL (Commercial Readiness Level)",
+      "name": "Assessment_1",
       "created_at": "2020-04-01T17:29:50.528Z",
       "updated_at": "2020-04-01T17:29:50.528Z",
       "risk_value": "3.92156862745098"
