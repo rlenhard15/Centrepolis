@@ -38,8 +38,7 @@ module Admins
     def index
       authorize current_user, policy_class: CustomerPolicy
 
-      @customers = policy_scope(Customer)
-      render json: @customers.as_json(methods: :assessments_risk_list)
+      render json: policy_scope(Customer).as_json(methods: :assessments_risk_list)
     end
 
     api :POST, 'api/customers', 'Only admin can create account for customer and invite his on email'
