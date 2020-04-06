@@ -21,12 +21,15 @@ class SubCategoriesController < ApplicationController
 
     === Success response body
     {
-      "body": "Progress updates successfully"
+      "message": "Progress updates successfully",
+      "assessment_risk": "7.45098039215686"
     }
   DESC
   def update_progress
     if @sub_category_progress.update(current_stage_id: params[:current_stage_id]) && @assessment_progress.update(risk_value: assessment_risk_value)
-      render json: { body: "Progress updates successfully" }, status: 200
+      render json: { message: "Progress updates successfully",
+                     assessment_risk: assessment_risk_value
+                   }, status: 200
     else
       render json: [@sub_category_progress.errors, @assessment_progress.errors], status: :unprocessable_entity
     end
@@ -51,7 +54,7 @@ class SubCategoriesController < ApplicationController
   end
 
   def assessment_risk_value
-    @assessment.assessment_risk(current_user.id)
+    @assessment_risk_value ||= @assessment.assessment_risk(current_user.id)
   end
 
   def set_assessment
