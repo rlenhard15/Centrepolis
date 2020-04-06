@@ -6,14 +6,14 @@ class Customer < User
   after_create :send_email
 
   def assessments_risk_list
-    assessment_progresses.assessment_risk_for_customers.map do |customer|
+    Assessment.with_assessment_progresses(self.id).map do |customer|
       {
-        assessment: customer.assessment_name,
+        assessment: customer.name,
         risk_value: customer.risk_value
       }
     end
   end
-  
+
   private
 
   def send_email

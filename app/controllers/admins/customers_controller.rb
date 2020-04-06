@@ -16,7 +16,7 @@ module Admins
     [
       {
         "id": 290,
-        "email": "monday_customer2@gmail.com",
+        "email": "customer_example@gmail.com",
         "created_at": "2020-03-23T11:51:56.801Z",
         "updated_at": "2020-03-23T11:52:32.725Z",
         "first_name": "Xu",
