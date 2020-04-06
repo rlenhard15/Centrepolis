@@ -22,7 +22,7 @@ class SubCategoriesController < ApplicationController
     === Success response body
     {
       "message": "Progress updates successfully",
-      "updated_assessment_risk": "7.45098039215686"
+      "assessment_risk": "7.45098039215686"
     }
   DESC
   def update_progress
