@@ -54,7 +54,7 @@ class SubCategoriesController < ApplicationController
   end
 
   def assessment_risk_value
-    @risk ||= @assessment.assessment_risk(current_user.id)
+    @assessment_risk_value ||= @assessment.assessment_risk(current_user.id)
   end
 
   def set_assessment
