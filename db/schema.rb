@@ -10,10 +10,18 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_03_17_132450) do
+ActiveRecord::Schema.define(version: 2020_04_02_140557) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
+
+  create_table "assessment_progresses", force: :cascade do |t|
+    t.integer "customer_id"
+    t.integer "assessment_id"
+    t.decimal "risk_value"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+  end
 
   create_table "assessments", force: :cascade do |t|
     t.string "name"
@@ -33,11 +41,20 @@ ActiveRecord::Schema.define(version: 2020_03_17_132450) do
     t.integer "sub_category_id"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
+    t.integer "position"
   end
 
   create_table "sub_categories", force: :cascade do |t|
     t.string "title"
     t.integer "category_id"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+  end
+
+  create_table "sub_category_progresses", force: :cascade do |t|
+    t.bigint "customer_id"
+    t.bigint "sub_category_id"
+    t.bigint "current_stage_id", null: false
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
   end

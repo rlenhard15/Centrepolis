@@ -15,14 +15,21 @@ module Admins
     === Success response body
     [
       {
-        "id": 49,
-        "email": "example_customer@gmail.com",
-        "created_at": "2020-03-23T11:40:16.388Z",
-        "updated_at": "2020-03-23T11:40:56.214Z",
+        "id": 290,
+        "email": "customer_example@gmail.com",
+        "created_at": "2020-03-23T11:51:56.801Z",
+        "updated_at": "2020-03-23T11:52:32.725Z",
         "first_name": "Xu",
         "last_name": "Xian",
-        "company_name": "MSI",
-        "created_by": 1
+        "company_name": "Company name",
+        "created_by": 101,
+        "assessment_risk_list": [
+          {
+            "assessment": "First assessment",
+            "risk_value": "3.92156862745098"
+          },
+          ...
+        ]
       },
       ...
     ]
@@ -31,7 +38,7 @@ module Admins
     def index
       authorize current_user, policy_class: CustomerPolicy
 
-      render json: policy_scope(Customer)
+      render json: policy_scope(Customer).as_json(methods: :assessments_risk_list)
     end
 
     api :POST, 'api/customers', 'Only admin can create account for customer and invite his on email'

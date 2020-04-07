@@ -10,8 +10,11 @@ Rails.application.routes.draw do
   scope :api, defaults: { format: :json } do
     resources :customers, only: %i[index create], module: 'admins'
     resources :assessments, only: %i[index show] do
-      resources :categories, only: :index do
+      resources :categories, only: %i[index show] do
         resources :sub_categories, only: :index do
+          member do
+            post :update_progress
+          end
           resources :stages, only: :index do
             resources :tasks
           end
