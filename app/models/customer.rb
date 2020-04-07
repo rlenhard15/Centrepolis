@@ -17,6 +17,7 @@ class Customer < User
   private
 
   def send_email
+    # TODO: We should pass simple data types instead of object
     UsersMailer.with(
       customer: self
     ).email_for_restore_password.deliver_later
