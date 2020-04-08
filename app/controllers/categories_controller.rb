@@ -48,8 +48,9 @@ class CategoriesController < ApplicationController
     "assessment_id": 4,
     "sub_categories": [
       {
-        "title_sub_category": "Sub category",
-        "current_stage_id": 19,
+        "sub_category_id": 6,
+        "sub_category_title": "Sub category",
+        "current_stage_id": 16,
         "stages": [
           {
             "id": 16,
