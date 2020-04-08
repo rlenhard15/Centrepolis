@@ -5,6 +5,4 @@ RSpec.describe Category, type: :model do
     it { should belong_to(:assessment) }
     it { should have_many(:sub_categories).dependent(:destroy) }
   end
-
-
 end

@@ -3,6 +3,8 @@ require 'rails_helper'
 RSpec.describe Assessment, type: :model do
   describe "Associations" do
     it { should have_many(:categories).dependent(:destroy) }
+    it { should have_many(:sub_categories).through(:categories) }
+    it { should have_many(:assessment_progresses).dependent(:destroy) }
   end
 
   describe "Method 'description_with_child_models'" do
@@ -34,7 +36,8 @@ RSpec.describe Assessment, type: :model do
                     {
                       "id"=> stage.id,
                       "title"=> stage.title,
-                      "sub_category_id"=> sub_category.id
+                      "sub_category_id"=> sub_category.id,
+                      "position"=> stage.position
                     }
                   ]
                 }

@@ -6,7 +6,7 @@ RSpec.describe User, type: :model do
   end
 
   describe "Method 'payload'" do
-    let!(:user)       { create(:user, email: "test_user@gmail.com", type: "Admin") }
+    let!(:user)       { create(:admin, email: "test_user@gmail.com") }
     let!(:auth_token) { JwtWrapper.encode(user_id: user.id) }
 
     it 'return user`s auth_token and email' do
@@ -22,7 +22,7 @@ RSpec.describe User, type: :model do
             "first_name"=> user.first_name,
             "last_name"=> user.last_name,
             "company_name"=> user.company_name,
-            "created_by"=> null
+            "created_by"=> user.created_by
           },
           :user_type => "Admin"
         }
@@ -31,7 +31,7 @@ RSpec.describe User, type: :model do
   end
 
   describe "Method 'user_info'" do
-    let!(:user) { create(:user, email: "test_user@gmail.com", type: "Admin") }
+    let!(:user) { create(:admin, email: "test_user@gmail.com") }
 
     it "return email of user" do
       user_info = user.user_info
@@ -46,7 +46,7 @@ RSpec.describe User, type: :model do
             "first_name"=> user.first_name,
             "last_name"=> user.last_name,
             "company_name"=> user.company_name,
-            "created_by"=> null
+            "created_by"=> user.created_by
           },
           :user_type => "Admin"
         }
