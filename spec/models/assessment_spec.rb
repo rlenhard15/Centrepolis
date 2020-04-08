@@ -10,26 +10,29 @@ RSpec.describe Assessment, type: :model do
   describe "Method 'with_assessment_progresses'" do
     let!(:admin)                     { create(:admin) }
       let!(:customer)                { create(:customer, created_by: admin.id) }
-    let!(:assessment)               { create(:assessment) }
-      let!(:assessment_progress_1)   { create(:assessment_progress, customer_id: customer.id, assessment_id: assessment.id, risk_value: 3.812) }
+    let!(:assessments)                { create_list(:assessment, 2) }
+      let!(:assessment_progress_1)   { create(:assessment_progress, customer_id: customer.id, assessment_id: assessments.first.id, risk_value: 3.812) }
+      let!(:assessment_progress_2)   { create(:assessment_progress, customer_id: customer.id, assessment_id: assessments.last.id, risk_value: 30.5) }
 
     it "return assessments with risk_value for customer" do
-      # assessment_with_risk = Assessment.with_assessment_progresses(customer.id)
-       byebug
+      assessment_with_risk = Assessment.with_assessment_progresses(customer.id).as_json
 
-      expect(assessment_with_risk.length).to eq(1)
-      expect(Assessment.with_assessment_progresses(customer.id)).to eq(
+      info = recursively_delete_timestamps(assessment_with_risk)
+
+      expect(info).to eq(
         [
           {
-            "id"=> assessment.id,
-            "name"=> assessment.name,
-            "created_at"=> assessment.created_at,
-            "updated_at"=> assessment.updated_at,
-            "risk_value"=> assessment_progress_1.risk_value
+            "id"=> assessments.first.id,
+            "name"=> assessments.first.name,
+            "risk_value"=> "3.812"
+          },
+          {
+            "id"=> assessments.last.id,
+            "name"=> assessments.last.name,
+            "risk_value"=> "30.5"
           }
         ]
       )
-
     end
   end
 
@@ -74,4 +77,19 @@ RSpec.describe Assessment, type: :model do
       )
     end
   end
+
+  describe "Method 'assessment_risk'" do
+    let!(:admin)                 { create(:admin) }
+      let!(:customer)            { create(:customer, created_by: admin.id) }
+    let!(:assessment)            { create(:assessment) }
+    let!(:categories)            { create(:category, assessment_id: assessment.id) }
+    let!(:sub_category)          { create(:sub_category, category_id: categories.id) }
+    let!(:stage)                 { create(:stage, sub_category_id: sub_category.id) }
+    let!(:sub_category_progress) { create(:sub_category_progress, sub_category_id: sub_category.id, current_stage_id: stage.id, customer_id: customer.id) }
+
+    it "return risk value for assessment" do
+      expect(assessment.assessment_risk(customer.id)).to eq(100)
+    end
+  end
+
 end
