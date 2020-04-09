@@ -4,7 +4,7 @@
   - git
   - Docker Compose
   - PostgreSQL
-  
+
 Instructions on how to setup postgres are linked below.
 
 | OS  | Link |
@@ -28,11 +28,10 @@ $ docker-compose up
 ##### Your server is located: http://localhost:3000
 ### 4. Required keys for .env
 4.1. Create `.env` file.
-4.2. Place `.env` in `.gitignore` file.
-4.3. Generate your secret keys and place it (without spaces) in your `.env` file.
+4.2. Generate your secret keys and place it (without spaces) in your `.env` file.
 - For authentication (can be any)
 ```
-JWT_SECRET=secret_key
+JWT_SECRET='secret_key'
 JWT_EXPIRATION_HOURS=6
 ```
 - For send emails (can be any)
@@ -42,6 +41,11 @@ SENDER_EMAIL='example@ex.com'
 - For host link
 ```
 ADMIN_PANEL_HOST='http://localhost:3000'
+```
+4.3. Restart server
+```sh
+$ Ctrl + C
+$ docker-compose up
 ```
 ### 5. Authorization requirements
 - All requests require authentication.
