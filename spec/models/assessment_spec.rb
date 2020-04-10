@@ -10,9 +10,9 @@ RSpec.describe Assessment, type: :model do
   describe "Method 'with_assessment_progresses'" do
     let!(:admin)                     { create(:admin) }
       let!(:customer)                { create(:customer, created_by: admin.id) }
-    let!(:assessments)                { create_list(:assessment, 2) }
-      let!(:assessment_progress_1)   { create(:assessment_progress, customer_id: customer.id, assessment_id: assessments.first.id, risk_value: 3.812) }
-      let!(:assessment_progress_2)   { create(:assessment_progress, customer_id: customer.id, assessment_id: assessments.last.id, risk_value: 30.5) }
+    let!(:assessments)               { create_list(:assessment, 2) }
+      let!(:assessment_progress_1)   { create(:assessment_progress, customer_id: customer.id, assessment_id: assessments.first.id) }
+      let!(:assessment_progress_2)   { create(:assessment_progress, customer_id: customer.id, assessment_id: assessments.last.id) }
 
     it "return assessments with risk_value for customer" do
       assessment_with_risk = Assessment.with_assessment_progresses(customer.id).as_json
@@ -29,7 +29,7 @@ RSpec.describe Assessment, type: :model do
           {
             "id"=> assessments.last.id,
             "name"=> assessments.last.name,
-            "risk_value"=> "30.5"
+            "risk_value"=> "3.812"
           }
         ]
       )

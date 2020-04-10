@@ -38,8 +38,8 @@ RSpec.describe Category, type: :model do
   end
 
   describe "Method 'sub_categories_with_statuses'" do
-    let!(:admin)                     { create(:admin) }
-      let!(:customer)                { create(:customer, created_by: admin.id) }
+    let!(:admin)                         { create(:admin) }
+      let!(:customer)                    { create(:customer, created_by: admin.id) }
     let!(:assessment)                    { create(:assessment) }
       let!(:category)                    { create(:category, assessment_id: assessment.id) }
         let!(:sub_categories)            { create_list(:sub_category, 2, category_id: category.id) }
