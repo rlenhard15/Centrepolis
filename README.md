@@ -11,6 +11,13 @@ Instructions on how to setup postgres are linked below.
 | ------ | ------ |
 | Mac | https://postgresapp.com|
 | Linux | http://postgresguide.com/setup/install.html |
+
+Instructions on how to setup docer are linked below.
+
+| OS  | Link |
+| ------ | ------ |
+| Mac | https://docs.docker.com/docker-for-mac|
+| Linux | https://docs.docker.com/engine/install/ubuntu |
 ### 2. Download and build project from BitBucket
 ```sh
 $ mkdir trello_forms
@@ -25,7 +32,7 @@ $ cd back-end.task-complete-service
 $ docker-compose run web rails db:setup
 $ docker-compose up
 ```
-##### Your server is located: http://localhost:3000
+##### Your server is located: <a href="http://localhost:3000">localhost</a>
 ### 4. Required keys for .env
 4.1. Create `.env` file.
 4.2. Generate your secret keys and place it (without spaces) in your `.env` file.
@@ -45,6 +52,7 @@ ADMIN_PANEL_HOST='http://localhost:3000'
 4.3. Restart server
 ```sh
 $ Ctrl + C
+$ docker-compose down
 $ docker-compose up
 ```
 ### 5. Authorization requirements
@@ -52,7 +60,7 @@ $ docker-compose up
 - Use `Authorization: Bearer TOKEN_FETCHED_FROM_SERVER_DURING_REGISTRATION` header in every request.
 
 ### 6. Api documentation
-##### Api docs is located: http://localhost:3000/apipie
+##### Api docs is located: <a href="http://localhost:3000/apipie">api docs</a>
 The main page of the documentation is separeted into sections for each required resources, which contains their routes.
 For more details abount each route, you must follow the link in subsection `Resource`, next to it is subsection with short `Description `.
 On pages with routes contains detailed information about:
