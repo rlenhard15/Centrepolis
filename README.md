@@ -12,7 +12,7 @@ Instructions on how to setup postgres are linked below.
 | Mac | https://postgresapp.com|
 | Linux | http://postgresguide.com/setup/install.html |
 
-Instructions on how to setup docer are linked below.
+Instructions on how to setup Docker are linked below.
 
 | OS  | Link |
 | ------ | ------ |
