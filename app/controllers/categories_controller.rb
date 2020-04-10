@@ -50,7 +50,11 @@ class CategoriesController < ApplicationController
       {
         "sub_category_id": 6,
         "sub_category_title": "Sub category",
+<<<<<<< HEAD
         "current_stage_id": 19,
+=======
+        "current_stage_id": 16,
+>>>>>>> master
         "stages": [
           {
             "id": 16,
