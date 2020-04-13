@@ -34,7 +34,7 @@ $ cd back-end.task-complete-service
 $ docker-compose run web rails db:setup
 $ docker-compose up
 ```
-##### Your server is located: <a href="http://localhost:3000">http://localhost:3000</a>
+##### Your server is located: http://localhost:3000
 ### 4. Required keys for .env
 4.1. Create `.env` file.
 4.2. Generate your secret keys and place it (without spaces) in your `.env` file.
@@ -61,7 +61,7 @@ $ docker-compose up
 - All requests require authentication.
 
 ### 6. Api documentation
-##### Api docs is located: <a href="http://localhost:3000/apipie">http://localhost:3000/apipie</a>
+##### Api docs is located: http://localhost:3000/apipie
 The main page of the documentation is separeted into sections for each required resources, which contains their routes.
 For more details abount each route, you must follow the link in subsection `Resource`, next to it is subsection with short `Description `.
 On pages with routes contains detailed information about:
