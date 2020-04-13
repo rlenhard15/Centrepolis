@@ -1,5 +1,4 @@
 # Trello Forms
-# Preparation steps:
 ### 1. Prerequisites
   - git
   - Docker Compose
@@ -25,19 +24,19 @@ Instructions on how to setup Docker are linked below.
 $ mkdir trello_forms
 $ cd trello_forms
 $ git clone LINK_TO_REMOTE_REPO
-$ cd back-end.task-complete-service
+$ cd backend_task_complete_service
 $ docker-compose build || sudo docker-compose build
 ```
 ### 3. Setup and run server
 ```sh
-$ cd back-end.task-complete-service
+$ cd backend_task_complete_service
 $ docker-compose run web rails db:setup
 $ docker-compose up
 ```
 ##### Your server is located: http://localhost:3000
 ### 4. Required keys for .env
-4.1. Create `.env` file.
-4.2. Generate your secret keys and place it (without spaces) in your `.env` file.
+- Create `.env` file.
+- Generate your secret keys and place it (without spaces) in your `.env` file.
 
 - For authentication (can be any)
 ```
@@ -73,7 +72,7 @@ On pages with routes contains detailed information about:
 ### 7. How to contribute
 7.1 Create branch
 ```sh
-$ cd back-end.task-complete-service
+$ cd backend_task_complete_service
 $ git checkout -b branch_name_date
 ```
 7.2 Create pull request
