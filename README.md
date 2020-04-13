@@ -38,6 +38,7 @@ $ docker-compose up
 ### 4. Required keys for .env
 4.1. Create `.env` file.
 4.2. Generate your secret keys and place it (without spaces) in your `.env` file.
+
 - For authentication (can be any)
 ```
 JWT_SECRET='secret_key'
