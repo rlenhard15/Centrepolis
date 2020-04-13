@@ -15,10 +15,12 @@ Instructions on how to setup postgres are linked below.
 Instructions on how to setup Docker are linked below.
 
 | OS  | Link |
-| ------ | ------ |
+| ---- | ---- |
 | Mac | https://docs.docker.com/docker-for-mac|
 | Linux | https://docs.docker.com/engine/install/ubuntu |
+
 ### 2. Download and build project from BitBucket
+
 ```sh
 $ mkdir trello_forms
 $ cd trello_forms
