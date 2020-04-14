@@ -1,6 +1,6 @@
 class TasksController < ApplicationController
   before_action :set_stage
-  before_action :set_task, only: [:show, :update, :task_completed, :destroy]
+  before_action :set_task, only: [:show, :update, :mark_task_as_completed, :destroy]
 
   api :GET, 'api/assessments/:assessment_id/categories/:category_id/sub_categories/:sub_category_id/stages/:stage_id/tasks', "Tasks list of a certain stage"
   param :assessment_id, Integer, desc: "id of assessment",  required: true
@@ -17,7 +17,7 @@ class TasksController < ApplicationController
   [
     {
       "id": 19,
-      "title": "task7 for user_1",
+      "title": "Task",
       "stage_id": 8,
       "created_at": "2020-02-21T15:41:40.718Z",
       "updated_at": "2020-02-21T15:41:40.718Z",
@@ -48,7 +48,7 @@ class TasksController < ApplicationController
   === Success response body
   {
      "id": 37,
-     "title": "example task",
+     "title": "Task",
      "stage_id": 8,
      "created_at": "2020-03-02T16:30:43.044Z",
      "updated_at": "2020-03-02T16:30:43.044Z",
@@ -80,7 +80,7 @@ class TasksController < ApplicationController
   === Success response body
   {
      "id": 37,
-     "title": "Example task",
+     "title": "Task",
      "stage_id": 8,
      "created_at": "2020-03-02T16:30:43.044Z",
      "updated_at": "2020-03-02T16:30:43.044Z",
@@ -91,7 +91,7 @@ class TasksController < ApplicationController
   DESC
 
   def create
-    @task = @stage.tasks.new(tasks_params.merge({user_id: current_user.id, status: 'started'}))
+    @task = @stage.tasks.new(tasks_params.merge({user_id: current_user.id}))
     if @task.save
       render json: @task, status: :created
     else
@@ -119,7 +119,7 @@ class TasksController < ApplicationController
   === Success response body
   {
      "id": 37,
-     "title": "Title of task",
+     "title": "Task",
      "stage_id": 8,
      "created_at": "2020-03-02T16:30:43.044Z",
      "updated_at": "2020-03-02T16:30:43.044Z",
@@ -136,7 +136,7 @@ class TasksController < ApplicationController
     end
   end
 
-  api :PUT, 'api/assessments/:assessment_id/categories/:category_id/sub_categories/:sub_category_id/stages/:stage_id/tasks/:id/task_completed', "Update task status to completed"
+  api :PUT, 'api/assessments/:assessment_id/categories/:category_id/sub_categories/:sub_category_id/stages/:stage_id/tasks/:id/mark_task_as_completed', "Update task status to completed"
   param :assessment_id, Integer, desc: "id of assessment",  required: true
   param :category_id, Integer, desc: "id of category",  required: true
   param :sub_category_id, Integer, desc: "id of sub_category",  required: true
@@ -156,7 +156,7 @@ class TasksController < ApplicationController
 
   DESC
 
-  def task_completed
+  def mark_task_as_completed
     if @task.update(status: 'completed')
       render json: { new_task_status: @task.status }
     else
@@ -206,6 +206,6 @@ class TasksController < ApplicationController
 
     # Only allow a trusted parameter "white list" through.
     def tasks_params
-      params.permit(:title)
+      params.permit(:title, :status)
     end
 end
