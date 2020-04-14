@@ -28,7 +28,7 @@ class TasksController < ApplicationController
   ]
   DESC
   def index
-    @tasks = @stage.tasks
+    @tasks = policy_scope(Task).where(stage_id: @stage.id)
     render json: @tasks
   end
 
@@ -197,7 +197,7 @@ class TasksController < ApplicationController
   private
 
     def set_task
-      @task = @stage.tasks.find(params[:id])
+      @task = policy_scope(Task).where("stage_id = ? and id = ?", @stage.id, params[:id]).last
     end
 
     def set_stage
