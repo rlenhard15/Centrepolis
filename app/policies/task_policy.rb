@@ -26,7 +26,7 @@ class TaskPolicy < ApplicationPolicy
     can_admin_do_it?
   end
 
-  def task_completed?
+  def mark_task_as_completed?
     can_do_it?
   end
 

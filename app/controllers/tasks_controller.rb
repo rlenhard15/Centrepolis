@@ -74,8 +74,9 @@ class TasksController < ApplicationController
   description <<-DESC
 
   === Request headers
-    Authentication - string - required
-      Example of Authentication header : "Bearer TOKEN_FETCHED_FROM_SERVER_DURING_REGISTRATION"
+    Only admin can perform this action
+      Authentication - string - required
+        Example of Authentication header : "Bearer TOKEN_FETCHED_FROM_SERVER_DURING_REGISTRATION"
 
   === Success response body
   {
@@ -92,6 +93,9 @@ class TasksController < ApplicationController
 
   def create
     @task = @stage.tasks.new(tasks_params.merge({user_id: current_user.id}))
+
+    authorize @task
+
     if @task.save
       render json: @task, status: :created
     else
@@ -113,8 +117,9 @@ class TasksController < ApplicationController
   description <<-DESC
 
   === Request headers
-    Authentication - string - required
-      Example of Authentication header : "Bearer TOKEN_FETCHED_FROM_SERVER_DURING_REGISTRATION"
+    Only admin can perform this action
+      Authentication - string - required
+        Example of Authentication header : "Bearer TOKEN_FETCHED_FROM_SERVER_DURING_REGISTRATION"
 
   === Success response body
   {
@@ -174,8 +179,9 @@ class TasksController < ApplicationController
   description <<-DESC
 
   === Request headers
-    Authentication - string - required
-      Example of Authentication header : "Bearer TOKEN_FETCHED_FROM_SERVER_DURING_REGISTRATION"
+    Only admin can perform this action
+      Authentication - string - required
+        Example of Authentication header : "Bearer TOKEN_FETCHED_FROM_SERVER_DURING_REGISTRATION"
 
   === Success response body
   {
@@ -197,7 +203,7 @@ class TasksController < ApplicationController
   private
 
     def set_task
-      @task = policy_scope(Task).where("stage_id = ? and id = ?", @stage.id, params[:id]).last
+      raise Pundit::NotAuthorizedError unless @task = policy_scope(Task).where(id: params[:id]).first
     end
 
     def set_stage
