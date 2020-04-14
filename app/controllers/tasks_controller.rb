@@ -91,7 +91,7 @@ class TasksController < ApplicationController
   DESC
 
   def create
-    @task = @stage.tasks.new(tasks_params.merge({user_id: current_user.id, status: 'started'}))
+    @task = @stage.tasks.new(tasks_params.merge({user_id: current_user.id}))
     if @task.save
       render json: @task, status: :created
     else
@@ -206,6 +206,6 @@ class TasksController < ApplicationController
 
     # Only allow a trusted parameter "white list" through.
     def tasks_params
-      params.permit(:title)
+      params.permit(:title, :status)
     end
 end
