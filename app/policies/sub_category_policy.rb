@@ -7,6 +7,6 @@ class SubCategoryPolicy < ApplicationPolicy
   end
 
   def update_progress?
-    !admin?
+    admin?
   end
 end

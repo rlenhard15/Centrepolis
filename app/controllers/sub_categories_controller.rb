@@ -1,6 +1,8 @@
 class SubCategoriesController < ApplicationController
 
   before_action :authorize_user!,
+                :customer_id,
+                :set_customer,
                 :set_sub_category_progress,
                 :set_assessment,
                 :set_assessment_progress
@@ -11,11 +13,12 @@ class SubCategoriesController < ApplicationController
   param :category_id, Integer, desc: 'ID of current category', required: true
   param :id, Integer, desc: 'ID of current sub category', required: true
   param :current_stage_id, Integer, desc: 'ID of stage selected by user', required: true
+  param :customer_id, Integer, desc: 'ID of customer', required: true
 
   description <<-DESC
 
     === Request headers
-      Only customer can perform this action
+      Only admin can perform this action
         Authentication - string - required
           Example of Authentication header : "Bearer TOKEN_FETCHED_FROM_SERVER_DURING_REGISTRATION"
 
@@ -26,7 +29,7 @@ class SubCategoriesController < ApplicationController
     }
   DESC
   def update_progress
-    if @sub_category_progress.update(current_stage_id: params[:current_stage_id]) && @assessment_progress.update(risk_value: assessment_risk_value)
+    if @sub_category_progress.update(current_stage_id: params[:current_stage_id], customer_id: @customer_id) && @assessment_progress.update(risk_value: assessment_risk_value)
       render json: { message: "Progress updates successfully",
                      assessment_risk: assessment_risk_value
                    }, status: 200
@@ -41,20 +44,28 @@ class SubCategoriesController < ApplicationController
     authorize SubCategory
   end
 
+  def customer_id
+    raise Pundit::NotAuthorizedError unless @customer_id = (current_user.customers.ids & [params[:customer_id].to_i]).first
+  end
+
+  def set_customer
+    @customer = Customer.find(@customer_id)
+  end
+
   def set_assessment_progress
-    @assessment_progress = current_user.assessment_progresses.where(
+    @assessment_progress = @customer.assessment_progresses.where(
       assessment_id: @assessment.id
     ).first_or_create
   end
 
   def set_sub_category_progress
-    @sub_category_progress = current_user.sub_category_progresses.where(
+    @sub_category_progress = @customer.sub_category_progresses.where(
       sub_category_id: params[:id]
     ).first_or_create
   end
 
   def assessment_risk_value
-    @assessment_risk_value ||= @assessment.assessment_risk(current_user.id)
+    @assessment_risk_value ||= @assessment.assessment_risk(@customer.id)
   end
 
   def set_assessment
