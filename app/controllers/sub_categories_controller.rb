@@ -1,7 +1,6 @@
 class SubCategoriesController < ApplicationController
 
-  before_action :authorize_user!,
-                :set_customer,
+  before_action :set_customer,
                 :set_sub_category_progress,
                 :set_assessment,
                 :set_assessment_progress
@@ -39,11 +38,9 @@ class SubCategoriesController < ApplicationController
 
   private
 
-  def authorize_user!
-    authorize SubCategory
-  end
-
   def set_customer
+    authorize current_user, policy_class: SubCategoryPolicy
+
     raise Pundit::NotAuthorizedError unless @customer = current_user.customers.find_by_id(params[:customer_id])
   end
 
