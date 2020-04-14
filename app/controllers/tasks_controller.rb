@@ -1,6 +1,6 @@
 class TasksController < ApplicationController
   before_action :set_stage
-  before_action :set_task, only: [:show, :update, :destroy]
+  before_action :set_task, only: [:show, :update, :task_completed, :destroy]
 
   api :GET, 'api/assessments/:assessment_id/categories/:category_id/sub_categories/:sub_category_id/stages/:stage_id/tasks', "Tasks list of a certain stage"
   param :assessment_id, Integer, desc: "id of assessment",  required: true
@@ -91,7 +91,7 @@ class TasksController < ApplicationController
   DESC
 
   def create
-    @task = @stage.tasks.new(tasks_params)
+    @task = @stage.tasks.new(tasks_params.merge({user_id: current_user.id, status: 'started'}))
     if @task.save
       render json: @task, status: :created
     else
@@ -131,6 +131,34 @@ class TasksController < ApplicationController
   def update
     if @task.update(tasks_params)
       render json: @task
+    else
+      render json: @task.errors, status: :unprocessable_entity
+    end
+  end
+
+  api :PUT, 'api/assessments/:assessment_id/categories/:category_id/sub_categories/:sub_category_id/stages/:stage_id/tasks/:id/task_completed', "Update task status to completed"
+  param :assessment_id, Integer, desc: "id of assessment",  required: true
+  param :category_id, Integer, desc: "id of category",  required: true
+  param :sub_category_id, Integer, desc: "id of sub_category",  required: true
+  param :stage_id, Integer, desc: "id of stage",  required: true
+  param :id, Integer, desc: "id of task",  required: true
+
+  description <<-DESC
+
+  === Request headers
+    Authentication - string - required
+      Example of Authentication header : "Bearer TOKEN_FETCHED_FROM_SERVER_DURING_REGISTRATION"
+
+  === Success response body
+  {
+     "new_task_status": "completed"
+  }
+
+  DESC
+
+  def task_completed
+    if @task.update(status: 'completed')
+      render json: { new_task_status: @task.status }
     else
       render json: @task.errors, status: :unprocessable_entity
     end
@@ -178,6 +206,6 @@ class TasksController < ApplicationController
 
     # Only allow a trusted parameter "white list" through.
     def tasks_params
-      params.permit(:title, :status, :user_id )
+      params.permit(:title)
     end
 end

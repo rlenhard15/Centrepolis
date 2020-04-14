@@ -14,7 +14,9 @@ Rails.application.routes.draw do
         resources :sub_categories, only: :index do
           post :update_progress, on: :member
           resources :stages, only: :index do
-            resources :tasks
+            resources :tasks do
+              put :task_completed, on: :member
+            end
           end
         end
       end
