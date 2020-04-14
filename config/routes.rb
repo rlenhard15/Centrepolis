@@ -15,7 +15,7 @@ Rails.application.routes.draw do
           post :update_progress, on: :member
           resources :stages, only: :index do
             resources :tasks do
-              put :task_completed, on: :member
+              put :mark_task_as_completed, on: :member
             end
           end
         end
