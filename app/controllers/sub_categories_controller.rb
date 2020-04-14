@@ -1,8 +1,6 @@
 class SubCategoriesController < ApplicationController
 
-  before_action :authorize_user!,
-                :customer_id,
-                :set_customer,
+  before_action :set_customer,
                 :set_sub_category_progress,
                 :set_assessment,
                 :set_assessment_progress
@@ -29,7 +27,7 @@ class SubCategoriesController < ApplicationController
     }
   DESC
   def update_progress
-    if @sub_category_progress.update(current_stage_id: params[:current_stage_id], customer_id: @customer_id) && @assessment_progress.update(risk_value: assessment_risk_value)
+    if @sub_category_progress.update(current_stage_id: params[:current_stage_id]) && @assessment_progress.update(risk_value: assessment_risk_value)
       render json: { message: "Progress updates successfully",
                      assessment_risk: assessment_risk_value
                    }, status: 200
@@ -40,16 +38,10 @@ class SubCategoriesController < ApplicationController
 
   private
 
-  def authorize_user!
-    authorize SubCategory
-  end
-
-  def customer_id
-    raise Pundit::NotAuthorizedError unless @customer_id = (current_user.customers.ids & [params[:customer_id].to_i]).first
-  end
-
   def set_customer
-    @customer = Customer.find(@customer_id)
+    authorize current_user, policy_class: SubCategoryPolicy
+
+    raise Pundit::NotAuthorizedError unless @customer = current_user.customers.find_by_id(params[:customer_id])
   end
 
   def set_assessment_progress
