@@ -1,7 +1,6 @@
 class SubCategoriesController < ApplicationController
 
   before_action :authorize_user!,
-                :customer_id,
                 :set_customer,
                 :set_sub_category_progress,
                 :set_assessment,
@@ -18,9 +17,8 @@ class SubCategoriesController < ApplicationController
   description <<-DESC
 
     === Request headers
-      Only admin can perform this action
-        Authentication - string - required
-          Example of Authentication header : "Bearer TOKEN_FETCHED_FROM_SERVER_DURING_REGISTRATION"
+      Authentication - string - required
+        Example of Authentication header : "Bearer TOKEN_FETCHED_FROM_SERVER_DURING_REGISTRATION"
 
     === Success response body
     {
@@ -29,7 +27,7 @@ class SubCategoriesController < ApplicationController
     }
   DESC
   def update_progress
-    if @sub_category_progress.update(current_stage_id: params[:current_stage_id], customer_id: @customer_id) && @assessment_progress.update(risk_value: assessment_risk_value)
+    if @sub_category_progress.update(current_stage_id: params[:current_stage_id]) && @assessment_progress.update(risk_value: assessment_risk_value)
       render json: { message: "Progress updates successfully",
                      assessment_risk: assessment_risk_value
                    }, status: 200
@@ -44,12 +42,8 @@ class SubCategoriesController < ApplicationController
     authorize SubCategory
   end
 
-  def customer_id
-    raise Pundit::NotAuthorizedError unless @customer_id = (current_user.customers.ids & [params[:customer_id].to_i]).first
-  end
-
   def set_customer
-    @customer = Customer.find(@customer_id)
+    raise Pundit::NotAuthorizedError unless @customer = current_user.customers.find_by_id(params[:customer_id])
   end
 
   def set_assessment_progress
