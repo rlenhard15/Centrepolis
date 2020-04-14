@@ -17,8 +17,9 @@ class SubCategoriesController < ApplicationController
   description <<-DESC
 
     === Request headers
-      Authentication - string - required
-        Example of Authentication header : "Bearer TOKEN_FETCHED_FROM_SERVER_DURING_REGISTRATION"
+      Only admin can perform this action
+        Authentication - string - required
+          Example of Authentication header : "Bearer TOKEN_FETCHED_FROM_SERVER_DURING_REGISTRATION"
 
     === Success response body
     {
