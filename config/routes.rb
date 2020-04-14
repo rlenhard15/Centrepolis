@@ -12,9 +12,7 @@ Rails.application.routes.draw do
     resources :assessments, only: %i[index show] do
       resources :categories, only: %i[index show] do
         resources :sub_categories, only: :index do
-          member do
-            post :update_progress
-          end
+          post :update_progress, on: :member
           resources :stages, only: :index do
             resources :tasks
           end
