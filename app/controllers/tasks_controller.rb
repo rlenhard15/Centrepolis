@@ -1,5 +1,6 @@
 class TasksController < ApplicationController
   before_action :set_stage
+  before_action :set_customer, only: :create
   before_action :set_task, only: [:show, :update, :mark_task_as_completed, :destroy]
 
   api :GET, 'api/assessments/:assessment_id/categories/:category_id/sub_categories/:sub_category_id/stages/:stage_id/tasks', "Tasks list of a certain stage"
@@ -84,6 +85,7 @@ class TasksController < ApplicationController
      "stage_id": 8,
      "created_at": "2020-03-02T16:30:43.044Z",
      "updated_at": "2020-03-02T16:30:43.044Z",
+     "created_by": 290,
      "user_id": 48,
      "status": "started"
   }
@@ -91,7 +93,7 @@ class TasksController < ApplicationController
   DESC
 
   def create
-    @task = @stage.tasks.new(tasks_params.merge({user_id: current_user.id}))
+    @task = @stage.tasks.new(tasks_params.merge({created_by: current_user.id, user_id: @customer.id}))
     if @task.save
       render json: @task, status: :created
     else
@@ -107,7 +109,7 @@ class TasksController < ApplicationController
   param :id, Integer, desc: "id of task",  required: true
 
   param :title, String, desc: 'Name of task', required: true
-  param :user_id, Integer, desc: 'user who performs task', required: true
+  param :user_id, Integer, desc: 'customer who belongs a task', required: true
   param :status, Integer, desc: 'value must be only: 0 (means started) or 1 (means completed)', required: true
 
   description <<-DESC
@@ -124,7 +126,7 @@ class TasksController < ApplicationController
      "created_at": "2020-03-02T16:30:43.044Z",
      "updated_at": "2020-03-02T16:30:43.044Z",
      "user_id": 48,
-     "status": "completed"
+     "status": "started"
   }
 
   DESC
@@ -196,6 +198,10 @@ class TasksController < ApplicationController
 
   private
 
+    def set_customer
+      raise Pundit::NotAuthorizedError unless @customer = policy_scope(Customer).where(id: params[:user_id]).first
+    end
+
     def set_task
       @task = @stage.tasks.find(params[:id])
     end
@@ -206,6 +212,6 @@ class TasksController < ApplicationController
 
     # Only allow a trusted parameter "white list" through.
     def tasks_params
-      params.permit(:title, :status)
+      params.permit(:title)
     end
 end
