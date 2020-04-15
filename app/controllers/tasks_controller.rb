@@ -94,7 +94,12 @@ class TasksController < ApplicationController
   DESC
 
   def create
-    @task = @stage.tasks.new(tasks_params.merge({created_by: current_user.id, user_id: @customer.id}))
+    @task = @stage.tasks.new(
+      tasks_params.merge({
+        created_by: current_user.id,
+        user_id: @customer.id
+      })
+    )
     if @task.save
       render json: @task, status: :created
     else
