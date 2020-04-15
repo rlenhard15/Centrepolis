@@ -22,6 +22,7 @@ class TasksController < ApplicationController
       "stage_id": 8,
       "created_at": "2020-02-21T15:41:40.718Z",
       "updated_at": "2020-02-21T15:41:40.718Z",
+      "created_by": 290,
       "user_id": 1,
       "status": "completed"
     },
@@ -53,6 +54,7 @@ class TasksController < ApplicationController
      "stage_id": 8,
      "created_at": "2020-03-02T16:30:43.044Z",
      "updated_at": "2020-03-02T16:30:43.044Z",
+     "created_by": 290,
      "user_id": 48,
      "status": "started"
   }
@@ -69,8 +71,7 @@ class TasksController < ApplicationController
   param :stage_id, Integer, desc: "id of stage",  required: true
 
   param :title, String, desc: 'Name of task', required: true
-  param :user_id, Integer, desc: 'user who performs task', required: true
-  param :status, Integer, desc: 'value must be only: 0 (means started) or 1 (means completed)', required: true
+  param :customer_id, Integer, desc: 'customer who belongs task', required: true
 
   description <<-DESC
 
@@ -109,8 +110,6 @@ class TasksController < ApplicationController
   param :id, Integer, desc: "id of task",  required: true
 
   param :title, String, desc: 'Name of task', required: true
-  param :user_id, Integer, desc: 'customer who belongs a task', required: true
-  param :status, Integer, desc: 'value must be only: 0 (means started) or 1 (means completed)', required: true
 
   description <<-DESC
 
@@ -125,6 +124,7 @@ class TasksController < ApplicationController
      "stage_id": 8,
      "created_at": "2020-03-02T16:30:43.044Z",
      "updated_at": "2020-03-02T16:30:43.044Z",
+     "created_by": 290,
      "user_id": 48,
      "status": "started"
   }
@@ -199,7 +199,7 @@ class TasksController < ApplicationController
   private
 
     def set_customer
-      raise Pundit::NotAuthorizedError unless @customer = policy_scope(Customer).where(id: params[:user_id]).first
+      raise Pundit::NotAuthorizedError unless @customer = policy_scope(Customer).where(id: params[:customer_id]).first
     end
 
     def set_task
