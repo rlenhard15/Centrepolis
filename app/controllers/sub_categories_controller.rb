@@ -6,7 +6,7 @@ class SubCategoriesController < ApplicationController
                 :set_assessment,
                 :set_assessment_progress
 
-  api :POST, 'api/assessments/:assessment_id/categories/:category_id/sub_categories/:id/update_progress?current_stage_id=:current_stage_id', 'Only customer can update progress'
+  api :POST, 'api/assessments/:assessment_id/categories/:category_id/sub_categories/:id/update_progress?current_stage_id=:current_stage_id&customer_id=:customer_id', 'Only admin can update progress'
 
   param :assessment_id, Integer, desc: 'ID of current assessment', required: true
   param :category_id, Integer, desc: 'ID of current category', required: true
