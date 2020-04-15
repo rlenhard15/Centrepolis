@@ -5,8 +5,8 @@ class SubCategoryPolicy < ApplicationPolicy
     @user = user
     @record = record
   end
-
+  
   def update_progress?
-    !admin?
+    admin?
   end
 end
