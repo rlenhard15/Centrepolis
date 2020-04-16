@@ -4,5 +4,5 @@ class Task < ApplicationRecord
   belongs_to :customer, foreign_key: "user_id"
 
   enum status: [:started, :completed]
-  enum priority: [:low, :medium, :low]
+  enum priority: [:low, :medium, :high]
 end

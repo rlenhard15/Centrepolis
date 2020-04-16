@@ -1,6 +1,6 @@
 class TasksController < ApplicationController
-  before_action :set_stage
-  before_action :set_customer, only: :create
+  before_action :set_stage, :set_customer
+  before_action :set_risk_category, :set_risk_sub_category, only: [:index, :show]
   before_action :set_task, only: [:show, :update, :mark_task_as_completed, :destroy]
 
   api :GET, 'api/assessments/:assessment_id/categories/:category_id/sub_categories/:sub_category_id/stages/:stage_id/tasks', "Tasks list of a certain stage"
@@ -29,8 +29,9 @@ class TasksController < ApplicationController
     ...
   ]
   DESC
-  def index 
-    render json: policy_scope(Task)
+  def index
+    @tasks = policy_scope(Task)
+    render json: @tasks
   end
 
   api :GET, 'api/assessments/:assessment_id/categories/:category_id/sub_categories/:sub_category_id/stages/:stage_id/tasks/:id', "Request for a certain task"
@@ -60,7 +61,7 @@ class TasksController < ApplicationController
 
   DESC
   def show
-    render json: @task
+    render json: @task.as_json.merge(risk_category: @risk_category, risk_sub_category: @risk_sub_category )
   end
 
   api :POST, 'api/assessments/:assessment_id/categories/:category_id/sub_categories/:sub_category_id/stages/:stage_id/tasks', "Create new task for user"
@@ -205,9 +206,21 @@ class TasksController < ApplicationController
 
   private
 
-    def set_customer
-      raise Pundit::NotAuthorizedError unless @customer = policy_scope(Customer).where(id: params[:customer_id]).first
+    def set_risk_category
+      @risk_category = Category.find(params[:category_id]).risk_category(@customer.id)
     end
+
+    def set_risk_sub_category
+      @risk_sub_category = SubCategory.find(params[:sub_category_id]).risk_sub_category(@customer.id)
+    end
+
+    def set_customer
+      raise Pundit::NotAuthorizedError unless @customer = current_user.admin? ? policy_scope(Customer).where(id: params[:customer_id]).first : current_user.id
+    end
+
+    # def set_customer
+    #   raise Pundit::NotAuthorizedError unless @customer = policy_scope(Customer).where(id: params[:customer_id]).first
+    # end
 
     def set_task
       @task = Task.find_by_id(params[:id])
