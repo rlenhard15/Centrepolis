@@ -30,6 +30,10 @@ class ApplicationPolicy
     user.admin?
   end
 
+  def customer?
+    user.customer?
+  end
+
   class Scope
     attr_reader :user, :scope
 

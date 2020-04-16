@@ -29,9 +29,8 @@ class TasksController < ApplicationController
     ...
   ]
   DESC
-  def index
-    @tasks = @stage.tasks
-    render json: @tasks
+  def index 
+    render json: policy_scope(Task)
   end
 
   api :GET, 'api/assessments/:assessment_id/categories/:category_id/sub_categories/:sub_category_id/stages/:stage_id/tasks/:id', "Request for a certain task"
@@ -76,8 +75,9 @@ class TasksController < ApplicationController
   description <<-DESC
 
   === Request headers
-    Authentication - string - required
-      Example of Authentication header : "Bearer TOKEN_FETCHED_FROM_SERVER_DURING_REGISTRATION"
+    Only admin can perform this action
+      Authentication - string - required
+        Example of Authentication header : "Bearer TOKEN_FETCHED_FROM_SERVER_DURING_REGISTRATION"
 
   === Success response body
   {
@@ -119,8 +119,9 @@ class TasksController < ApplicationController
   description <<-DESC
 
   === Request headers
-    Authentication - string - required
-      Example of Authentication header : "Bearer TOKEN_FETCHED_FROM_SERVER_DURING_REGISTRATION"
+    Only admin can perform this action
+      Authentication - string - required
+        Example of Authentication header : "Bearer TOKEN_FETCHED_FROM_SERVER_DURING_REGISTRATION"
 
   === Success response body
   {
@@ -181,8 +182,9 @@ class TasksController < ApplicationController
   description <<-DESC
 
   === Request headers
-    Authentication - string - required
-      Example of Authentication header : "Bearer TOKEN_FETCHED_FROM_SERVER_DURING_REGISTRATION"
+    Only admin can perform this action
+      Authentication - string - required
+        Example of Authentication header : "Bearer TOKEN_FETCHED_FROM_SERVER_DURING_REGISTRATION"
 
   === Success response body
   {
@@ -208,7 +210,8 @@ class TasksController < ApplicationController
     end
 
     def set_task
-      @task = @stage.tasks.find(params[:id])
+      @task = Task.find_by_id(params[:id])
+      authorize @task
     end
 
     def set_stage
