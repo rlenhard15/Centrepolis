@@ -1,11 +1,12 @@
 class SubCategoriesController < ApplicationController
 
-  before_action :set_customer,
+  before_action :authorize_user!,
+                :set_customer,
                 :set_sub_category_progress,
                 :set_assessment,
                 :set_assessment_progress
 
-  api :POST, 'api/assessments/:assessment_id/categories/:category_id/sub_categories/:id/update_progress?current_stage_id=:current_stage_id', 'Only customer can update progress'
+  api :POST, 'api/assessments/:assessment_id/categories/:category_id/sub_categories/:id/update_progress?current_stage_id=:current_stage_id&customer_id=:customer_id', 'Only admin can update progress'
 
   param :assessment_id, Integer, desc: 'ID of current assessment', required: true
   param :category_id, Integer, desc: 'ID of current category', required: true
@@ -28,9 +29,10 @@ class SubCategoriesController < ApplicationController
   DESC
   def update_progress
     if @sub_category_progress.update(current_stage_id: params[:current_stage_id]) && @assessment_progress.update(risk_value: assessment_risk_value)
-      render json: { message: "Progress updates successfully",
-                     assessment_risk: assessment_risk_value
-                   }, status: 200
+      render json: {
+        message: "Progress updates successfully",
+        assessment_risk: assessment_risk_value
+      }, status: 200
     else
       render json: [@sub_category_progress.errors, @assessment_progress.errors], status: :unprocessable_entity
     end
@@ -38,10 +40,12 @@ class SubCategoriesController < ApplicationController
 
   private
 
-  def set_customer
-    authorize current_user, policy_class: SubCategoryPolicy
+  def authorize_user!
+    authorize SubCategory
+  end
 
-    raise Pundit::NotAuthorizedError unless @customer = current_user.customers.find_by_id(params[:customer_id])
+  def set_customer
+    raise Pundit::NotAuthorizedError unless @customer = policy_scope(Customer).where(id: params[:customer_id]).first
   end
 
   def set_assessment_progress
