@@ -211,8 +211,8 @@ class TasksController < ApplicationController
     end
 
     def set_task
-       @task = Task.find_by_id(params[:id])
-       authorize @task
+      @task = Task.find_by_id(params[:id])
+      authorize @task
     end
 
     def set_stage
