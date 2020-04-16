@@ -39,10 +39,10 @@ class TaskPolicy < ApplicationPolicy
   end
 
   def can_admin_do_it?
-    admin? && user.id == record.admin.id
+    admin? && user.id == record.created_by
   end
 
   def can_customer_do_it?
-    customer? && user.id == record.customer.id
+    customer? && user.id == record.user_id
   end
 end
