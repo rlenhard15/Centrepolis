@@ -29,9 +29,8 @@ class TasksController < ApplicationController
     ...
   ]
   DESC
-  def index
-    @tasks = policy_scope(Task).where(stage_id: @stage.id)
-    render json: @tasks
+  def index 
+    render json: policy_scope(Task)
   end
 
   api :GET, 'api/assessments/:assessment_id/categories/:category_id/sub_categories/:sub_category_id/stages/:stage_id/tasks/:id', "Request for a certain task"
