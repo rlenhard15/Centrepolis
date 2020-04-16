@@ -1,6 +1,7 @@
 class TasksController < ApplicationController
   before_action :set_stage
-  before_action :set_task, only: [:show, :update, :destroy]
+  before_action :set_customer, only: :create
+  before_action :set_task, only: [:show, :update, :mark_task_as_completed, :destroy]
 
   api :GET, 'api/assessments/:assessment_id/categories/:category_id/sub_categories/:sub_category_id/stages/:stage_id/tasks', "Tasks list of a certain stage"
   param :assessment_id, Integer, desc: "id of assessment",  required: true
@@ -17,10 +18,11 @@ class TasksController < ApplicationController
   [
     {
       "id": 19,
-      "title": "task7 for user_1",
+      "title": "Task",
       "stage_id": 8,
       "created_at": "2020-02-21T15:41:40.718Z",
       "updated_at": "2020-02-21T15:41:40.718Z",
+      "created_by": 290,
       "user_id": 1,
       "status": "completed"
     },
@@ -48,10 +50,11 @@ class TasksController < ApplicationController
   === Success response body
   {
      "id": 37,
-     "title": "example task",
+     "title": "Task",
      "stage_id": 8,
      "created_at": "2020-03-02T16:30:43.044Z",
      "updated_at": "2020-03-02T16:30:43.044Z",
+     "created_by": 290,
      "user_id": 48,
      "status": "started"
   }
@@ -68,8 +71,7 @@ class TasksController < ApplicationController
   param :stage_id, Integer, desc: "id of stage",  required: true
 
   param :title, String, desc: 'Name of task', required: true
-  param :user_id, Integer, desc: 'user who performs task', required: true
-  param :status, Integer, desc: 'value must be only: 0 (means started) or 1 (means completed)', required: true
+  param :customer_id, Integer, desc: 'customer who belongs task', required: true
 
   description <<-DESC
 
@@ -80,10 +82,11 @@ class TasksController < ApplicationController
   === Success response body
   {
      "id": 37,
-     "title": "Example task",
+     "title": "Task",
      "stage_id": 8,
      "created_at": "2020-03-02T16:30:43.044Z",
      "updated_at": "2020-03-02T16:30:43.044Z",
+     "created_by": 290,
      "user_id": 48,
      "status": "started"
   }
@@ -91,7 +94,12 @@ class TasksController < ApplicationController
   DESC
 
   def create
-    @task = @stage.tasks.new(tasks_params)
+    @task = @stage.tasks.new(
+      tasks_params.merge({
+        created_by: current_user.id,
+        user_id: @customer.id
+      })
+    )
     if @task.save
       render json: @task, status: :created
     else
@@ -107,8 +115,6 @@ class TasksController < ApplicationController
   param :id, Integer, desc: "id of task",  required: true
 
   param :title, String, desc: 'Name of task', required: true
-  param :user_id, Integer, desc: 'user who performs task', required: true
-  param :status, Integer, desc: 'value must be only: 0 (means started) or 1 (means completed)', required: true
 
   description <<-DESC
 
@@ -119,18 +125,47 @@ class TasksController < ApplicationController
   === Success response body
   {
      "id": 37,
-     "title": "Title of task",
+     "title": "Task",
      "stage_id": 8,
      "created_at": "2020-03-02T16:30:43.044Z",
      "updated_at": "2020-03-02T16:30:43.044Z",
+     "created_by": 290,
      "user_id": 48,
-     "status": "completed"
+     "status": "started"
   }
 
   DESC
   def update
     if @task.update(tasks_params)
       render json: @task
+    else
+      render json: @task.errors, status: :unprocessable_entity
+    end
+  end
+
+  api :PUT, 'api/assessments/:assessment_id/categories/:category_id/sub_categories/:sub_category_id/stages/:stage_id/tasks/:id/mark_task_as_completed', "Update task status to completed"
+  param :assessment_id, Integer, desc: "id of assessment",  required: true
+  param :category_id, Integer, desc: "id of category",  required: true
+  param :sub_category_id, Integer, desc: "id of sub_category",  required: true
+  param :stage_id, Integer, desc: "id of stage",  required: true
+  param :id, Integer, desc: "id of task",  required: true
+
+  description <<-DESC
+
+  === Request headers
+    Authentication - string - required
+      Example of Authentication header : "Bearer TOKEN_FETCHED_FROM_SERVER_DURING_REGISTRATION"
+
+  === Success response body
+  {
+     "new_task_status": "completed"
+  }
+
+  DESC
+
+  def mark_task_as_completed
+    if @task.update(status: 'completed')
+      render json: { new_task_status: @task.status }
     else
       render json: @task.errors, status: :unprocessable_entity
     end
@@ -168,6 +203,10 @@ class TasksController < ApplicationController
 
   private
 
+    def set_customer
+      raise Pundit::NotAuthorizedError unless @customer = policy_scope(Customer).where(id: params[:customer_id]).first
+    end
+
     def set_task
       @task = @stage.tasks.find(params[:id])
     end
@@ -178,6 +217,6 @@ class TasksController < ApplicationController
 
     # Only allow a trusted parameter "white list" through.
     def tasks_params
-      params.permit(:title, :status, :user_id )
+      params.permit(:title)
     end
 end
