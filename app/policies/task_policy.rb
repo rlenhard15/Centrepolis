@@ -11,7 +11,7 @@ class TaskPolicy < ApplicationPolicy
       return scope.none unless user
 
       if user.admin?
-        scope.where(user_id: user.id)
+        scope.where(created_by: user.id)
       elsif user.customer?
         scope.where(user_id: user.id)
       end
@@ -35,11 +35,11 @@ class TaskPolicy < ApplicationPolicy
   end
 
   def can_do_it?
-    admin? || customer? && user == record.user
+    admin? && user == record.admin || customer? && user == record.customer
   end
 
   def can_admin_do_it?
-    admin? && user == record.user
+    admin? && user == record.admin
   end
 
   def customer?
