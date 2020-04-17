@@ -9,8 +9,6 @@ class TasksController < ApplicationController
   param :sub_category_id, Integer, desc: "id of sub_category",  required: true
   param :stage_id, Integer, desc: "id of stage",  required: true
 
-  param :customer_id, Integer, desc: "id of customer, required if current_user is admin", required: true
-
   description <<-DESC
   === Request headers
     Authentication - string - required
@@ -55,8 +53,6 @@ class TasksController < ApplicationController
   param :sub_category_id, Integer, desc: "id of sub_category",  required: true
   param :stage_id, Integer, desc: "id of stage",  required: true
   param :id, Integer, desc: "id of task",  required: true
-
-  param :customer_id, Integer, desc: "id of customer, required if current_user is admin", required: true
 
   description <<-DESC
 
