@@ -1,6 +1,6 @@
 class TasksController < ApplicationController
-  before_action :set_stage, :set_customer
-  before_action :set_risk_category, :set_risk_sub_category, only: [:index, :show]
+  before_action :set_stage
+  before_action :set_customer, only: :create
   before_action :set_task, only: [:show, :update, :mark_task_as_completed, :destroy]
 
   api :GET, 'api/assessments/:assessment_id/categories/:category_id/sub_categories/:sub_category_id/stages/:stage_id/tasks', "Tasks list of a certain stage"
@@ -8,6 +8,8 @@ class TasksController < ApplicationController
   param :category_id, Integer, desc: "id of category",  required: true
   param :sub_category_id, Integer, desc: "id of sub_category",  required: true
   param :stage_id, Integer, desc: "id of stage",  required: true
+
+  param :customer_id, Integer, desc: "id of customer, required if current_user is admin", required: true
 
   description <<-DESC
   === Request headers
@@ -17,21 +19,34 @@ class TasksController < ApplicationController
   === Success response body
   [
     {
-      "id": 19,
       "title": "Task",
-      "stage_id": 8,
-      "created_at": "2020-02-21T15:41:40.718Z",
-      "updated_at": "2020-02-21T15:41:40.718Z",
-      "created_by": 290,
-      "user_id": 1,
-      "status": "completed"
+      "priority": "low",
+      "due_date": "2020-04-01T17:29:50.528Z",
+      "desc_for_tasks": {
+        "assessment": {
+          "id": 4,
+          "name": "Assessment",
+          "created_at": "2020-04-01T17:29:50.528Z",
+          "updated_at": "2020-04-01T17:29:50.528Z"
+        },
+        "stage": {
+          "id": 20,
+          "title": "Stage",
+          "created_at": "2020-04-01T17:29:50.927Z",
+          "updated_at": "2020-04-01T17:29:50.927Z",
+          "position": 5,
+          "sub_category_id": 6
+        },
+        "risk_category": 31.666666666666664,
+        "risk_sub_category": 66.66666666666666
+      }
     },
     ...
   ]
   DESC
   def index
     @tasks = policy_scope(Task)
-    render json: @tasks
+    render json: @tasks.as_json(methods: :desc_for_tasks, only: [:title, :due_date, :priority])
   end
 
   api :GET, 'api/assessments/:assessment_id/categories/:category_id/sub_categories/:sub_category_id/stages/:stage_id/tasks/:id', "Request for a certain task"
@@ -41,6 +56,8 @@ class TasksController < ApplicationController
   param :stage_id, Integer, desc: "id of stage",  required: true
   param :id, Integer, desc: "id of task",  required: true
 
+  param :customer_id, Integer, desc: "id of customer, required if current_user is admin", required: true
+
   description <<-DESC
 
   === Request headers
@@ -49,19 +66,32 @@ class TasksController < ApplicationController
 
   === Success response body
   {
-     "id": 37,
-     "title": "Task",
-     "stage_id": 8,
-     "created_at": "2020-03-02T16:30:43.044Z",
-     "updated_at": "2020-03-02T16:30:43.044Z",
-     "created_by": 290,
-     "user_id": 48,
-     "status": "started"
+    "title": "Task",
+    "priority": "low",
+    "due_date": "2020-04-01T17:29:50.528Z",
+    "desc_for_tasks": {
+      "assessment": {
+        "id": 4,
+        "name": "Assessment",
+        "created_at": "2020-04-01T17:29:50.528Z",
+        "updated_at": "2020-04-01T17:29:50.528Z"
+      },
+      "stage": {
+        "id": 20,
+        "title": "Stage",
+        "created_at": "2020-04-01T17:29:50.927Z",
+        "updated_at": "2020-04-01T17:29:50.927Z",
+        "position": 5,
+        "sub_category_id": 6
+      },
+      "risk_category": 31.666666666666664,
+      "risk_sub_category": 66.66666666666666
+    }
   }
 
   DESC
   def show
-    render json: @task.as_json.merge(risk_category: @risk_category, risk_sub_category: @risk_sub_category )
+    render json: @task.as_json(methods: :desc_for_tasks, only: [:title, :due_date, :priority])
   end
 
   api :POST, 'api/assessments/:assessment_id/categories/:category_id/sub_categories/:sub_category_id/stages/:stage_id/tasks', "Create new task for user"
@@ -206,21 +236,9 @@ class TasksController < ApplicationController
 
   private
 
-    def set_risk_category
-      @risk_category = Category.find(params[:category_id]).risk_category(@customer.id)
-    end
-
-    def set_risk_sub_category
-      @risk_sub_category = SubCategory.find(params[:sub_category_id]).risk_sub_category(@customer.id)
-    end
-
     def set_customer
-      raise Pundit::NotAuthorizedError unless @customer = current_user.admin? ? policy_scope(Customer).where(id: params[:customer_id]).first : current_user.id
+      raise Pundit::NotAuthorizedError unless @customer = policy_scope(Customer).where(id: params[:customer_id]).first
     end
-
-    # def set_customer
-    #   raise Pundit::NotAuthorizedError unless @customer = policy_scope(Customer).where(id: params[:customer_id]).first
-    # end
 
     def set_task
       @task = Task.find_by_id(params[:id])
