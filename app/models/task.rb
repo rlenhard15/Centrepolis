@@ -8,10 +8,10 @@ class Task < ApplicationRecord
 
   def desc_for_task
     {
-      master_assessment: stage.sub_category.category.assessment.name,
+      assessment: stage.sub_category.category.assessment.name,
       stage: stage.title,
-      risk_category: stage.sub_category.category.title,
-      risk_sub_category: stage.sub_category.title
+      category: stage.sub_category.category.title,
+      sub_category: stage.sub_category.title
     }
   end
 

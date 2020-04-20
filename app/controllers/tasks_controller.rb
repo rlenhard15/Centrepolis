@@ -31,6 +31,7 @@ class TasksController < ApplicationController
   def index
     @tasks = policy_scope(Task).where(user_id: @customer.id)
 
+    # TODO: Make join instead of this way
     render json: @tasks.as_json(methods: :desc_for_task, only: [:title, :due_date, :priority])
   end
 
@@ -62,7 +63,7 @@ class TasksController < ApplicationController
   end
 
   api :POST, 'api/tasks', "Create new task for customer"
-
+  # TODO: Add Task Hash
   param :stage_id, Integer, desc: "id of stage",  required: true
   param :title, String, desc: 'Name of task', required: true
   param :priority, String, desc: 'Task execution priority', required: true
@@ -202,6 +203,7 @@ class TasksController < ApplicationController
     end
 
     def set_stage
+      # TODO: We dont need it more
       @stage = Stage.find(params[:stage_id])
     end
 
