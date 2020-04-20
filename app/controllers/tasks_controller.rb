@@ -15,36 +15,27 @@ class TasksController < ApplicationController
       Example of Authentication header : "Bearer TOKEN_FETCHED_FROM_SERVER_DURING_REGISTRATION"
 
   === Success response body
-  [
-    {
-      "title": "Task",
-      "priority": "low",
-      "due_date": "2020-04-01T17:29:50.528Z",
-      "desc_for_tasks": {
-        "assessment": {
-          "id": 4,
-          "name": "Assessment",
-          "created_at": "2020-04-01T17:29:50.528Z",
-          "updated_at": "2020-04-01T17:29:50.528Z"
-        },
-        "stage": {
-          "id": 20,
-          "title": "Stage",
-          "created_at": "2020-04-01T17:29:50.927Z",
-          "updated_at": "2020-04-01T17:29:50.927Z",
-          "position": 5,
-          "sub_category_id": 6
-        },
-        "risk_category": 31.666666666666664,
-        "risk_sub_category": 66.66666666666666
-      }
-    },
-    ...
-  ]
+  {
+    "master_assessment": "Assessment",
+    "stage": "Stage",
+    "risk_category": "Category",
+    "risk_sub_category": "SubCategory",
+    "tasks": [
+      {
+        "title": "Task",
+        "priority": "high",
+        "due_date": "2020-04-01T17:29:50.927Z"
+      },
+      ...
+    ]
+  }
   DESC
   def index
     @tasks = policy_scope(Task)
-    render json: @tasks.as_json(methods: :desc_for_tasks, only: [:title, :due_date, :priority])
+
+    render json: @tasks.first.desc_for_task.merge(tasks:
+      @tasks.as_json(only: [:title, :due_date, :priority])
+    )
   end
 
   api :GET, 'api/assessments/:assessment_id/categories/:category_id/sub_categories/:sub_category_id/stages/:stage_id/tasks/:id', "Request for a certain task"
@@ -64,30 +55,20 @@ class TasksController < ApplicationController
   {
     "title": "Task",
     "priority": "low",
-    "due_date": "2020-04-01T17:29:50.528Z",
-    "desc_for_tasks": {
-      "assessment": {
-        "id": 4,
-        "name": "Assessment",
-        "created_at": "2020-04-01T17:29:50.528Z",
-        "updated_at": "2020-04-01T17:29:50.528Z"
-      },
-      "stage": {
-        "id": 20,
-        "title": "Stage",
-        "created_at": "2020-04-01T17:29:50.927Z",
-        "updated_at": "2020-04-01T17:29:50.927Z",
-        "position": 5,
-        "sub_category_id": 6
-      },
-      "risk_category": 31.666666666666664,
-      "risk_sub_category": 66.66666666666666
+    "due_date": "2020-04-01T17:29:50.927Z",
+    "desc_for_task": {
+      "master_assessment": "Assessment",
+      "stage": "Stage",
+      "risk_category": "Category",
+      "risk_sub_category": "SubCategory"
     }
   }
 
   DESC
   def show
-    render json: @task.as_json(methods: :desc_for_tasks, only: [:title, :due_date, :priority])
+    render json: @task.as_json(only: [:title, :due_date, :priority]).merge(
+      desc_for_task: @task.desc_for_task
+    )
   end
 
   api :POST, 'api/assessments/:assessment_id/categories/:category_id/sub_categories/:sub_category_id/stages/:stage_id/tasks', "Create new task for user"

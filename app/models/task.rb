@@ -6,12 +6,13 @@ class Task < ApplicationRecord
   enum status: [:started, :completed]
   enum priority: [:low, :medium, :high]
 
-  def desc_for_tasks
-   {
-      assessment: stage.sub_category.category.assessment,
-      stage: stage,
-      risk_category: stage.sub_category.category.risk_category(user_id),
-      risk_sub_category: stage.sub_category.risk_sub_category(user_id)
+  def desc_for_task
+    {
+      master_assessment: stage.sub_category.category.assessment.name,
+      stage: stage.title,
+      risk_category: stage.sub_category.category.title,
+      risk_sub_category: stage.sub_category.title
     }
   end
+
 end
