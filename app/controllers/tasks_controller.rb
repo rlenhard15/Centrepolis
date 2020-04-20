@@ -1,13 +1,11 @@
 class TasksController < ApplicationController
-  before_action :set_stage
-  before_action :set_customer, only: :create
+  before_action :set_stage, only: :create
+  before_action :set_customer, only: [:index, :create]
   before_action :set_task, only: [:show, :update, :mark_task_as_completed, :destroy]
 
-  api :GET, 'api/assessments/:assessment_id/categories/:category_id/sub_categories/:sub_category_id/stages/:stage_id/tasks', "Tasks list of a certain stage"
-  param :assessment_id, Integer, desc: "id of assessment",  required: true
-  param :category_id, Integer, desc: "id of category",  required: true
-  param :sub_category_id, Integer, desc: "id of sub_category",  required: true
-  param :stage_id, Integer, desc: "id of stage",  required: true
+  api :GET, 'api/tasks', "Tasks list for customer"
+
+  param :customer_id, Integer, desc: "id of customer, required if current_user is admin", required: true
 
   description <<-DESC
   === Request headers
@@ -15,34 +13,28 @@ class TasksController < ApplicationController
       Example of Authentication header : "Bearer TOKEN_FETCHED_FROM_SERVER_DURING_REGISTRATION"
 
   === Success response body
-  {
-    "master_assessment": "Assessment",
-    "stage": "Stage",
-    "risk_category": "Category",
-    "risk_sub_category": "SubCategory",
-    "tasks": [
-      {
-        "title": "Task",
-        "priority": "high",
-        "due_date": "2020-04-01T17:29:50.927Z"
-      },
-      ...
-    ]
-  }
+  [
+    {
+      "title": "Task",
+      "priority": "low",
+      "due_date": "2020-04-01T17:29:50.927Z",
+      "desc_for_task": {
+        "master_assessment": "Assessment",
+        "stage": "Stage",
+        "risk_category": "Category",
+        "risk_sub_category": "SubCategory"
+      }
+    },
+    ...
+  ]
   DESC
   def index
-    @tasks = policy_scope(Task)
+    @tasks = policy_scope(Task).where(user_id: @customer.id)
 
-    render json: @tasks.first.desc_for_task.merge(tasks:
-      @tasks.as_json(only: [:title, :due_date, :priority])
-    )
+    render json: @tasks.as_json(methods: :desc_for_task, only: [:title, :due_date, :priority])
   end
 
-  api :GET, 'api/assessments/:assessment_id/categories/:category_id/sub_categories/:sub_category_id/stages/:stage_id/tasks/:id', "Request for a certain task"
-  param :assessment_id, Integer, desc: "id of assessment",  required: true
-  param :category_id, Integer, desc: "id of category",  required: true
-  param :sub_category_id, Integer, desc: "id of sub_category",  required: true
-  param :stage_id, Integer, desc: "id of stage",  required: true
+  api :GET, 'api/tasks/:id', "Request for a certain task"
   param :id, Integer, desc: "id of task",  required: true
 
   description <<-DESC
@@ -54,7 +46,7 @@ class TasksController < ApplicationController
   === Success response body
   {
     "title": "Task",
-    "priority": "low",
+    "priority": "high",
     "due_date": "2020-04-01T17:29:50.927Z",
     "desc_for_task": {
       "master_assessment": "Assessment",
@@ -66,19 +58,16 @@ class TasksController < ApplicationController
 
   DESC
   def show
-    render json: @task.as_json(only: [:title, :due_date, :priority]).merge(
-      desc_for_task: @task.desc_for_task
-    )
+    render json: @task.as_json(methods: :desc_for_task, only: [:title, :due_date, :priority])
   end
 
-  api :POST, 'api/assessments/:assessment_id/categories/:category_id/sub_categories/:sub_category_id/stages/:stage_id/tasks', "Create new task for user"
-  param :assessment_id, Integer, desc: "id of assessment",  required: true
-  param :category_id, Integer, desc: "id of category",  required: true
-  param :sub_category_id, Integer, desc: "id of sub_category",  required: true
-  param :stage_id, Integer, desc: "id of stage",  required: true
+  api :POST, 'api/tasks', "Create new task for customer"
 
+  param :stage_id, Integer, desc: "id of stage",  required: true
   param :title, String, desc: 'Name of task', required: true
-  param :customer_id, Integer, desc: 'customer who belongs task', required: true
+  param :priority, String, desc: 'Task execution priority', required: true
+  param :due_date, DateTime, desc: 'Deadline date', required: true
+  param :customer_id, Integer, desc: 'Customer who is owner of task', required: true
 
   description <<-DESC
 
@@ -102,6 +91,8 @@ class TasksController < ApplicationController
   DESC
 
   def create
+    authorize current_user, policy_class: TaskPolicy
+
     @task = @stage.tasks.new(
       tasks_params.merge({
         created_by: current_user.id,
@@ -115,11 +106,7 @@ class TasksController < ApplicationController
     end
   end
 
-  api :PUT, 'api/assessments/:assessment_id/categories/:category_id/sub_categories/:sub_category_id/stages/:stage_id/tasks/:id', "Update info of a certain task"
-  param :assessment_id, Integer, desc: "id of assessment",  required: true
-  param :category_id, Integer, desc: "id of category",  required: true
-  param :sub_category_id, Integer, desc: "id of sub_category",  required: true
-  param :stage_id, Integer, desc: "id of stage",  required: true
+  api :PUT, 'api/tasks/:id', "Update info of a certain task"
   param :id, Integer, desc: "id of task",  required: true
 
   param :title, String, desc: 'Name of task', required: true
@@ -152,11 +139,7 @@ class TasksController < ApplicationController
     end
   end
 
-  api :PUT, 'api/assessments/:assessment_id/categories/:category_id/sub_categories/:sub_category_id/stages/:stage_id/tasks/:id/mark_task_as_completed', "Update task status to completed"
-  param :assessment_id, Integer, desc: "id of assessment",  required: true
-  param :category_id, Integer, desc: "id of category",  required: true
-  param :sub_category_id, Integer, desc: "id of sub_category",  required: true
-  param :stage_id, Integer, desc: "id of stage",  required: true
+  api :PUT, 'api/tasks/:id/mark_task_as_completed', "Update task status to completed"
   param :id, Integer, desc: "id of task",  required: true
 
   description <<-DESC
@@ -180,11 +163,7 @@ class TasksController < ApplicationController
     end
   end
 
-  api :DELETE, 'api/assessments/:assessment_id/categories/:category_id/sub_categories/:sub_category_id/stages/:stage_id/tasks/:id', 'Delete task'
-  param :assessment_id, Integer, desc: "id of assessment",  required: true
-  param :category_id, Integer, desc: "id of category", required: true
-  param :sub_category_id, Integer, desc: "id of sub_category", required: true
-  param :stage_id, Integer, desc: "id of stage", required: true
+  api :DELETE, 'api/tasks/:id', 'Delete task'
   param :id, Integer, desc: "id of task", required: true
 
   description <<-DESC
@@ -214,7 +193,7 @@ class TasksController < ApplicationController
   private
 
     def set_customer
-      raise Pundit::NotAuthorizedError unless @customer = policy_scope(Customer).where(id: params[:customer_id]).first
+      raise Pundit::NotAuthorizedError unless @customer = current_user.admin? ? policy_scope(Customer).where(id: params[:customer_id]).first : current_user
     end
 
     def set_task
@@ -228,6 +207,6 @@ class TasksController < ApplicationController
 
     # Only allow a trusted parameter "white list" through.
     def tasks_params
-      params.permit(:title)
+      params.permit(:title, :stage_id, :priority, :due_date)
     end
 end
