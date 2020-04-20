@@ -200,11 +200,7 @@ class TasksController < ApplicationController
       @task = Task.find_by_id(params[:id])
       authorize @task
     end
-
-    def set_stage
-      @stage = Stage.find(params[:stage_id])
-    end
-
+    
     # Only allow a trusted parameter "white list" through.
     def tasks_params
       params.permit(:title, :stage_id, :priority, :due_date)
