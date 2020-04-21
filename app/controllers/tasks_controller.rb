@@ -5,9 +5,7 @@ class TasksController < ApplicationController
 
   api :GET, 'api/tasks', "Tasks list for customer"
 
-  param :task, Hash, required: true do
-    param :customer_id, Integer, desc: "id of customer, required if current_user is admin"
-  end
+  param :customer_id, Integer, desc: "id of customer, required if current_user is admin"
 
   description <<-DESC
   === Request headers
@@ -47,20 +45,21 @@ class TasksController < ApplicationController
 
   === Success response body
   {
+    "id": 104,
     "title": "Task",
-    "priority": "low",
-    "due_date": "2020-03-02T16:30:43.044Z",
-    "with_all_required_info_for_task": {
-      "master_assessment": "Assessment",
-      "risk_category": "Category",
-      "risk_sub_category": "SubCategory",
-      "stage_title": "Stage"
-    }
+    "priority": "medium",
+    "due_date": "2020-04-16T00:00:00.000Z",
+    "master_assessment": "Assessment",
+    "risk_category": "Category",
+    "risk_sub_category": "SubCategory",
+    "stage_title": "Stage"
   }
 
   DESC
   def show
-    render json: @task.as_json(methods: :with_all_required_info_for_task, only: [:title, :priority, :due_date])
+    render json: @task.as_json(only: [:id, :title, :priority, :due_date]).merge(
+      @task.with_all_required_info_for_task
+    )
   end
 
   api :POST, 'api/tasks', "Create new task for customer"
@@ -118,8 +117,8 @@ class TasksController < ApplicationController
     param :title, String, desc: 'Name of task', required: true
     param :priority, String, desc: 'Task execution priority', required: true
     param :due_date, DateTime, desc: 'Deadline date', required: true
-    param :customer_id, Integer, desc: 'Customer who is owner of task', required: true
   end
+  param :customer_id, Integer, desc: 'Customer who is owner of task', required: true
 
   description <<-DESC
 
@@ -203,7 +202,7 @@ class TasksController < ApplicationController
   private
 
     def set_customer
-      raise Pundit::NotAuthorizedError unless @customer = current_user.admin? ? policy_scope(Customer).find_by_id(params[:task][:customer_id]) : current_user
+      raise Pundit::NotAuthorizedError unless @customer = current_user.admin? ? policy_scope(Customer).find_by_id(params[:customer_id]) : current_user
     end
 
     def set_task
@@ -213,6 +212,6 @@ class TasksController < ApplicationController
 
     # Only allow a trusted parameter "white list" through.
     def tasks_params
-      params.require(:task).permit(:title, :stage_id, :priority, :due_date, :customer_id)
+      params.require(:task).permit(:title, :stage_id, :priority, :due_date)
     end
 end
