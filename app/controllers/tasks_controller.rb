@@ -5,7 +5,9 @@ class TasksController < ApplicationController
 
   api :GET, 'api/tasks', "Tasks list for customer"
 
-  param :customer_id, Integer, desc: "id of customer, required if current_user is admin", required: true
+  param :task, Hash, required: true do
+    param :customer_id, Integer, desc: "id of customer, required if current_user is admin"
+  end
 
   description <<-DESC
   === Request headers
@@ -15,15 +17,14 @@ class TasksController < ApplicationController
   === Success response body
   [
     {
+      "id": 63,
       "title": "Task",
-      "priority": "low",
-      "due_date": "2020-04-01T17:29:50.927Z",
-      "desc_for_task": {
-        "master_assessment": "Assessment",
-        "stage": "Stage",
-        "risk_category": "Category",
-        "risk_sub_category": "SubCategory"
-      }
+      "priority": "high",
+      "due_date": "2020-03-02T16:30:43.044Z",
+      "master_assessment": "Assessment",
+      "risk_category": "Category",
+      "risk_sub_category": "SubCategory",
+      "stage_title": "Stage"
     },
     ...
   ]
@@ -31,7 +32,8 @@ class TasksController < ApplicationController
   def index
     @tasks = policy_scope(Task).where(user_id: @customer.id)
 
-    render json: @tasks.as_json(methods: :desc_for_task, only: [:title, :due_date, :priority])
+
+    render json: @tasks.with_all_required_info_for_tasks
   end
 
   api :GET, 'api/tasks/:id', "Request for a certain task"
@@ -46,28 +48,30 @@ class TasksController < ApplicationController
   === Success response body
   {
     "title": "Task",
-    "priority": "high",
-    "due_date": "2020-04-01T17:29:50.927Z",
-    "desc_for_task": {
+    "priority": "low",
+    "due_date": "2020-03-02T16:30:43.044Z",
+    "with_all_required_info_for_task": {
       "master_assessment": "Assessment",
-      "stage": "Stage",
       "risk_category": "Category",
-      "risk_sub_category": "SubCategory"
+      "risk_sub_category": "SubCategory",
+      "stage_title": "Stage"
     }
   }
 
   DESC
   def show
-    render json: @task.as_json(methods: :desc_for_task, only: [:title, :due_date, :priority])
+    render json: @task.as_json(methods: :with_all_required_info_for_task, only: [:title, :priority, :due_date])
   end
 
   api :POST, 'api/tasks', "Create new task for customer"
 
-  param :stage_id, Integer, desc: "id of stage",  required: true
-  param :title, String, desc: 'Name of task', required: true
-  param :priority, String, desc: 'Task execution priority', required: true
-  param :due_date, DateTime, desc: 'Deadline date', required: true
-  param :customer_id, Integer, desc: 'Customer who is owner of task', required: true
+  param :task, Hash, required: true do
+    param :stage_id, Integer, desc: "id of stage",  required: true
+    param :title, String, desc: 'Name of task', required: true
+    param :priority, String, desc: 'Task execution priority', required: true
+    param :due_date, DateTime, desc: 'Deadline date', required: true
+    param :customer_id, Integer, desc: 'Customer who is owner of task', required: true
+  end
 
   description <<-DESC
 
@@ -109,7 +113,13 @@ class TasksController < ApplicationController
   api :PUT, 'api/tasks/:id', "Update info of a certain task"
   param :id, Integer, desc: "id of task",  required: true
 
-  param :title, String, desc: 'Name of task', required: true
+  param :task, Hash, required: true do
+    param :stage_id, Integer, desc: "id of stage",  required: true
+    param :title, String, desc: 'Name of task', required: true
+    param :priority, String, desc: 'Task execution priority', required: true
+    param :due_date, DateTime, desc: 'Deadline date', required: true
+    param :customer_id, Integer, desc: 'Customer who is owner of task', required: true
+  end
 
   description <<-DESC
 
@@ -193,16 +203,16 @@ class TasksController < ApplicationController
   private
 
     def set_customer
-      raise Pundit::NotAuthorizedError unless @customer = current_user.admin? ? policy_scope(Customer).where(id: params[:customer_id]).first : current_user
+      raise Pundit::NotAuthorizedError unless @customer = current_user.admin? ? policy_scope(Customer).find_by_id(params[:task][:customer_id]) : current_user
     end
 
     def set_task
       @task = Task.find_by_id(params[:id])
       authorize @task
     end
-    
+
     # Only allow a trusted parameter "white list" through.
     def tasks_params
-      params.permit(:title, :stage_id, :priority, :due_date)
+      params.require(:task).permit(:title, :stage_id, :priority, :due_date, :customer_id)
     end
 end

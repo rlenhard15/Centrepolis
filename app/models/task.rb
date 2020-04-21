@@ -6,13 +6,22 @@ class Task < ApplicationRecord
   enum status: [:started, :completed]
   enum priority: [:low, :medium, :high]
 
-  def desc_for_task
+  scope :with_all_required_info_for_tasks, -> {
+    joins(stage: [sub_category: [category: :assessment]]).select(
+      "tasks.id, tasks.title, tasks.priority, tasks.due_date,
+      assessments.name AS master_assessment,
+      categories.title AS risk_category,
+      sub_categories.title AS risk_sub_category,
+      stages.title AS stage_title"
+    )
+  }
+
+  def with_all_required_info_for_task
     {
       master_assessment: stage.sub_category.category.assessment.name,
-      stage: stage.title,
       risk_category: stage.sub_category.category.title,
-      risk_sub_category: stage.sub_category.title
+      risk_sub_category: stage.sub_category.title,
+      stage_title: stage.title
     }
   end
-
 end
