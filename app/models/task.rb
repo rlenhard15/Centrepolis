@@ -15,13 +15,8 @@ class Task < ApplicationRecord
       stages.title AS stage_title"
     )
   }
-
+  
   def with_all_required_info_for_task
-    {
-      master_assessment: stage.sub_category.category.assessment.name,
-      risk_category: stage.sub_category.category.title,
-      risk_sub_category: stage.sub_category.title,
-      stage_title: stage.title
-    }
+    self.class.with_all_required_info_for_tasks.where(id: id)
   end
 end
