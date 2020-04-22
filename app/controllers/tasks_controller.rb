@@ -1,7 +1,8 @@
 class TasksController < ApplicationController
   before_action :set_stage, only: :create
+  before_action :set_task_for_show, only: :show
   before_action :set_customer, only: [:index, :create]
-  before_action :set_task, only: [:show, :update, :mark_task_as_completed, :destroy]
+  before_action :set_task, only: [:update, :mark_task_as_completed, :destroy]
 
   api :GET, 'api/tasks', "Tasks list for customer"
 
@@ -56,7 +57,7 @@ class TasksController < ApplicationController
 
   DESC
   def show
-    render json: policy_scope(Task).with_all_required_info_for_tasks.where(id: @task.id).first
+    render json: @task
   end
 
   api :POST, 'api/tasks', "Create new task for customer"
@@ -111,7 +112,7 @@ class TasksController < ApplicationController
 
   param :task, Hash, required: true do
     param :stage_id, Integer, desc: "id of stage",  required: true
-    param :title, String, desc: 'Name of task', required: true
+    param :title, String, desc: 'Name of ta:show, sk', required: true
     param :priority, String, desc: 'Task execution priority', required: true
     param :due_date, DateTime, desc: 'Deadline date', required: true
   end
@@ -205,6 +206,10 @@ class TasksController < ApplicationController
     def set_task
       @task = Task.find_by_id(params[:id])
       authorize @task
+    end
+
+    def set_task_for_show
+      raise Pundit::NotAuthorizedError unless @task = policy_scope(Task).with_all_required_info_for_tasks.where(id: params[:id]).first
     end
 
     # Only allow a trusted parameter "white list" through.
