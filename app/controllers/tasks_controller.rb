@@ -29,8 +29,7 @@ class TasksController < ApplicationController
   DESC
   def index
     @tasks = policy_scope(Task).where(user_id: @customer.id)
-
-
+    
     render json: @tasks.with_all_required_info_for_tasks
   end
 
@@ -44,22 +43,20 @@ class TasksController < ApplicationController
       Example of Authentication header : "Bearer TOKEN_FETCHED_FROM_SERVER_DURING_REGISTRATION"
 
   === Success response body
-  [
-    {
-      "id": 104,
-      "title": "Task",
-      "priority": "medium",
-      "due_date": "2020-04-16T00:00:00.000Z",
-      "master_assessment": "Assessment",
-      "risk_category": "Category",
-      "risk_sub_category": "SubCategory",
-      "stage_title": "Stage"
-    }
-  ]
+  {
+    "id": 104,
+    "title": "Task",
+    "priority": "medium",
+    "due_date": "2020-04-16T00:00:00.000Z",
+    "master_assessment": "Assessment",
+    "risk_category": "Category",
+    "risk_sub_category": "SubCategory",
+    "stage_title": "Stage"
+  }
 
   DESC
   def show
-    render json: @task.with_all_required_info_for_task
+    render json: policy_scope(Task).with_all_required_info_for_tasks.where(id: @task.id).first
   end
 
   api :POST, 'api/tasks', "Create new task for customer"

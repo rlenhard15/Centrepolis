@@ -2,7 +2,7 @@ class Task < ApplicationRecord
   belongs_to :stage
   belongs_to :admin, foreign_key: "created_by"
   belongs_to :customer, foreign_key: "user_id"
-
+  
   enum status: [:started, :completed]
   enum priority: [:low, :medium, :high]
 
@@ -15,8 +15,4 @@ class Task < ApplicationRecord
       stages.title AS stage_title"
     )
   }
-  
-  def with_all_required_info_for_task
-    self.class.with_all_required_info_for_tasks.where(id: id)
-  end
 end
