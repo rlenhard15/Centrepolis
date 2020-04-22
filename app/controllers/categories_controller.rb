@@ -6,9 +6,8 @@ class CategoriesController < ApplicationController
   description <<-DESC
 
   === Request headers
-    Only admin and customer can perform this action
-      Authentication - string - required
-        Example of Authentication header : "Bearer TOKEN_FETCHED_FROM_SERVER_DURING_REGISTRATION"
+    Authentication - string - required
+      Example of Authentication header : "Bearer TOKEN_FETCHED_FROM_SERVER_DURING_REGISTRATION"
 
   === Success response body for admin
   [
