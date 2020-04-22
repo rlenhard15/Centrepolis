@@ -29,7 +29,7 @@ class TasksController < ApplicationController
   DESC
   def index
     @tasks = policy_scope(Task).where(user_id: @customer.id)
-    
+
     render json: @tasks.with_all_required_info_for_tasks
   end
 
@@ -66,8 +66,8 @@ class TasksController < ApplicationController
     param :title, String, desc: 'Name of task', required: true
     param :priority, String, desc: 'Task execution priority', required: true
     param :due_date, DateTime, desc: 'Deadline date', required: true
-    param :customer_id, Integer, desc: 'Customer who is owner of task', required: true
   end
+  param :customer_id, Integer, desc: 'Customer who is owner of task', required: true
 
   description <<-DESC
 
