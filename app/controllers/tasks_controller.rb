@@ -20,8 +20,8 @@ class TasksController < ApplicationController
       "priority": "high",
       "due_date": "2020-03-02T16:30:43.044Z",
       "master_assessment": "Assessment",
-      "risk_category": "Category",
-      "risk_sub_category": "SubCategory",
+      "category": "Category",
+      "sub_category": "SubCategory",
       "stage_title": "Stage"
     },
     ...
@@ -49,8 +49,8 @@ class TasksController < ApplicationController
     "priority": "medium",
     "due_date": "2020-04-16T00:00:00.000Z",
     "master_assessment": "Assessment",
-    "risk_category": "Category",
-    "risk_sub_category": "SubCategory",
+    "category": "Category",
+    "sub_category": "SubCategory",
     "stage_title": "Stage"
   }
 

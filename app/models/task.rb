@@ -10,8 +10,8 @@ class Task < ApplicationRecord
     joins(stage: [sub_category: [category: :assessment]]).select(
       "tasks.id, tasks.title, tasks.priority, tasks.due_date,
       assessments.name AS master_assessment,
-      categories.title AS risk_category,
-      sub_categories.title AS risk_sub_category,
+      categories.title AS category,
+      sub_categories.title AS sub_category,
       stages.title AS stage_title"
     )
   }
