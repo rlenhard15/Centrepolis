@@ -1,5 +1,4 @@
 class TasksController < ApplicationController
-  before_action :set_stage, only: :create
   before_action :set_task_for_show, only: :show
   before_action :set_customer, only: [:index, :create]
   before_action :set_task, only: [:update, :mark_task_as_completed, :destroy]
@@ -67,8 +66,8 @@ class TasksController < ApplicationController
     param :title, String, desc: 'Name of task', required: true
     param :priority, String, desc: 'Task execution priority', required: true
     param :due_date, DateTime, desc: 'Deadline date', required: true
+    param :customer_id, Integer, desc: 'Customer who is owner of task', required: true
   end
-  param :customer_id, Integer, desc: 'Customer who is owner of task', required: true
 
   description <<-DESC
 
@@ -94,7 +93,7 @@ class TasksController < ApplicationController
   def create
     authorize current_user, policy_class: TaskPolicy
 
-    @task = @stage.tasks.new(
+    @task = Task.new(
       tasks_params.merge({
         created_by: current_user.id,
         user_id: @customer.id
@@ -115,8 +114,8 @@ class TasksController < ApplicationController
     param :title, String, desc: 'Name of ta:show, sk', required: true
     param :priority, String, desc: 'Task execution priority', required: true
     param :due_date, DateTime, desc: 'Deadline date', required: true
+    param :customer_id, Integer, desc: 'Customer who is owner of task', required: true
   end
-  param :customer_id, Integer, desc: 'Customer who is owner of task', required: true
 
   description <<-DESC
 
@@ -200,7 +199,8 @@ class TasksController < ApplicationController
   private
 
     def set_customer
-      raise Pundit::NotAuthorizedError unless @customer = current_user.admin? ? policy_scope(Customer).find_by_id(params[:customer_id]) : current_user
+      customer_id = params[:customer_id]
+      raise Pundit::NotAuthorizedError unless @customer = current_user.admin? ? policy_scope(Customer).find_by_id(customer_id || params[:task][:customer_id]) : current_user
     end
 
     def set_task
