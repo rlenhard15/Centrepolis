@@ -59,7 +59,7 @@ class TasksController < ApplicationController
     render json: @task
   end
 
-  api :POST, 'api/tasks', "Create new task for customer"
+  api :POST, 'api/tasks', "Create new task and notification for this task for customer"
 
   param :task, Hash, required: true do
     param :stage_id, Integer, desc: "id of stage",  required: true
