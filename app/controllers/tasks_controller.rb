@@ -99,7 +99,7 @@ class TasksController < ApplicationController
         user_id: @customer.id
       })
     )
-    if @task.save
+    if @task.save && @task.create_notification!(customer_id: @customer.id)
       render json: @task, status: :created
     else
       render json: @task.errors, status: :unprocessable_entity
