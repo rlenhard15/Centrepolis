@@ -59,7 +59,7 @@ class TasksController < ApplicationController
     render json: @task
   end
 
-  api :POST, 'api/tasks', "Create new task for customer"
+  api :POST, 'api/tasks', "Create new task and notification for this task for customer"
 
   param :task, Hash, required: true do
     param :stage_id, Integer, desc: "id of stage",  required: true
@@ -78,14 +78,16 @@ class TasksController < ApplicationController
 
   === Success response body
   {
-     "id": 37,
-     "title": "Task",
-     "stage_id": 8,
-     "created_at": "2020-03-02T16:30:43.044Z",
-     "updated_at": "2020-03-02T16:30:43.044Z",
-     "created_by": 290,
-     "user_id": 48,
-     "status": "started"
+    "id": 122,
+    "title": "Task",
+    "stage_id": 20,
+    "created_at": "2020-04-27T12:23:54.883Z",
+    "updated_at": "2020-04-27T12:23:54.883Z",
+    "user_id": 290,
+    "status": "started",
+    "created_by": 101,
+    "priority": "low",
+    "due_date": "2020-04-24T00:00:00.000Z"
   }
 
   DESC
@@ -100,7 +102,12 @@ class TasksController < ApplicationController
       })
     )
     if @task.save
-      render json: @task, status: :created
+      if @task.create_notification(customer_id: @customer.id)
+        render json: @task, status: :created
+      else
+        # add errors of notification
+        render json: { error: "Notification was not created" }, status: :unprocessable_entity
+      end
     else
       render json: @task.errors, status: :unprocessable_entity
     end
