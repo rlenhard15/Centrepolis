@@ -78,19 +78,16 @@ class TasksController < ApplicationController
 
   === Success response body
   {
-    "task": {
-      "id": 120,
-      "title": "Task",
-      "stage_id": 20,
-      "created_at": "2020-04-24T16:37:57.537Z",
-      "updated_at": "2020-04-24T16:37:57.537Z",
-      "user_id": 290,
-      "status": "started",
-      "created_by": 101,
-      "priority": "low",
-      "due_date": "2020-04-24T00:00:00.000Z"
-    },
-    "message": "Notification was successfully created"
+    "id": 122,
+    "title": "Task",
+    "stage_id": 20,
+    "created_at": "2020-04-27T12:23:54.883Z",
+    "updated_at": "2020-04-27T12:23:54.883Z",
+    "user_id": 290,
+    "status": "started",
+    "created_by": 101,
+    "priority": "low",
+    "due_date": "2020-04-24T00:00:00.000Z"
   }
 
   DESC
@@ -106,11 +103,9 @@ class TasksController < ApplicationController
     )
     if @task.save
       if @task.create_notification(customer_id: @customer.id)
-        render json: {
-          task: @task,
-          message: "Notification was successfully created"
-        }, status: :created
+        render json: @task, status: :created
       else
+        # add errors of notification
         render json: { error: "Notification was not created" }, status: :unprocessable_entity
       end
     else
