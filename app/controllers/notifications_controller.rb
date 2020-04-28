@@ -29,7 +29,7 @@ class NotificationsController < ApplicationController
     render json: policy_scope(Notification).with_task_and_admin_info
   end
 
-  api :PUT, 'api/:id/mark_as_readed', "Update read status of notification to true"
+  api :PUT, 'api/notifications/:id/mark_as_readed', "Update read status of notification to true"
   param :id, Integer, desc: "id of notification",  required: true
 
   description <<-DESC
