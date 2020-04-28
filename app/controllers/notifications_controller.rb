@@ -25,8 +25,6 @@ class NotificationsController < ApplicationController
   def index
     authorize current_user, policy_class: NotificationPolicy
 
-    @notifications = policy_scope(Notification)
-
-    render json: @notifications.with_task_and_admin_info
+    render json: policy_scope(Notification).with_task_and_admin_info
   end
 end
