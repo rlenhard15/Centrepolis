@@ -8,7 +8,9 @@ Rails.application.routes.draw do
   end
 
   scope :api, defaults: { format: :json } do
-    resources :notifications, only: :index
+    resources :notifications, only: :index do
+      put :mark_as_readed, on: :member
+    end
     resources :tasks do
       put :mark_task_as_completed, on: :member
     end
