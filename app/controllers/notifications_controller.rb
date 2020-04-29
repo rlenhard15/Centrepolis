@@ -29,7 +29,7 @@ class NotificationsController < ApplicationController
     render json: policy_scope(Notification).with_task_and_admin_info
   end
 
-  api :PUT, '/api/notifications/mark_as_readed_all', "Update all notification of customer to true"
+  api :PUT, '/api/notifications/mark_as_readed_all', "Update all notifications of customer to true"
 
   description <<-DESC
 
