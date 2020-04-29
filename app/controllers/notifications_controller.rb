@@ -29,6 +29,31 @@ class NotificationsController < ApplicationController
     render json: policy_scope(Notification).with_task_and_admin_info
   end
 
+  api :PUT, '/api/notifications/mark_as_readed_all', "Update all notifications of customer to true"
+
+  description <<-DESC
+
+  === Request headers
+  Only customer can perform this action
+    Authentication - string - required
+      Example of Authentication header : "Bearer TOKEN_FETCHED_FROM_SERVER_DURING_REGISTRATION"
+
+  === Success response body
+  {
+    "message": "Successfully update read status to true for all customer notifications"
+  }
+
+  DESC
+  def mark_as_readed_all
+    authorize current_user, policy_class: NotificationPolicy
+
+    if policy_scope(Notification).update_all(read: true)
+      render json: { message: "Successfully update read status to true for all customer notifications" }
+    else
+      render json: {error: "Notifications were not update"}
+    end
+  end
+
   api :PUT, 'api/notifications/:id/mark_as_readed', "Update read status of notification to true"
   param :id, Integer, desc: "id of notification",  required: true
 

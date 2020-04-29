@@ -22,6 +22,10 @@ class NotificationPolicy < ApplicationPolicy
     can_customer_do_it
   end
 
+  def mark_as_readed_all?
+    customer?  
+  end
+
   def index?
     !admin?
   end
