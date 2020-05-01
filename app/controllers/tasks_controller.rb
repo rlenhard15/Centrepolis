@@ -1,7 +1,7 @@
 class TasksController < ApplicationController
-  before_action :set_stage, only: :create
+  before_action :set_task_for_show, only: :show
   before_action :set_customer, only: [:index, :create]
-  before_action :set_task, only: [:show, :update, :mark_task_as_completed, :destroy]
+  before_action :set_task, only: [:update, :mark_task_as_completed, :destroy]
 
   api :GET, 'api/tasks', "Tasks list for customer"
 
@@ -20,8 +20,8 @@ class TasksController < ApplicationController
       "priority": "high",
       "due_date": "2020-03-02T16:30:43.044Z",
       "master_assessment": "Assessment",
-      "risk_category": "Category",
-      "risk_sub_category": "SubCategory",
+      "category": "Category",
+      "sub_category": "SubCategory",
       "stage_title": "Stage"
     },
     ...
@@ -49,25 +49,25 @@ class TasksController < ApplicationController
     "priority": "medium",
     "due_date": "2020-04-16T00:00:00.000Z",
     "master_assessment": "Assessment",
-    "risk_category": "Category",
-    "risk_sub_category": "SubCategory",
+    "category": "Category",
+    "sub_category": "SubCategory",
     "stage_title": "Stage"
   }
 
   DESC
   def show
-    render json: policy_scope(Task).with_all_required_info_for_tasks.where(id: @task.id).first
+    render json: @task
   end
 
-  api :POST, 'api/tasks', "Create new task for customer"
+  api :POST, 'api/tasks', "Create new task and notification for this task for customer"
 
   param :task, Hash, required: true do
     param :stage_id, Integer, desc: "id of stage",  required: true
     param :title, String, desc: 'Name of task', required: true
     param :priority, String, desc: 'Task execution priority', required: true
     param :due_date, DateTime, desc: 'Deadline date', required: true
+    param :customer_id, Integer, desc: 'Customer who is owner of task', required: true
   end
-  param :customer_id, Integer, desc: 'Customer who is owner of task', required: true
 
   description <<-DESC
 
@@ -78,14 +78,16 @@ class TasksController < ApplicationController
 
   === Success response body
   {
-     "id": 37,
-     "title": "Task",
-     "stage_id": 8,
-     "created_at": "2020-03-02T16:30:43.044Z",
-     "updated_at": "2020-03-02T16:30:43.044Z",
-     "created_by": 290,
-     "user_id": 48,
-     "status": "started"
+    "id": 122,
+    "title": "Task",
+    "stage_id": 20,
+    "created_at": "2020-04-27T12:23:54.883Z",
+    "updated_at": "2020-04-27T12:23:54.883Z",
+    "user_id": 290,
+    "status": "started",
+    "created_by": 101,
+    "priority": "low",
+    "due_date": "2020-04-24T00:00:00.000Z"
   }
 
   DESC
@@ -93,14 +95,19 @@ class TasksController < ApplicationController
   def create
     authorize current_user, policy_class: TaskPolicy
 
-    @task = @stage.tasks.new(
+    @task = Task.new(
       tasks_params.merge({
         created_by: current_user.id,
         user_id: @customer.id
       })
     )
     if @task.save
-      render json: @task, status: :created
+      if @task.create_notification(customer_id: @customer.id)
+        render json: @task, status: :created
+      else
+        # add errors of notification
+        render json: { error: "Notification was not created" }, status: :unprocessable_entity
+      end
     else
       render json: @task.errors, status: :unprocessable_entity
     end
@@ -111,11 +118,11 @@ class TasksController < ApplicationController
 
   param :task, Hash, required: true do
     param :stage_id, Integer, desc: "id of stage",  required: true
-    param :title, String, desc: 'Name of task', required: true
+    param :title, String, desc: 'Name of ta:show, sk', required: true
     param :priority, String, desc: 'Task execution priority', required: true
     param :due_date, DateTime, desc: 'Deadline date', required: true
+    param :customer_id, Integer, desc: 'Customer who is owner of task', required: true
   end
-  param :customer_id, Integer, desc: 'Customer who is owner of task', required: true
 
   description <<-DESC
 
@@ -199,12 +206,17 @@ class TasksController < ApplicationController
   private
 
     def set_customer
-      raise Pundit::NotAuthorizedError unless @customer = current_user.admin? ? policy_scope(Customer).find_by_id(params[:customer_id]) : current_user
+      customer_id = params[:customer_id]
+      raise Pundit::NotAuthorizedError unless @customer = current_user.admin? ? policy_scope(Customer).find_by_id(customer_id || params[:task][:customer_id]) : current_user
     end
 
     def set_task
       @task = Task.find_by_id(params[:id])
       authorize @task
+    end
+
+    def set_task_for_show
+      raise Pundit::NotAuthorizedError unless @task = policy_scope(Task).with_all_required_info_for_tasks.where(id: params[:id]).first
     end
 
     # Only allow a trusted parameter "white list" through.
