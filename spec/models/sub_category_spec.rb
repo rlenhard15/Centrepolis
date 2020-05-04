@@ -8,12 +8,12 @@ RSpec.describe SubCategory, type: :model do
   end
 
   describe "Method 'with_stages_progresses'" do
-    let!(:admin)            { create(:admin) }
-      let!(:customer)       { create(:customer, created_by: admin.id) }
-    let!(:assessment)       { create(:assessment) }
-      let!(:category)       { create(:category, assessment_id: assessment.id) }
-        let!(:sub_category) { create(:sub_category, category_id: category.id) }
-          let!(:stage)      { create(:stage, sub_category_id: sub_category.id) }
+    let!(:admin)                         { create(:admin) }
+      let!(:customer)                    { create(:customer, created_by: admin.id) }
+    let!(:assessment)                    { create(:assessment) }
+      let!(:category)                    { create(:category, assessment_id: assessment.id) }
+        let!(:sub_category)              { create(:sub_category, category_id: category.id) }
+          let!(:stage)                   { create(:stage, sub_category_id: sub_category.id) }
             let!(:sub_category_progress) { create(:sub_category_progress, sub_category_id: sub_category.id, current_stage_id: stage.id, customer_id: customer.id) }
 
     it "return stages progress for sub_category" do
