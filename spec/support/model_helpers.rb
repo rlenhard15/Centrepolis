@@ -11,7 +11,7 @@ module ModelHelpers
         key.in?(%w[created_at updated_at])
       end
     else
-      object.each{ |h| h.delete("updated_at") && h.delete("created_at")}
+      object.each{ |h| (h.delete("updated_at") && h.delete("created_at")) || h.delete("created_at") }
     end
   end
 end
