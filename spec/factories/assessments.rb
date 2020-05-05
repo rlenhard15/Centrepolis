@@ -1,5 +1,5 @@
 FactoryBot.define do
   factory :assessment do
-    name { "Test assessment" }
+    name { Faker::Science.element }
   end
 end

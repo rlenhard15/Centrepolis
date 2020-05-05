@@ -60,7 +60,7 @@ RSpec.describe Category, type: :model do
 
       recursively_delete_timestamps(sub_categories_list[0]["stages"])
       recursively_delete_timestamps(sub_categories_list[1]["stages"])
-      
+
       expect(sub_categories_list).to eq(
         [
           {
@@ -131,7 +131,6 @@ RSpec.describe Category, type: :model do
           }
         ]
       )
-
     end
   end
 end

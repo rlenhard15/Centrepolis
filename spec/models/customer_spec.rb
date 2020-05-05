@@ -27,15 +27,16 @@ RSpec.describe Customer, type: :model do
 
       recursively_delete_timestamps(assessment_risk_list)
 
+      expect(customer.assessment_progresses).to include(assessment_progress)
       expect(assessment_risk_list.count).to eq(2)
       expect(assessment_risk_list).to eq(
         [
           {
-            "assessment"=> "Test assessment",
-            "risk_value"=> "3.812"
+            "assessment"=> assessments.first.name,
+            "risk_value"=> "#{(assessment_progress.risk_value).to_f}"
           },
           {
-            "assessment"=> "Test assessment",
+            "assessment"=> assessments.last.name,
             "risk_value"=> nil
           }
         ]
