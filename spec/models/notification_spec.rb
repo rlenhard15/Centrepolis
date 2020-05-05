@@ -9,6 +9,7 @@ RSpec.describe Notification, type: :model do
   describe "Method 'with_task_and_admin_info'" do
     let!(:admin)              { create(:admin) }
       let!(:customer)         { create(:customer, created_by: admin.id) }
+      let!(:customer_1)       { create(:customer, created_by: admin.id) }
     let!(:assessment)         { create(:assessment) }
       let!(:category)         { create(:category, assessment_id: assessment.id) }
         let!(:sub_category)   { create(:sub_category, category_id: category.id) }
@@ -18,12 +19,17 @@ RSpec.describe Notification, type: :model do
     let!(:task_2)             { create(:task, user_id: customer.id, created_by: admin.id, stage_id: stage.id) }
       let!(:notification_2)   { create(:notification, customer_id: customer.id, task_id: task_2.id) }
 
+    it "return empty info if there arent notifications for customer" do
+      notifications_list = Notification.where(customer_id: customer_1.id).with_task_and_admin_info.as_json
+
+      expect(notifications_list).to eq([])
+    end
+
     it "return all required info for notifications" do
-      notifications_list = Notification.with_task_and_admin_info.as_json
+      notifications_list = Notification.where(customer_id: customer.id).with_task_and_admin_info.as_json
 
       info_notifications = recursively_delete_timestamps(notifications_list)
 
-      expect(info_notifications.count).to eq(2)
       expect(info_notifications).to eq(
         [
           {
