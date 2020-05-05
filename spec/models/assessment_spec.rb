@@ -10,26 +10,30 @@ RSpec.describe Assessment, type: :model do
   describe "Method 'with_assessment_progresses'" do
     let!(:admin)                     { create(:admin) }
       let!(:customer)                { create(:customer, created_by: admin.id) }
+      let!(:customer_2)              { create(:customer, created_by: admin.id) }
     let!(:assessments)               { create_list(:assessment, 2) }
       let!(:assessment_progress_1)   { create(:assessment_progress, customer_id: customer.id, assessment_id: assessments.first.id) }
       let!(:assessment_progress_2)   { create(:assessment_progress, customer_id: customer.id, assessment_id: assessments.last.id) }
 
     it "return assessments with risk_value for customer" do
       assessment_with_risk = Assessment.with_assessment_progresses(customer.id).as_json
+      assessment_with_risk_2 = Assessment.with_assessment_progresses(customer_2.id).as_json
 
       info = recursively_delete_timestamps(assessment_with_risk)
 
+      expect(assessment_with_risk).to eq(recursively_delete_timestamps(Assessment.with_assessment_progresses(customer.id).as_json))
+      expect(assessment_with_risk_2[0]['risk_value']).to eq(nil)
       expect(info).to eq(
         [
           {
             "id"=> assessments.first.id,
             "name"=> assessments.first.name,
-            "risk_value"=> "3.812"
+            "risk_value"=> "#{(assessment_progress_1.risk_value).to_f}"
           },
           {
             "id"=> assessments.last.id,
             "name"=> assessments.last.name,
-            "risk_value"=> "3.812"
+            "risk_value"=> "#{(assessment_progress_2.risk_value).to_f}"
           }
         ]
       )
@@ -38,9 +42,24 @@ RSpec.describe Assessment, type: :model do
 
   describe "Method 'description_with_child_models'" do
     let!(:assessment)   { create(:assessment) }
+    let!(:assessment_2)   { create(:assessment) }
     let!(:category)     { create(:category, assessment_id: assessment.id) }
     let!(:sub_category) { create(:sub_category, category_id: category.id) }
     let!(:stage)        { create(:stage, sub_category_id: sub_category.id) }
+
+    it "return empty info about nested description if there arent categories, sub_categories, stages" do
+      assessment_with_desc = assessment_2.as_json(methods: :description_with_child_models)
+
+      info = recursively_delete_timestamps(assessment_with_desc)
+
+      expect(info).to eq(
+        {
+          "id"=> assessment_2.id,
+          "name"=> assessment_2.name,
+          "description_with_child_models"=>[]
+        }
+      )
+    end
 
     it "return description of assessment with info of child models" do
       assessment_with_desc = assessment.as_json(methods: :description_with_child_models)
@@ -81,15 +100,20 @@ RSpec.describe Assessment, type: :model do
   describe "Method 'assessment_risk'" do
     let!(:admin)                 { create(:admin) }
       let!(:customer)            { create(:customer, created_by: admin.id) }
+      let!(:customer_2)          { create(:customer, created_by: admin.id) }
     let!(:assessment)            { create(:assessment) }
     let!(:categories)            { create(:category, assessment_id: assessment.id) }
     let!(:sub_category)          { create(:sub_category, category_id: categories.id) }
     let!(:stage)                 { create(:stage, sub_category_id: sub_category.id) }
     let!(:sub_category_progress) { create(:sub_category_progress, sub_category_id: sub_category.id, current_stage_id: stage.id, customer_id: customer.id) }
 
-    it "return risk value for assessment" do
+    it "return risk value for assessment if customer has progress" do
       expect(assessment.assessment_risk(customer.id)).to eq(100)
+      expect(customer.sub_category_progresses.last.customer_id).to eq(customer.id)
+    end
+
+    it "return 0.0 of risk_value if customer hasnt progress for assessment" do
+      expect(assessment.assessment_risk(customer_2.id)).to eq(0.0)
     end
   end
-
 end

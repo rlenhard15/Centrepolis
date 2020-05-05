@@ -1,5 +1,3 @@
 FactoryBot.define do
-  factory :sub_category_progress do
-    
-  end
+  factory :sub_category_progress
 end
