@@ -10,6 +10,7 @@ RSpec.describe SubCategory, type: :model do
   describe "Method 'with_stages_progresses'" do
     let!(:admin)                         { create(:admin) }
       let!(:customer)                    { create(:customer, created_by: admin.id) }
+      let!(:customer_2)                  { create(:customer, created_by: admin.id) }
     let!(:assessment)                    { create(:assessment) }
       let!(:category)                    { create(:category, assessment_id: assessment.id) }
         let!(:sub_category)              { create(:sub_category, category_id: category.id) }
@@ -21,6 +22,7 @@ RSpec.describe SubCategory, type: :model do
 
       recursively_delete_timestamps(sub_category_with_progress)
 
+      expect(customer.sub_category_progresses).to include(sub_category_progress)
       expect(sub_category_with_progress).to eq(
         [
           {
@@ -30,6 +32,25 @@ RSpec.describe SubCategory, type: :model do
             "customer_id"=> sub_category_progress.customer_id,
             "sub_category_id"=> sub_category_progress.sub_category_id,
             "current_stage_id"=> sub_category_progress.current_stage_id
+          }
+        ]
+      )
+    end
+
+    it "return nil for sub_category_progresses if customer hasnt stages progress for sub_category" do
+      sub_category_with_progress = SubCategory.with_stages_progresses(customer_2.id).select("sub_categories.*, sub_category_progresses.*").as_json
+
+      recursively_delete_timestamps(sub_category_with_progress)
+
+      expect(sub_category_with_progress).to eq(
+        [
+          {
+            "id"=>nil,
+            "category_id"=> category.id,
+            "current_stage_id"=>nil,
+            "customer_id"=>nil,
+            "sub_category_id"=>nil,
+            "title"=> sub_category.title
           }
         ]
       )
