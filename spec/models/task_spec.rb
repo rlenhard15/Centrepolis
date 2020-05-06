@@ -9,13 +9,13 @@ RSpec.describe Task, type: :model do
   end
 
   describe "Method 'with_all_required_info_for_tasks'" do
-    let!(:admin)              { create(:admin) }
-      let!(:customer)         { create(:customer, created_by: admin.id) }
-    let!(:assessment)         { create(:assessment) }
-      let!(:category)         { create(:category, assessment_id: assessment.id) }
-        let!(:sub_category)   { create(:sub_category, category_id: category.id) }
-          let!(:stage)        { create(:stage, sub_category_id: sub_category.id) }
-    let!(:tasks)              { create_list(:task, 2, user_id: customer.id, created_by: admin.id, stage_id: stage.id) }
+    let!(:admin)            { create(:admin) }
+      let!(:customer)       { create(:customer, created_by: admin.id) }
+    let!(:assessment)       { create(:assessment) }
+      let!(:category)       { create(:category, assessment_id: assessment.id) }
+        let!(:sub_category) { create(:sub_category, category_id: category.id) }
+          let!(:stage)      { create(:stage, sub_category_id: sub_category.id) }
+            let!(:tasks)    { create_list(:task, 2, user_id: customer.id, created_by: admin.id, stage_id: stage.id) }
 
     it "return stages progress for sub_category" do
       tasks_info = Task.with_all_required_info_for_tasks.as_json
