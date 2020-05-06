@@ -15,14 +15,35 @@ RSpec.describe Assessment, type: :model do
       let!(:assessment_progress_1)   { create(:assessment_progress, customer_id: customer.id, assessment_id: assessments.first.id) }
       let!(:assessment_progress_2)   { create(:assessment_progress, customer_id: customer.id, assessment_id: assessments.last.id) }
 
+    it "return nil for risk value if customer hasnt assessment progress" do
+      assessment_with_risk = Assessment.with_assessment_progresses(customer_2.id).as_json
+
+      info = recursively_delete_timestamps(assessment_with_risk)
+      expect(info).to eq(
+        [
+          {
+            "id"=> assessments.first.id,
+            "name"=> assessments.first.name,
+            "risk_value"=> nil
+          },
+          {
+            "id"=> assessments.last.id,
+            "name"=> assessments.last.name,
+            "risk_value"=> nil
+          }
+        ]
+      )
+    end
+
+    it "return assessments with risk value for certain customer" do
+      expect(recursively_delete_timestamps(customer.assessment_progresses.as_json)).to eq(recursively_delete_timestamps([assessment_progress_1, assessment_progress_2].as_json))
+    end
+
     it "return assessments with risk_value for customer" do
       assessment_with_risk = Assessment.with_assessment_progresses(customer.id).as_json
-      assessment_with_risk_2 = Assessment.with_assessment_progresses(customer_2.id).as_json
 
       info = recursively_delete_timestamps(assessment_with_risk)
 
-      expect(assessment_with_risk).to eq(recursively_delete_timestamps(Assessment.with_assessment_progresses(customer.id).as_json))
-      expect(assessment_with_risk_2[0]['risk_value']).to eq(nil)
       expect(info).to eq(
         [
           {
