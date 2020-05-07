@@ -9,19 +9,24 @@ RSpec.describe Task, type: :model do
   end
 
   describe "Method 'with_all_required_info_for_tasks'" do
-    let!(:admin)            { create(:admin) }
-      let!(:customer)       { create(:customer, created_by: admin.id) }
-    let!(:assessment)       { create(:assessment) }
-      let!(:category)       { create(:category, assessment_id: assessment.id) }
-        let!(:sub_category) { create(:sub_category, category_id: category.id) }
-          let!(:stage)      { create(:stage, sub_category_id: sub_category.id) }
-            let!(:tasks)    { create_list(:task, 2, user_id: customer.id, created_by: admin.id, stage_id: stage.id) }
+    let!(:admin)             { create(:admin) }
+      let!(:customer)        { create(:customer, created_by: admin.id) }
+      let!(:customer_2)      { create(:customer, created_by: admin.id) }
+    let!(:assessment)        { create(:assessment) }
+      let!(:category)        { create(:category, assessment_id: assessment.id) }
+        let!(:sub_categories){ create_list(:sub_category, 2,  category_id: category.id) }
+          let!(:stage)       { create(:stage, sub_category_id: sub_categories.first.id) }
+            let!(:tasks)     { create_list(:task, 2, user_id: customer.id, created_by: admin.id, stage_id: stage.id) }
+            let!(:tasks_2)   { create_list(:task, 2, user_id: customer_2.id, created_by: admin.id, stage_id: stage.id) }
 
-    it "return stages progress for sub_category" do
-      tasks_info = Task.with_all_required_info_for_tasks.as_json
+    it "return tasks for current user" do
+      tasks_info = Task.where(user_id: customer.id).with_all_required_info_for_tasks.as_json
+      tasks_info_2 = Task.where(user_id: customer_2.id).with_all_required_info_for_tasks.as_json
 
       recursively_delete_timestamps(tasks_info)
+      recursively_delete_timestamps(tasks_info_2)
 
+      expect(tasks_info).not_to eq(tasks_info_2)
       expect(tasks_info).to eq(
         [
           {
@@ -32,7 +37,7 @@ RSpec.describe Task, type: :model do
             "status"=> tasks.first.status,
             "master_assessment"=> assessment.name,
             "category"=> category.title,
-            "sub_category"=> sub_category.title,
+            "sub_category"=> sub_categories.first.title,
             "stage_title"=> stage.title
           },
           {
@@ -43,7 +48,7 @@ RSpec.describe Task, type: :model do
             "status"=> tasks.last.status,
             "master_assessment"=> assessment.name,
             "category"=> category.title,
-            "sub_category"=> sub_category.title,
+            "sub_category"=> sub_categories.last.title,
             "stage_title"=> stage.title
           }
         ]

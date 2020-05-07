@@ -11,9 +11,11 @@ RSpec.describe Assessment, type: :model do
     let!(:admin)                     { create(:admin) }
       let!(:customer)                { create(:customer, created_by: admin.id) }
       let!(:customer_2)              { create(:customer, created_by: admin.id) }
+      let!(:customer_3)              { create(:customer, created_by: admin.id) }
     let!(:assessments)               { create_list(:assessment, 2) }
       let!(:assessment_progress_1)   { create(:assessment_progress, customer_id: customer.id, assessment_id: assessments.first.id) }
       let!(:assessment_progress_2)   { create(:assessment_progress, customer_id: customer.id, assessment_id: assessments.last.id) }
+      let!(:assessment_progress_3)   { create(:assessment_progress, customer_id: customer_3.id, assessment_id: assessments.last.id) }
 
     it "return nil for risk value if customer hasnt assessment progress" do
       assessment_with_risk = Assessment.with_assessment_progresses(customer_2.id).as_json
@@ -35,15 +37,12 @@ RSpec.describe Assessment, type: :model do
       )
     end
 
-    it "return assessments with risk value for certain customer" do
-      expect(recursively_delete_timestamps(customer.assessment_progresses.as_json)).to eq(recursively_delete_timestamps([assessment_progress_1, assessment_progress_2].as_json))
-    end
-
     it "return assessments with risk_value for customer" do
       assessment_with_risk = Assessment.with_assessment_progresses(customer.id).as_json
 
       info = recursively_delete_timestamps(assessment_with_risk)
 
+      expect(info).not_to include(assessment_progress_3)
       expect(info).to eq(
         [
           {
@@ -63,7 +62,7 @@ RSpec.describe Assessment, type: :model do
 
   describe "Method 'description_with_child_models'" do
     let!(:assessment)   { create(:assessment) }
-    let!(:assessment_2)   { create(:assessment) }
+    let!(:assessment_2) { create(:assessment) }
     let!(:category)     { create(:category, assessment_id: assessment.id) }
     let!(:sub_category) { create(:sub_category, category_id: category.id) }
     let!(:stage)        { create(:stage, sub_category_id: sub_category.id) }
@@ -119,18 +118,21 @@ RSpec.describe Assessment, type: :model do
   end
 
   describe "Method 'assessment_risk'" do
-    let!(:admin)                 { create(:admin) }
-      let!(:customer)            { create(:customer, created_by: admin.id) }
-      let!(:customer_2)          { create(:customer, created_by: admin.id) }
-    let!(:assessment)            { create(:assessment) }
-    let!(:categories)            { create(:category, assessment_id: assessment.id) }
-    let!(:sub_category)          { create(:sub_category, category_id: categories.id) }
-    let!(:stage)                 { create(:stage, sub_category_id: sub_category.id) }
-    let!(:sub_category_progress) { create(:sub_category_progress, sub_category_id: sub_category.id, current_stage_id: stage.id, customer_id: customer.id) }
+    let!(:admin)                           { create(:admin) }
+      let!(:customer)                      { create(:customer, created_by: admin.id) }
+      let!(:customer_2)                    { create(:customer, created_by: admin.id) }
+      let!(:customer_3)                    { create(:customer, created_by: admin.id) }
+    let!(:assessment)                      { create(:assessment) }
+      let!(:category)                      { create(:category, assessment_id: assessment.id) }
+        let!(:sub_category)                { create(:sub_category, category_id: category.id) }
+          let!(:stage_1)                   { create(:stage, position: 1, sub_category_id: sub_category.id) }
+          let!(:stage_2)                   { create(:stage, position: 2, sub_category_id: sub_category.id) }
+            let!(:sub_category_progress)   { create(:sub_category_progress, sub_category_id: sub_category.id, current_stage_id: stage_2.id, customer_id: customer.id) }
+            let!(:sub_category_progress_2) { create(:sub_category_progress, sub_category_id: sub_category.id, current_stage_id: stage_1.id, customer_id: customer_3.id) }
 
-    it "return risk value for assessment if customer has progress" do
+    it "return correct risk value for assessment if customer has progress" do
       expect(assessment.assessment_risk(customer.id)).to eq(100)
-      expect(customer.sub_category_progresses.last.customer_id).to eq(customer.id)
+      expect(assessment.assessment_risk(customer_3.id)).to eq(50)
     end
 
     it "return 0.0 of risk_value if customer hasnt progress for assessment" do

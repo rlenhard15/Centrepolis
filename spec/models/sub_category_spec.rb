@@ -8,21 +8,25 @@ RSpec.describe SubCategory, type: :model do
   end
 
   describe "Method 'with_stages_progresses'" do
-    let!(:admin)                         { create(:admin) }
-      let!(:customer)                    { create(:customer, created_by: admin.id) }
-      let!(:customer_2)                  { create(:customer, created_by: admin.id) }
-    let!(:assessment)                    { create(:assessment) }
-      let!(:category)                    { create(:category, assessment_id: assessment.id) }
-        let!(:sub_category)              { create(:sub_category, category_id: category.id) }
-          let!(:stage)                   { create(:stage, sub_category_id: sub_category.id) }
-            let!(:sub_category_progress) { create(:sub_category_progress, sub_category_id: sub_category.id, current_stage_id: stage.id, customer_id: customer.id) }
+    let!(:admin)                           { create(:admin) }
+      let!(:customer)                      { create(:customer, created_by: admin.id) }
+      let!(:customer_2)                    { create(:customer, created_by: admin.id) }
+      let!(:customer_3)                    { create(:customer, created_by: admin.id) }
+    let!(:assessment)                      { create(:assessment) }
+      let!(:category)                      { create(:category, assessment_id: assessment.id) }
+        let!(:sub_category)                { create(:sub_category, category_id: category.id) }
+          let!(:stage)                     { create(:stage, position: 1, sub_category_id: sub_category.id) }
+            let!(:sub_category_progress)   { create(:sub_category_progress, sub_category_id: sub_category.id, current_stage_id: stage.id, customer_id: customer.id) }
+            let!(:sub_category_progress_2) { create(:sub_category_progress, sub_category_id: sub_category.id, current_stage_id: stage.id, customer_id: customer_3.id) }
 
     it "return stages progress for sub_category" do
       sub_category_with_progress = SubCategory.with_stages_progresses(customer.id).select("sub_categories.*, sub_category_progresses.*").as_json
+      sub_category_with_progress_2 = SubCategory.with_stages_progresses(customer_3.id).select("sub_categories.*, sub_category_progresses.*").as_json
 
       recursively_delete_timestamps(sub_category_with_progress)
+      recursively_delete_timestamps(sub_category_with_progress_2)
 
-      expect(customer.sub_category_progresses).to include(sub_category_progress)
+      expect(sub_category_with_progress).not_to eq(sub_category_progress_2)
       expect(sub_category_with_progress).to eq(
         [
           {

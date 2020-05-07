@@ -17,17 +17,21 @@ RSpec.describe Customer, type: :model do
   end
 
   describe "Method 'assessments_risk_list'" do
-    let!(:admin)                 { create(:admin) }
-      let!(:customer)            { create(:customer, created_by: admin.id) }
-    let!(:assessments)           { create_list(:assessment, 2) }
-      let!(:assessment_progress) { create(:assessment_progress, customer_id: customer.id, assessment_id: assessments.first.id) }
+    let!(:admin)                   { create(:admin) }
+      let!(:customer)              { create(:customer, created_by: admin.id) }
+      let!(:customer_2)            { create(:customer, created_by: admin.id) }
+    let!(:assessments)             { create_list(:assessment, 2) }
+      let!(:assessment_progress)   { create(:assessment_progress, customer_id: customer.id, assessment_id: assessments.first.id) }
+      let!(:assessment_progress_2) { create(:assessment_progress, customer_id: customer_2.id, assessment_id: assessments.first.id) }
 
     it "return list of assessments risk for customer" do
       assessment_risk_list = customer.assessments_risk_list.as_json
+      assessment_risk_list_2 = customer_2.assessments_risk_list.as_json
 
       recursively_delete_timestamps(assessment_risk_list)
+      recursively_delete_timestamps(assessment_risk_list_2)
 
-      expect(customer.assessment_progresses).to include(assessment_progress)
+      expect(assessment_risk_list).not_to include(assessment_risk_list_2)
       expect(assessment_risk_list.count).to eq(2)
       expect(assessment_risk_list).to eq(
         [
