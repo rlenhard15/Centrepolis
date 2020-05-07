@@ -16,17 +16,15 @@ RSpec.describe SubCategory, type: :model do
       let!(:category)                      { create(:category, assessment_id: assessment.id) }
         let!(:sub_category)                { create(:sub_category, category_id: category.id) }
           let!(:stage)                     { create(:stage, position: 1, sub_category_id: sub_category.id) }
+          let!(:stage_2)                   { create(:stage, position: 2, sub_category_id: sub_category.id) }
             let!(:sub_category_progress)   { create(:sub_category_progress, sub_category_id: sub_category.id, current_stage_id: stage.id, customer_id: customer.id) }
-            let!(:sub_category_progress_2) { create(:sub_category_progress, sub_category_id: sub_category.id, current_stage_id: stage.id, customer_id: customer_3.id) }
+            let!(:sub_category_progress_2) { create(:sub_category_progress, sub_category_id: sub_category.id, current_stage_id: stage_2.id, customer_id: customer_3.id) }
 
-    it "return stages progress for sub_category" do
+    it "return nil for sub_category_progresses if customer hasnt stages progress for sub_category" do
       sub_category_with_progress = SubCategory.with_stages_progresses(customer.id).select("sub_categories.*, sub_category_progresses.*").as_json
-      sub_category_with_progress_2 = SubCategory.with_stages_progresses(customer_3.id).select("sub_categories.*, sub_category_progresses.*").as_json
 
       recursively_delete_timestamps(sub_category_with_progress)
-      recursively_delete_timestamps(sub_category_with_progress_2)
 
-      expect(sub_category_with_progress).not_to eq(sub_category_progress_2)
       expect(sub_category_with_progress).to eq(
         [
           {

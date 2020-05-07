@@ -28,14 +28,40 @@ RSpec.describe Notification, type: :model do
       expect(notifications_list).to eq([])
     end
 
-    it "return all required info for notifications" do
-      notifications_list = Notification.where(customer_id: customer.id).with_task_and_admin_info.as_json
-      notifications_list_2 = Notification.where(customer_id: customer_2.id).with_task_and_admin_info.as_json
+    it "return all notifications" do
+      notifications_list = Notification.with_task_and_admin_info.as_json
 
       info_notifications = recursively_delete_timestamps(notifications_list)
-      info_notifications_2 = recursively_delete_timestamps(notifications_list_2)
 
-      expect(info_notifications).not_to eq(info_notifications_2)
+      expect(info_notifications).to eq(
+        [
+          {
+            "id"=> notification_1.id,
+            "read"=> notification_1.read,
+            "task_title"=> task_1.title,
+            "admin_name"=> (admin.first_name + " " + admin.last_name)
+          },
+          {
+            "id"=> notification_2.id,
+           "read"=> notification_2.read,
+           "task_title"=> task_2.title,
+           "admin_name"=> (admin.first_name + " " + admin.last_name)
+          },
+          {
+           "id"=> notification_3.id,
+           "read"=> notification_3.read,
+           "task_title"=> task_3.title,
+           "admin_name"=> (admin.first_name + " " + admin.last_name)
+          }
+        ]
+      )
+    end
+
+    it "return all required info for notifications" do
+      notifications_list = Notification.where(customer_id: customer.id).with_task_and_admin_info.as_json
+
+      info_notifications = recursively_delete_timestamps(notifications_list)
+
       expect(info_notifications).to eq(
         [
           {

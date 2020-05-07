@@ -6,14 +6,6 @@ RSpec.describe SubCategoryProgress, type: :model do
     it { should belong_to(:sub_category).without_validating_presence }
   end
 
-  describe "validates" do
-    it 'validates correct_values_for_current_stage_id' do
-      sub_category_progress = SubCategoryProgress.new(current_stage_id: rand(1..10))
-      sub_category_progress.valid?
-      expect(sub_category_progress.valid?).to eq(false)
-    end
-  end
-
   describe "Method 'correct_values_for_current_stage_id'" do
     let!(:admin)              { create(:admin) }
       let!(:customer)         { create(:customer, created_by: admin.id) }
@@ -33,19 +25,6 @@ RSpec.describe SubCategoryProgress, type: :model do
       SubCategoryProgress.create(params)
 
       expect(SubCategoryProgress.count).to eq(1)
-    end
-
-    it "return 0 if current_stage_id is nil" do
-      params = {
-        customer_id: customer.id,
-        sub_category_id: sub_category.id,
-        current_stage_id: nil
-      }
-
-      sub_category_progress = SubCategoryProgress.create(params)
-
-      expect(SubCategoryProgress.count).to eq(0)
-      expect(sub_category_progress.errors.messages).to eq({:current_stage_id=>["current_stage_id is invalid"]})
     end
 
     it "return 0 if current_stage_id doesn't exist in stages_ids" do

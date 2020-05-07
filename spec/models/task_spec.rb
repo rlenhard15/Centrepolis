@@ -11,22 +11,17 @@ RSpec.describe Task, type: :model do
   describe "Method 'with_all_required_info_for_tasks'" do
     let!(:admin)             { create(:admin) }
       let!(:customer)        { create(:customer, created_by: admin.id) }
-      let!(:customer_2)      { create(:customer, created_by: admin.id) }
     let!(:assessment)        { create(:assessment) }
       let!(:category)        { create(:category, assessment_id: assessment.id) }
-        let!(:sub_categories){ create_list(:sub_category, 2,  category_id: category.id) }
+        let!(:sub_categories){ create_list(:sub_category, 2, category_id: category.id) }
           let!(:stage)       { create(:stage, sub_category_id: sub_categories.first.id) }
             let!(:tasks)     { create_list(:task, 2, user_id: customer.id, created_by: admin.id, stage_id: stage.id) }
-            let!(:tasks_2)   { create_list(:task, 2, user_id: customer_2.id, created_by: admin.id, stage_id: stage.id) }
 
     it "return tasks for current user" do
       tasks_info = Task.where(user_id: customer.id).with_all_required_info_for_tasks.as_json
-      tasks_info_2 = Task.where(user_id: customer_2.id).with_all_required_info_for_tasks.as_json
 
       recursively_delete_timestamps(tasks_info)
-      recursively_delete_timestamps(tasks_info_2)
 
-      expect(tasks_info).not_to eq(tasks_info_2)
       expect(tasks_info).to eq(
         [
           {

@@ -24,8 +24,6 @@ RSpec.describe Category, type: :model do
 
       info = recursively_delete_timestamps(categories_list)
 
-      expect(info).not_to include(category_1)
-      expect(info.count).to eq(2)
       expect(info).to eq(
         [
           {
@@ -40,7 +38,6 @@ RSpec.describe Category, type: :model do
           }
         ]
       )
-      expect(info.last["assessment_id"]).to_not eq(assessment_1.id)
     end
   end
 
@@ -51,14 +48,17 @@ RSpec.describe Category, type: :model do
       let!(:customer_2)                    { create(:customer, created_by: admin.id) }
     let!(:assessment)                      { create(:assessment) }
       let!(:category)                      { create(:category, assessment_id: assessment.id) }
+      let!(:category_2)                    { create(:category, assessment_id: assessment.id) }
+        let!(:sub_category_3)              { create(:sub_category, category_id: category_2.id) }
         let!(:sub_categories)              { create_list(:sub_category, 2, category_id: category.id) }
           let!(:stage_1)                   { create(:stage, position: 1, sub_category_id: sub_categories.first.id) }
-          let!(:stage_2)                   { create(:stage, position: 1, sub_category_id: sub_categories.last.id) }
+          let!(:stage_2)                   { create(:stage, position: 2, sub_category_id: sub_categories.last.id) }
+          let!(:stage_3)                   { create(:stage, position: 1, sub_category_id: sub_category_3.id) }
             let!(:sub_category_progress)   { create(:sub_category_progress, sub_category_id: sub_categories.first.id, customer_id: customer.id, current_stage_id: stage_1.id) }
-            let!(:sub_category_progress_2) { create(:sub_category_progress, sub_category_id: sub_categories.first.id, customer_id: customer_2.id, current_stage_id: stage_1.id) }
+            let!(:sub_category_progress_2) { create(:sub_category_progress, sub_category_id: sub_categories.last.id, customer_id: customer_2.id, current_stage_id: stage_2.id) }
 
 
-    it "return sub_categories with empty info about current stages for certain category" do
+    it "return sub_categories with nil of current_stage_id if customer hasnt progresses" do
       sub_categories_list = category.sub_categories_with_statuses(customer_1.id).as_json
 
       recursively_delete_timestamps(sub_categories_list[0]["stages"])
@@ -98,13 +98,10 @@ RSpec.describe Category, type: :model do
 
     it "return sub_categories with all info and current stages for certain category" do
       sub_categories_list = category.sub_categories_with_statuses(customer.id).as_json
-      sub_categories_list_2 = category.sub_categories_with_statuses(customer_2.id).as_json
 
       recursively_delete_timestamps(sub_categories_list[0]["stages"])
       recursively_delete_timestamps(sub_categories_list[1]["stages"])
 
-      expect(sub_categories_list.count).to eq(2)
-      expect(sub_categories_list).not_to include(sub_categories_list_2)
       expect(sub_categories_list).to eq(
         [
           {
