@@ -11,16 +11,23 @@ RSpec.describe Notification, type: :model do
       let!(:customer)         { create(:customer, created_by: admin.id) }
       let!(:customer_1)       { create(:customer, created_by: admin.id) }
       let!(:customer_2)       { create(:customer, created_by: admin.id) }
+      let!(:customer_3)       { create(:customer, created_by: admin.id) }
     let!(:assessment)         { create(:assessment) }
+    let!(:assessment_2)       { create(:assessment) }
       let!(:category)         { create(:category, assessment_id: assessment.id) }
+      let!(:category_2)       { create(:category, assessment_id: assessment_2.id) }
         let!(:sub_category)   { create(:sub_category, category_id: category.id) }
+        let!(:sub_category_2) { create(:sub_category, category_id: category_2.id) }
           let!(:stage)        { create(:stage, position: 1, sub_category_id: sub_category.id) }
+          let!(:stage_2)      { create(:stage, position: 1, sub_category_id: sub_category_2.id) }
     let!(:task_1)             { create(:task, user_id: customer.id, created_by: admin.id, stage_id: stage.id) }
       let!(:notification_1)   { create(:notification, customer_id: customer.id, task_id: task_1.id) }
     let!(:task_2)             { create(:task, user_id: customer.id, created_by: admin.id, stage_id: stage.id) }
       let!(:notification_2)   { create(:notification, customer_id: customer.id, task_id: task_2.id) }
       let!(:task_3)           { create(:task, user_id: customer_2.id, created_by: admin.id, stage_id: stage.id) }
         let!(:notification_3) { create(:notification, customer_id: customer_2.id, task_id: task_3.id) }
+      let!(:task_4)           { create(:task, user_id: customer_3.id, created_by: admin.id, stage_id: stage_2.id) }
+        let!(:notification_4) { create(:notification, user_id: customer_3.id, created_by: admin.id, stage_id: stage_2.id) }
 
     it "return empty info if there arent notifications for customer" do
       notifications_list = Notification.where(customer_id: customer_1.id).with_task_and_admin_info.as_json

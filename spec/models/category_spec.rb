@@ -10,8 +10,8 @@ RSpec.describe Category, type: :model do
     let!(:assessment)   { create(:assessment) }
     let!(:assessment_1) { create(:assessment) }
     let!(:assessment_2) { create(:assessment) }
-      let!(:categories) { create_list(:category, 2, assessment_id: assessment.id)}
-      let!(:category_1) { create(:category, assessment_id: assessment_1.id)}
+      let!(:categories) { create_list(:category, 2, assessment_id: assessment.id) }
+      let!(:category_1) { create(:category, assessment_id: assessment_1.id) }
 
     it "return empty info if there arent categories for current assessment" do
       categories_list = Category.for_assessment(assessment_2.id).as_json

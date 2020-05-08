@@ -11,11 +11,17 @@ RSpec.describe Task, type: :model do
   describe "Method 'with_all_required_info_for_tasks'" do
     let!(:admin)             { create(:admin) }
       let!(:customer)        { create(:customer, created_by: admin.id) }
+      let!(:customer_2)      { create(:customer, created_by: admin.id) }
     let!(:assessment)        { create(:assessment) }
+    let!(:assessment_2)      { create(:assessment) }
       let!(:category)        { create(:category, assessment_id: assessment.id) }
+      let!(:category_2)      { create(:category, assessment_id: assessment_2.id) }
         let!(:sub_categories){ create_list(:sub_category, 2, category_id: category.id) }
+        let!(:sub_category)  { create(:sub_category, category_id: category_2.id) }
           let!(:stage)       { create(:stage, sub_category_id: sub_categories.first.id) }
+          let!(:stage_2)     { create(:stage, sub_category_id: sub_category.id) }
             let!(:tasks)     { create_list(:task, 2, user_id: customer.id, created_by: admin.id, stage_id: stage.id) }
+            let!(:tasks_2)   { create_list(:task, 2, user_id: customer_2.id, created_by: admin.id, stage_id: stage_2.id) }
 
     it "return tasks for current user" do
       tasks_info = Task.where(user_id: customer.id).with_all_required_info_for_tasks.as_json

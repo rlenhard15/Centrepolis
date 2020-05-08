@@ -42,7 +42,6 @@ RSpec.describe Assessment, type: :model do
 
       info = recursively_delete_timestamps(assessment_with_risk)
 
-      expect(info).not_to include(assessment_progress_3)
       expect(info).to eq(
         [
           {
@@ -61,11 +60,15 @@ RSpec.describe Assessment, type: :model do
   end
 
   describe "Method 'description_with_child_models'" do
-    let!(:assessment)   { create(:assessment) }
-    let!(:assessment_2) { create(:assessment) }
-    let!(:category)     { create(:category, assessment_id: assessment.id) }
-    let!(:sub_category) { create(:sub_category, category_id: category.id) }
-    let!(:stage)        { create(:stage, sub_category_id: sub_category.id) }
+    let!(:assessment)         { create(:assessment) }
+    let!(:assessment_2)       { create(:assessment) }
+    let!(:assessment_3)       { create(:assessment) }
+      let!(:category)         { create(:category, assessment_id: assessment.id) }
+      let!(:category_2)       { create(:category, assessment_id: assessment_3.id) }
+        let!(:sub_category)   { create(:sub_category, category_id: category.id) }
+        let!(:sub_category_2) { create(:sub_category, category_id: category_2.id) }
+          let!(:stage)        { create(:stage, sub_category_id: sub_category.id) }
+          let!(:stage_2)      { create(:stage, sub_category_id: sub_category_2.id) }
 
     it "return empty info about nested description if there arent categories, sub_categories, stages" do
       assessment_with_desc = assessment_2.as_json(methods: :description_with_child_models)
@@ -123,12 +126,17 @@ RSpec.describe Assessment, type: :model do
       let!(:customer_2)                    { create(:customer, created_by: admin.id) }
       let!(:customer_3)                    { create(:customer, created_by: admin.id) }
     let!(:assessment)                      { create(:assessment) }
+    let!(:assessment_2)                    { create(:assessment) }
       let!(:category)                      { create(:category, assessment_id: assessment.id) }
+      let!(:category_2)                    { create(:category, assessment_id: assessment_2.id) }
         let!(:sub_category)                { create(:sub_category, category_id: category.id) }
+        let!(:sub_category_2)              { create(:sub_category, category_id: category_2.id) }
           let!(:stage_1)                   { create(:stage, position: 1, sub_category_id: sub_category.id) }
           let!(:stage_2)                   { create(:stage, position: 2, sub_category_id: sub_category.id) }
+          let!(:stage_3)                   { create(:stage, position: 1, sub_category_id: sub_category_2.id) }
             let!(:sub_category_progress)   { create(:sub_category_progress, sub_category_id: sub_category.id, current_stage_id: stage_2.id, customer_id: customer.id) }
             let!(:sub_category_progress_2) { create(:sub_category_progress, sub_category_id: sub_category.id, current_stage_id: stage_1.id, customer_id: customer_3.id) }
+            let!(:sub_category_progress_3) { create(:sub_category_progress, sub_category_id: sub_category_2.id, current_stage_id: stage_3.id, customer_id: customer_3.id) }
 
     it "return correct risk value for assessment if customer has progress" do
       expect(assessment.assessment_risk(customer.id)).to eq(100)
