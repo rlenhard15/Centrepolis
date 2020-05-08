@@ -24,7 +24,6 @@ RSpec.describe Customer, type: :model do
     let!(:assessments)             { create_list(:assessment, 2) }
       let!(:assessment_progress)   { create(:assessment_progress, customer_id: customer.id, assessment_id: assessments.first.id) }
       let!(:assessment_progress_2) { create(:assessment_progress, customer_id: customer_2.id, assessment_id: assessments.last.id) }
-      let!(:assessment_progress_3) { create(:assessment_progress, customer_id: customer_2.id, assessment_id: assessments.first.id) }
 
     it "return nil of risk_value if customer hasnt any progreses" do
       assessment_risk_list = customer_3.assessments_risk_list.as_json

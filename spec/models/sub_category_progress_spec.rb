@@ -19,7 +19,7 @@ RSpec.describe SubCategoryProgress, type: :model do
           let!(:stage)        { create(:stage, position: 1, sub_category_id: sub_category.id) }
           let!(:stage_2)      { create(:stage, position: 1, sub_category_id: sub_category_3.id) }
 
-    it "return 1 if current_stage_id exists in stages_ids" do
+    it "check validation of current_stage_id which must exists in stages_ids" do
       params = {
         customer_id: customer.id,
         sub_category_id: sub_category.id,
@@ -31,7 +31,7 @@ RSpec.describe SubCategoryProgress, type: :model do
       expect(SubCategoryProgress.count).to eq(1)
     end
 
-    it "return 0 if current_stage_id doesn't exist in stages_ids" do
+    it "validation doesnt allow create progress if current_stage_id doesn't exist in stages_ids" do
       params = {
         customer_id: customer.id,
         sub_category_id: sub_category_2.id,
