@@ -77,6 +77,8 @@ GEM
       dotenv (= 2.7.5)
       railties (>= 3.2, < 6.1)
     erubi (1.9.0)
+    everlasting (0.2.0)
+      actionpack (>= 5.0.0)
     factory_bot (5.1.1)
       activesupport (>= 4.2.0)
     factory_bot_rails (5.1.1)
@@ -210,6 +212,7 @@ DEPENDENCIES
   byebug
   devise
   dotenv-rails
+  everlasting
   factory_bot_rails
   faker
   jwt

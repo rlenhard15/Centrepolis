@@ -1,0 +1,62 @@
+require 'rails_helper'
+
+RSpec.describe SubCategoriesController, type: :controller do
+  it { should use_before_action(:authenticate_user!) }
+  it { should use_before_action(:authorize_user!) }
+  it { should use_before_action(:set_customer) }
+  it { should use_before_action(:set_sub_category_progress) }
+  it { should use_before_action(:set_assessment) }
+  it { should use_before_action(:set_assessment_progress) }
+
+  let!(:admin)                         { create(:admin) }
+  let!(:admin_2)                       { create(:admin) }
+    let!(:customer)                    { create(:customer, created_by: admin.id) }
+    let!(:customer_2)                  { create(:customer, created_by: admin_2.id) }
+  let!(:assessment)                    { create(:assessment) }
+    let!(:category)                    { create(:category, assessment_id: assessment.id) }
+      let!(:sub_category)              { create(:sub_category, category_id: category.id) }
+        let!(:stage)                   { create(:stage, position: 1, sub_category_id: sub_category.id) }
+        let!(:stage_2)                 { create(:stage, position: 2, sub_category_id: sub_category.id) }
+          let!(:sub_category_progress) { create(:sub_category_progress, customer_id: customer.id, sub_category_id: sub_category.id, current_stage_id: stage.id) }
+          let!(:assessment_progress)   { create(:assessment_progress, customer_id: customer.id, assessment_id: assessment.id, risk_value: 60) }
+
+    let!(:params)   { ActionController::Parameters.new({'assessment_id': assessment.id, 'category_id': category.id, 'id': sub_category.id, current_stage_id: stage.id, customer_id: customer.id}) }
+    let!(:params_2) { ActionController::Parameters.new({customer_id: customer_2.id}) }
+
+    before { params.permit! }
+    before { params_2.permit! }
+
+    describe "POST update_progress action" do
+      let!(:params_3)   { ActionController::Parameters.new({customer_id: customer.id, current_stage_id: stage_2.id, risk_value: 100}) }
+
+      before { params_3.permit! }
+
+      it "return success messege and risk_value" do
+        sign_in admin
+        post :update_progress, params: params.merge(params_3)
+        sub_category_progress.reload
+        assessment_progress.reload
+        expect(response.body).to eq({ message: "Progress updates successfully", assessment_risk: assessment_progress.risk_value.to_f }.to_json)
+        expect(response.content_type).to eq('application/json; charset=utf-8')
+        expect(sub_category_progress.current_stage_id).to eq(stage_2.id)
+        expect(assessment_progress.risk_value).to eq(100)
+        expect(response).to have_http_status(:success)
+      end
+
+      it "return error in json with status forbidden if admin try to update progress not for his customer" do
+        sign_in admin
+        post :update_progress, params: params.merge(params_2)
+        expect(response.body).to eq({'notice': 'You do not have permission to perform this action'}.to_json)
+        expect(response.content_type).to eq('application/json; charset=utf-8')
+        expect(response).to have_http_status(:forbidden)
+      end
+
+      it "return error in json with status forbidden if sign in as customer" do
+        sign_in customer
+        post :update_progress, params: params
+        expect(response.body).to eq({'notice': 'You do not have permission to perform this action'}.to_json)
+        expect(response.content_type).to eq('application/json; charset=utf-8')
+        expect(response).to have_http_status(:forbidden)
+      end
+    end
+end

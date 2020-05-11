@@ -10,6 +10,8 @@ require 'rspec/rails'
 require 'support/model_helpers'
 
 require 'devise'
+require 'support/controller_helpers'
+require 'support/json_helpers'
 # Add additional requires below this line. Rails is not loaded until this point!
 
 # Requires supporting ruby files with custom matchers and macros, etc, in
@@ -59,6 +61,10 @@ RSpec.configure do |config|
   # https://relishapp.com/rspec/rspec-rails/docs
   config.infer_spec_type_from_file_location!
   config.include FactoryBot::Syntax::Methods
+  config.include Devise::Test::ControllerHelpers, :type => :controller
+  config.include ControllerHelpers, :type => :controller
+  config.include JSONHelpers, :type => :controller
+  config.include Warden::Test::Helpers
   config.include ModelHelpers, :type => :model
   # Filter lines from Rails gems in backtraces.
   config.filter_rails_from_backtrace!
