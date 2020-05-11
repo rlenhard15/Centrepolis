@@ -12,6 +12,6 @@ class SubCategoryProgress < ApplicationRecord
   end
 
   def valid_sub_category_stage
-    sub_category.stages.ids.include? current_stage_id || current_stage_id.nil?
+    sub_category&.stages&.ids&.include? current_stage_id || current_stage_id.nil?
   end
 end

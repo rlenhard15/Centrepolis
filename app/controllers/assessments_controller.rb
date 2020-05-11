@@ -46,7 +46,7 @@ class AssessmentsController < ApplicationController
     "name": "First assessment",
     "created_at": "2020-03-14T20:13:27.006Z",
     "updated_at": "2020-03-14T20:13:27.006Z",
-    "description": [
+    "description_with_child_models": [
       {
         "id": 3,
         "title": "First category",

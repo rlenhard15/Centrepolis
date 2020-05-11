@@ -31,6 +31,13 @@ gem 'apipie-rails'
 gem 'rack-cors'
 
 group :development, :test do
+  gem 'rspec-rails'
+  gem 'shoulda-matchers'
+  gem 'factory_bot_rails'
+  gem 'pundit-matchers'
+  gem 'faker'
+  gem 'everlasting'
+  gem 'shoulda-callback-matchers'
   # Call 'byebug' anywhere in the code to stop execution and get a debugger console
   gem 'byebug', platforms: [:mri, :mingw, :x64_mingw]
   gem 'dotenv-rails'
