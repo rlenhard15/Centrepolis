@@ -27,7 +27,7 @@ RSpec.describe Notification, type: :model do
       let!(:task_3)           { create(:task, user_id: customer_2.id, created_by: admin.id, stage_id: stage.id) }
         let!(:notification_3) { create(:notification, customer_id: customer_2.id, task_id: task_3.id) }
       let!(:task_4)           { create(:task, user_id: customer_3.id, created_by: admin.id, stage_id: stage_2.id) }
-        let!(:notification_4) { create(:notification, user_id: customer_3.id, created_by: admin.id, stage_id: stage_2.id) }
+        let!(:notification_4) { create(:notification, customer_id: customer_3.id, task_id: task_4.id) }
 
     it "return empty info if there arent notifications for customer" do
       notifications_list = Notification.where(customer_id: customer_1.id).with_task_and_admin_info.as_json
@@ -58,6 +58,12 @@ RSpec.describe Notification, type: :model do
            "id"=> notification_3.id,
            "read"=> notification_3.read,
            "task_title"=> task_3.title,
+           "admin_name"=> (admin.first_name + " " + admin.last_name)
+          },
+          {
+           "id"=> notification_4.id,
+           "read"=> notification_4.read,
+           "task_title"=> task_4.title,
            "admin_name"=> (admin.first_name + " " + admin.last_name)
           }
         ]
