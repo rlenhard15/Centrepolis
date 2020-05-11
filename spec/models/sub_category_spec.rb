@@ -21,18 +21,17 @@ RSpec.describe SubCategory, type: :model do
             let!(:sub_category_progress_2) { create(:sub_category_progress, sub_category_id: sub_category.id, current_stage_id: stage_2.id, customer_id: customer_3.id) }
 
     it "return nil for sub_category_progresses if customer hasnt stages progress for sub_category" do
-      sub_category_with_progress = SubCategory.with_stages_progresses(customer.id).select("sub_categories.*, sub_category_progresses.*").as_json
+      sub_category_with_progress = SubCategory.with_stages_progresses(customer.id).select("sub_categories.*, sub_category_progresses.current_stage_id, sub_category_progresses.customer_id").as_json
 
       recursively_delete_timestamps(sub_category_with_progress)
 
       expect(sub_category_with_progress).to eq(
         [
           {
-            "id"=> sub_category_progress.id,
+            "id"=> sub_category.id,
             "title"=> sub_category.title,
             "category_id"=> sub_category.category_id,
             "customer_id"=> sub_category_progress.customer_id,
-            "sub_category_id"=> sub_category_progress.sub_category_id,
             "current_stage_id"=> sub_category_progress.current_stage_id
           }
         ]
@@ -40,18 +39,17 @@ RSpec.describe SubCategory, type: :model do
     end
 
     it "return nil for sub_category_progresses if customer hasnt stages progress for sub_category" do
-      sub_category_with_progress = SubCategory.with_stages_progresses(customer_2.id).select("sub_categories.*, sub_category_progresses.*").as_json
+      sub_category_with_progress = SubCategory.with_stages_progresses(customer_2.id).select("sub_categories.*, sub_category_progresses.current_stage_id, sub_category_progresses.customer_id").as_json
 
       recursively_delete_timestamps(sub_category_with_progress)
 
       expect(sub_category_with_progress).to eq(
         [
           {
-            "id"=>nil,
+            "id"=>sub_category.id,
             "category_id"=> category.id,
             "current_stage_id"=>nil,
-            "customer_id"=>nil,
-            "sub_category_id"=>nil,
+            "customer_id"=> nil,
             "title"=> sub_category.title
           }
         ]
