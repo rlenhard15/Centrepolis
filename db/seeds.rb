@@ -1,8 +1,3 @@
-Assessment.destroy_all
-Category.destroy_all
-SubCategory.destroy_all
-Stage.destroy_all
-
 records = [
   {
     name: "CRL (Commercial Readiness Level)",
@@ -418,11 +413,11 @@ records = [
             }
           ]
         },
-       {
+  {
          name: "TRL",
          categories: [
            {
-             title: '',
+             title: 'Technology Risk',
              sub_categories: [
                {
                  title: 'Basic Tech Research',
@@ -512,16 +507,16 @@ records = [
            }
          ]
        }
-     ]
+]
 
 records.each do |assesment|
-  created_assesment = Assessment.create(name: assesment[:name])
+  created_assesment = Assessment.where(name: assesment[:name]).first_or_create
   assesment[:categories].each do |category|
-    created_category = created_assesment.categories.create(title: category[:title])
+    created_category = created_assesment.categories.where(title: category[:title]).first_or_create
     category[:sub_categories].each do |sub_category|
-      created_sub_category = created_category.sub_categories.create(title: sub_category[:title])
+      created_sub_category = created_category.sub_categories.where(title: sub_category[:title]).first_or_create
       sub_category[:stages].each_with_index do |stage, index|
-        created_stage = created_sub_category.stages.create(title: stage[:title], position: index + 1)
+        created_stage = created_sub_category.stages.where(title: stage[:title]).first_or_create{|stage| stage.position = index + 1}
       end
     end
   end
