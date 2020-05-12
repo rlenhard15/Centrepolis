@@ -214,8 +214,305 @@ records = [
         ]
       }
     ]
-  }
-]
+  },
+  {
+    name: "MRL",
+    categories: [
+      {
+        title: 'Product Design Risk',
+        sub_categories: [
+          {
+            title: 'Customer Use:',
+            stages: [
+              {title: 'Not identified or specified'},
+              {title: 'Limited details on customer use designed into product'},
+              {title: 'Detailed customer use specs designed ino product'},
+              {title: 'Prototypes shared with limited customers for feedback'},
+              {title: 'Prototypes shared with significant number of customers for feedback'},
+              {title: 'Customer tested product directly for use specs to validate product design'}
+            ]
+          },
+          {
+            title: 'Cost:',
+            stages: [
+              {title: 'Unknown'},
+              {title: 'High level cost estimation of materials & components'},
+              {title: 'High level Cost of Goods Sold (COGS)'},
+              {title: 'Detailed Bill of Materials cost estimate'},
+              {title: 'Detailed COGS'},
+              {title: 'Intelligent COGS and production cost analysis at different volumes'},
+            ]
+          },
+          {
+            title: 'Durability/Reliability:',
+            stages: [
+              {title: 'Not measured or estimated'},
+              {title: 'Evaluated internally through simulation(s) or prototype(s)'},
+              {title: 'Evaluated internally through both prototype(s) and simulation(s) or DFMEA'},
+              {title: 'Evaluated via experienced and trusted third party'},
+              {title: 'Evaluated extensively by customer(s)'},
+              {title: 'Tested extensively to life internally, external partner and/or customer'}
+            ]
+          },
+          {
+            title: 'Performance:',
+            stages: [
+              {title: 'Not measured or estimated'},
+              {title: 'Evaluated internally through simulation(s) or prototype(s)'},
+              {title: 'Evaluated internally through both prototype(s) and simulation(s)'},
+              {title: 'Evaluated via experienced and trusted third party'},
+              {title: 'Evaluated extensively by customer(s)'},
+              {title: 'Tested extensively to life internally, external partner and/or customer'}
+            ]
+           }
+          ]
+          },
+          {
+            title: 'Management Team Risk',
+            sub_categories: [
+              {
+                title: 'Management Team',
+                stages: [
+                  {title: 'No notable experience'},
+                  {title: 'Technology or domain experience only'},
+                  {title: 'Technology / domain expert along with sales / marketing expertise'},
+                  {title: 'Team with notable experience, but gaps exists'},
+                  {title: 'Solid team with notable experience'},
+                  {title: 'Very strong team with notable experience and prior successful startups'}
+                ]
+              },
+              {
+                title: 'Alliance/Partners',
+                stages: [
+                  {title: 'Unknown'},
+                  {title: 'Alliance partners identified'},
+                  {title: 'Talks with potential partners commenced'},
+                  {title: 'Negotiations with all necessary partners commenced'},
+                  {title: 'Some alliances with partners closed but others still outstanding'},
+                  {title: 'All necessary alliances closed with A-List partners'}
+                ]
+              },
+              {
+                title: 'Advisory Board',
+                stages: [
+                  {title: 'Not addressed'},
+                  {title: 'Advisors identified'},
+                  {title: 'Some advisors approached but uncommitted'},
+                  {title: 'Some advisors committed'},
+                  {title: 'Some strong advisors committed'},
+                  {title: 'A-List technology & business advisors committed'}
+                ]
+              },
+              {
+                title: 'Implementation Plan',
+                stages: [
+                  {title: 'Not addressed'},
+                  {title: 'Incomplete'},
+                  {title: 'Difficult to assess due to significant gaps'},
+                  {title: 'Fairly realistic but planning incomplete'},
+                  {title: 'Realistic with thorough planning'},
+                  {title: 'Highly realistic, easy to follow, thoroughly planned'}
+                ]
+              }
+            ]
+           },
+           {
+              title: 'Manufacturing Risk',
+              sub_categories: [
+                {
+                  title: 'Materials:',
+                  stages: [
+                    {title: 'Not fully evaluated'},
+                    {title: 'Limited material testing, evaluation, or alternatives considered'},
+                    {title: 'Some material testing, evaluation, alternatives considered'},
+                    {title: 'Some testing, evaluation of materials'},
+                    {title: 'Comprehensive material testing, evaluation, many alternatives considered'}
+                  ]
+                },
+                {
+                  title: 'Tooling:',
+                  stages: [
+                    {title: 'No understanding of tooling being used or required to make product'},
+                    {title: 'Limited understanding of tooling being used or required to make product'},
+                    {title: 'Tooling design considerations being evaluated now'},
+                    {title: 'Tooling design well understood'},
+                    {title: 'Tooling design and tooling cost well understood'}
+                  ]
+                },
+                {
+                  title: 'Manufacturing Equipment:',
+                  stages: [
+                    {title: 'No understanding of mfg equip being used or required to make product'},
+                    {title: 'Limited understanding of mfg equip being used or required to make product'},
+                    {title: 'Mfg equip considerations being evaluated now'},
+                    {title: 'Mfg equip well understood'},
+                    {title: 'Mfg equip, capacity constraints and capital cost well understood'}
+                  ]
+                },
+                {
+                  title: 'Manufacturing Process Validation:',
+                  stages: [
+                    {title: 'No knowledge of Production and Workflow Process'},
+                    {title: 'Limited knowledge of Production and Workflow Process'},
+                    {title: 'Production and Workflow Process plan in place but not validated'},
+                    {title: 'Production and Workflow Process plan in place and validated through PFMEA'},
+                    {title: 'Production and Workflow Process plan in place and validated through actual audit'}
+                  ]
+                },
+                {
+                  title: 'Manufacturing Process Efficiency:',
+                  stages: [
+                    {title: 'Production and Workflow Process without lean assessment'},
+                    {title: 'Production and Workflow Process evaluated through high level lean assessment'},
+                    {title: 'Production and Workflow Process evaluated through detailed lean assessment'},
+                    {title: 'Production and Workflow Process evaluated through detailed lean assessment and quality audit'},
+                    {title: 'Production and Workflow Process certified to Lean Mfg, ISO, Quality standards'}
+                  ]
+                }
+             ]
+           },
+           {
+             title: 'Supply Chain Risk',
+             sub_categories: [
+               {
+                 title: 'Supplier Identifaction:',
+                 stages: [
+                   {title: 'No suppliers identified but needed'},
+                   {title: 'Supplier search started but not complete'},
+                   {title: 'Suppliers identified but not multiple sources'},
+                   {title: 'Multiple suppliers identified for each material/component'},
+                   {title: 'Multiple suppliers identified for each material/component, contacted and in discussions'}
+                 ]
+               },
+               {
+                 title: 'Supplier Evaluation:',
+                 stages: [
+                   {title: 'Not evaluated or no formal process for evaluation'},
+                   {title: 'Limited evaluation of suppliers but no formal process for evaluation'},
+                   {title: 'Evaluation of suppliers including formal process for evaluation (cost, performance, lead time, quality)'},
+                   {title: 'Evaluation of suppliers includes on-site audit'},
+                   {title: 'Evaluation of suppliers includes detailed on-site audit to verify performance, quality takt time'}
+                 ]
+               },
+               {
+                 title: 'Supplier Agreements:',
+                 stages: [
+                   {title: 'No formal supplier agreements in place'},
+                   {title: 'Limited suppliers agreements in place (NDA’s, PO’s, contracts)'},
+                   {title: 'Most supplier agreements in place (NDA’s, PO’s, contracts)'},
+                   {title: 'Agreements include alternative procurement terms (e.g., volume, delivery time) and clear ownership of quality issues (e.g., product yield, failures)'},
+                   {title: 'Agreements include alternative procurement terms and supplier reward and/or penalty compensation contracting terms associated with performance, quality, lead time measures'}
+                 ]
+               },
+               {
+                 title: 'Supply Chain Plan:',
+                 stages: [
+                   {title: 'No supply chain plan or supplier risk assessment in place'},
+                   {title: 'Weak supply chain plan or limited supplier risk assessment in place'},
+                   {title: 'Supply chain strategy and risk mitigation includes multiple sources under contract for each component'},
+                   {title: 'Supply chain strategy and risk mitigation includes lead time guarantees for each component'},
+                   {title: 'Detailed supply chain strategy followed, supply chain quality tracing in place, ERP systems connected'}
+                 ]
+               }
+              ]
+            }
+          ]
+        },
+       {
+         name: "TRL",
+         categories: [
+           {
+             title: '',
+             sub_categories: [
+               {
+                 title: 'Basic Tech Research',
+                 stages: [
+                   {title: 'Basic Principles Observed and Reporte'},
+                   {title: 'Technology Concept and/or Application Formulate'},
+                   {title: 'Proof of concept analyzed and experimented on'},
+                   {title: 'System validation in lab environmen'},
+                   {title: 'System validation, testing in operating environmen'},
+                   {title: 'Prototype/pilot system verification in operating environmen'},
+                   {title: 'Full Scale prototype verified in operating environmen'},
+                   {title: 'Actual system complete and functioning in operating environmen'},
+                   {title: 'Actual system tested and data collected over lifetime of syste'}
+                 ]
+               },
+               {
+                 title: 'Feasibility Research',
+                 stages: [
+                   {title: 'Basic Principles Observed and Reported'},
+                   {title: 'Technology Concept and/or Application Formulated'},
+                   {title: 'Proof of concept analyzed and experimented on'},
+                   {title: 'System validation in lab environment'},
+                   {title: 'System validation, testing in operating environment'},
+                   {title: 'Prototype/pilot system verification in operating environment'},
+                   {title: 'Full Scale prototype verified in operating environment'},
+                   {title: 'Actual system complete and functioning in operating environment'},
+                   {title: 'Actual system tested and data collected over lifetime of system'}
+                 ]
+               },
+               {
+                 title: 'Tech Development',
+                 stages: [
+                   {title: 'Basic Principles Observed and Reported'},
+                   {title: 'Technology Concept and/or Application Formulated'},
+                   {title: 'Proof of concept analyzed and experimented on'},
+                   {title: 'System validation in lab environment'},
+                   {title: 'System validation, testing in operating environment'},
+                   {title: 'Prototype/pilot system verification in operating environment'},
+                   {title: 'Full Scale prototype verified in operating environment'},
+                   {title: 'Actual system complete and functioning in operating environment'},
+                   {title: 'Actual system tested and data collected over lifetime of system'}
+                 ]
+               },
+               {
+                 title: 'Tech Demonstration',
+                 stages: [
+                   {title: 'Basic Principles Observed and Reported'},
+                   {title: 'Technology Concept and/or Application Formulated'},
+                   {title: 'Proof of concept analyzed and experimented on'},
+                   {title: 'System validation in lab environment'},
+                   {title: 'System validation, testing in operating environment'},
+                   {title: 'Prototype/pilot system verification in operating environment'},
+                   {title: 'Full Scale prototype verified in operating environment'},
+                   {title: 'Actual system complete and functioning in operating environment'},
+                   {title: 'Actual system tested and data collected over lifetime of system'}
+                 ]
+               },
+               {
+                 title: 'System Commissioning',
+                 stages: [
+                   {title: 'Basic Principles Observed and Reported'},
+                   {title: 'Technology Concept and/or Application Formulated'},
+                   {title: 'Proof of concept analyzed and experimented on'},
+                   {title: 'System validation in lab environment'},
+                   {title: 'System validation, testing in operating environment'},
+                   {title: 'Prototype/pilot system verification in operating environment'},
+                   {title: 'Full Scale prototype verified in operating environment'},
+                   {title: 'Actual system complete and functioning in operating environment'},
+                   {title: 'Actual system tested and data collected over lifetime of system'}
+                 ]
+               },
+               {
+                 title: 'System Operation',
+                 stages: [
+                   {title: 'Basic Principles Observed and Reported'},
+                   {title: 'Technology Concept and/or Application Formulated'},
+                   {title: 'Proof of concept analyzed and experimented on'},
+                   {title: 'System validation in lab environment'},
+                   {title: 'System validation, testing in operating environment'},
+                   {title: 'Prototype/pilot system verification in operating environment'},
+                   {title: 'Full Scale prototype verified in operating environment'},
+                   {title: 'Actual system complete and functioning in operating environment'},
+                   {title: 'Actual system tested and data collected over lifetime of system'}
+                 ]
+               }
+             ]
+           }
+         ]
+       }
+     ]
 
 records.each do |assesment|
   created_assesment = Assessment.create(name: assesment[:name])
