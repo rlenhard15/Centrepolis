@@ -12,13 +12,12 @@ class SubCategoriesController < ApplicationController
   param :category_id, Integer, desc: 'ID of current category', required: true
   param :id, Integer, desc: 'ID of current sub category', required: true
   param :current_stage_id, Integer, desc: 'ID of stage selected by user', required: true
-  param :customer_id, Integer, desc: 'ID of customer', required: true
+  param :customer_id, Integer, desc: 'ID of customer if current_user is admin'
 
   description <<-DESC
 
     === Request headers
-      Only admin can perform this action
-        Authentication - string - required
+      Authentication - string - required
           Example of Authentication header : "Bearer TOKEN_FETCHED_FROM_SERVER_DURING_REGISTRATION"
 
     === Success response body
@@ -45,7 +44,7 @@ class SubCategoriesController < ApplicationController
   end
 
   def set_customer
-    raise Pundit::NotAuthorizedError unless @customer = policy_scope(Customer).where(id: params[:customer_id]).first
+    raise Pundit::NotAuthorizedError unless @customer = current_user.admin? ? policy_scope(Customer).where(id: params[:customer_id]).first : current_user
   end
 
   def set_assessment_progress
