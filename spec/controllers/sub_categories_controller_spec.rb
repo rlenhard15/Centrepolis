@@ -73,6 +73,7 @@ RSpec.describe SubCategoriesController, type: :controller do
         expect(response.body).to eq({ message: "Progress updates successfully", assessment_risk: assessment_progress.risk_value.to_f }.to_json)
         expect(response.content_type).to eq('application/json; charset=utf-8')
         expect(sub_category_progress.customer_id).to eq(customer.id)
+        expect(SubCategoryProgress.find_by_customer_id(customer_2.id)).to eq(nil)
         expect(sub_category_progress.current_stage_id).to eq(stage_2.id)
         expect(assessment_progress.risk_value).to eq(100)
         expect(response).to have_http_status(:success)
