@@ -17,6 +17,6 @@ RSpec.describe SubCategoryPolicy, type: :policy do
     let!(:admin)  {create(:admin)}
       let!(:user) {create(:customer, created_by: admin.id)}
 
-    it { is_expected.to forbid_actions(%i[update_progress]) }
+    it { is_expected.to permit_actions(%i[update_progress]) }
   end
 end
