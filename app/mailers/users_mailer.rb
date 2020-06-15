@@ -7,7 +7,7 @@ class UsersMailer < ApplicationMailer
 
   def email_for_restore_password
     @reset_token = @customer.send(:set_reset_password_token)
-    mail(to: @customer.email, subject: "You have been invited to Trello forms")
+    mail(to: @customer.email, subject: "You have been invited to RAMP Client Business Planning Support")
   end
 
 end
