@@ -3,6 +3,12 @@ class ApplicationController < ActionController::API
 
   before_action :authenticate_user!
 
+  def error_401
+    render json: {
+       status: :unauthorized
+    }
+  end
+
   rescue_from(Pundit::NotAuthorizedError) do
     render json:
       {

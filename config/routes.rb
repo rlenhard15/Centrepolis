@@ -7,6 +7,8 @@ Rails.application.routes.draw do
     put '/users/password', to: 'users/passwords#update'
   end
 
+  get :error_401, to: 'application#error_401'
+
   scope :api, defaults: { format: :json } do
     resources :notifications, only: :index do
       put :mark_as_readed, on: :member
