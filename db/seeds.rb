@@ -521,3 +521,13 @@ records.each do |assesment|
     end
   end
 end
+
+accelerators = [
+  {
+    name: 'Centeropolis'
+  }
+]
+
+accelerators.each do |accelerator|
+  Accelerator.where(name: accelerator[:name]).first_or_create
+end

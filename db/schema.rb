@@ -10,10 +10,16 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_04_24_131734) do
+ActiveRecord::Schema.define(version: 2020_07_02_132341) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
+
+  create_table "accelerators", force: :cascade do |t|
+    t.string "name"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+  end
 
   create_table "assessment_progresses", force: :cascade do |t|
     t.integer "customer_id"
@@ -92,6 +98,7 @@ ActiveRecord::Schema.define(version: 2020_04_24_131734) do
     t.string "company_name"
     t.string "type"
     t.integer "created_by"
+    t.integer "accelerator_id"
     t.index ["company_name"], name: "index_users_on_company_name", unique: true
     t.index ["email"], name: "index_users_on_email", unique: true
     t.index ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true

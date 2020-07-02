@@ -5,6 +5,7 @@ class User < ApplicationRecord
          :recoverable, :rememberable, :validatable
 
   has_many :tasks, dependent: :destroy
+  belongs_to :accelerator
 
   USER_TYPES = [
     ADMIN = 'Admin',
