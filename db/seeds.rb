@@ -525,6 +525,12 @@ end
 accelerators = [
   {
     name: 'Centeropolis'
+  },
+  {
+    name: 'LeanRocketLab'
+  },
+  {
+    name: 'FuzeHub'
   }
 ]
 
