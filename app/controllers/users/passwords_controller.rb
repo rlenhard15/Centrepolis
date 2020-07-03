@@ -31,7 +31,7 @@ module Users
     def update
       self.resource = resource_class.reset_password_by_token(update_password_params)
 
-      if resource.errors.empty? && resource.update(update_customer_params)
+      if resource.errors.empty? && resource.accelerator_id == accelerator_id && resource.update(update_customer_params)
         resource.unlock_access! if unlockable?(resource)
         if Devise.sign_in_after_reset_password
           resource.after_database_authentication
@@ -69,5 +69,10 @@ module Users
     def update_customer_params
       params.permit(:first_name, :last_name)
     end
+
+    def accelerator_id
+      @accelerator_id ||= request.headers['Accelerator-Id'].to_i
+    end
+
   end
 end
