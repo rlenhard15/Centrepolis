@@ -11,6 +11,7 @@ module Users
       last_name
       password
       password_confirmation
+      accelerator_id
     ].freeze
 
     api :POST, '/users/sign_up', 'Admin registration'
