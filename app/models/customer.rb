@@ -17,7 +17,7 @@ class Customer < User
   end
 
   def frontend_hostname
-    accelerator.hostname
+    ENV[accelerator.hostname]
   end
 
   private

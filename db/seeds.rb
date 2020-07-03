@@ -525,15 +525,15 @@ end
 accelerators = [
   {
     name: 'Centeropolis',
-    hostname: 'http://www.centeropolis.rampassessment.com'
+    hostname: 'CENTEROPOLIS_HOST'
   },
   {
     name: 'LeanRocketLab',
-    hostname: 'http://www.leanrocketlab.rampassessment.com'
+    hostname: 'LEANROCKETLAB_HOST'
   },
   {
     name: 'FuzeHub',
-    hostname: 'http://www.fuzehub.rampassessment.com'
+    hostname: 'FUZEHUB_HOST'
   }
 ]
 
