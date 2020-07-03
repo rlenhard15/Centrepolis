@@ -7,8 +7,9 @@ RSpec.describe TaskPolicy, type: :policy do
     described_class::Scope.new(user, Task.all).resolve
   end
 
-  let!(:admin)            {create(:admin)}
-    let!(:customer)       {create(:customer, created_by: admin.id)}
+  let!(:accelerator)      { create(:accelerator) }
+  let!(:admin)            {create(:admin, accelerator_id: accelerator.id)}
+    let!(:customer)       {create(:customer, created_by: admin.id, accelerator_id: accelerator.id)}
   let!(:assessment)       {create(:assessment)}
     let!(:category)       {create(:category, assessment_id: assessment.id)}
       let!(:sub_category) {create(:sub_category, category_id: category.id)}
@@ -16,7 +17,8 @@ RSpec.describe TaskPolicy, type: :policy do
           let!(:task)     { create(:task, stage_id: stage.id, user_id: customer.id, created_by: admin.id)}
 
   describe "user's type: Admin" do
-    let!(:user) { create(:admin) }
+    let!(:accelerator) { create(:accelerator) }
+    let!(:user)        { create(:admin, accelerator_id: accelerator.id) }
 
     it "show tasks for current admin" do
       expect(policy_scope).to eq(user.tasks)
@@ -26,7 +28,8 @@ RSpec.describe TaskPolicy, type: :policy do
   end
 
   describe "user's type: Customer" do
-    let!(:user) { create(:customer, created_by: admin.id) }
+    let!(:accelerator) { create(:accelerator) }
+    let!(:user)        { create(:customer, created_by: admin.id, accelerator_id: accelerator.id) }
 
     it "show tasks for current customer" do
       expect(policy_scope).to eq(user.tasks)

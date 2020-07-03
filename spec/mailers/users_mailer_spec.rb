@@ -1,9 +1,10 @@
 require "rails_helper"
 
 RSpec.describe UsersMailer, type: :mailer do
-  let!(:admin)    {create(:admin)}
-  let!(:customer) {create(:customer, created_by: admin.id)}
-  let!(:params)   {ActionController::Parameters.new({customer: customer})}
+  let!(:accelerator) {create(:accelerator)}
+  let!(:admin)       {create(:admin, accelerator_id: accelerator.id)}
+  let!(:customer)    {create(:customer, created_by: admin.id, accelerator_id: accelerator.id)}
+  let!(:params)      {ActionController::Parameters.new({customer: customer})}
 
   let!(:mail) {UsersMailer.with(params).email_for_restore_password}
 

@@ -5,10 +5,11 @@ RSpec.describe AssessmentsController, type: :controller do
   it { should use_before_action(:set_customer) }
   it { should use_before_action(:set_assessment) }
 
-  let!(:admin)                { create(:admin) }
-  let!(:admin_2)              { create(:admin) }
-    let!(:customer)           { create(:customer, created_by: admin.id) }
-    let!(:customer_2)         { create(:customer, created_by: admin_2.id) }
+  let!(:accelerator)          { create(:accelerator) }
+  let!(:admin)                { create(:admin, accelerator_id: accelerator.id) }
+  let!(:admin_2)              { create(:admin, accelerator_id: accelerator.id) }
+    let!(:customer)           { create(:customer, created_by: admin.id, accelerator_id: accelerator.id) }
+    let!(:customer_2)         { create(:customer, created_by: admin_2.id, accelerator_id: accelerator.id) }
   let!(:assessments)          { create_list(:assessment, 2) }
     let!(:assessment_progress){ create(:assessment_progress, customer_id: customer.id, assessment_id: assessments.first.id) }
     let!(:categories)         { create_list(:category, 2, assessment_id: assessments.first.id) }

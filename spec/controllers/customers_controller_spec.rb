@@ -3,8 +3,9 @@ require 'rails_helper'
 RSpec.describe Admins::CustomersController, type: :controller do
   it { should use_before_action(:authenticate_user!) }
 
-  let!(:admin)                 { create(:admin) }
-    let!(:customers)           { create_list(:customer, 2, created_by: admin.id) }
+  let!(:accelerator)           { create(:accelerator) }
+  let!(:admin)                 { create(:admin, accelerator_id: accelerator.id) }
+    let!(:customers)           { create_list(:customer, 2, created_by: admin.id, accelerator_id: accelerator.id) }
   let!(:assessment)            { create(:assessment) }
     let!(:assessment_progress) { create(:assessment_progress, customer_id: customers.first.id, assessment_id: assessment.id) }
     let!(:category)            { create(:category, assessment_id: assessment.id) }
@@ -31,7 +32,7 @@ RSpec.describe Admins::CustomersController, type: :controller do
   end
 
   describe "POST create action" do
-    let!(:params) {ActionController::Parameters.new({customer: {email: 'customer@gmail.com', company_name: 'Company name'}})}
+    let!(:params) {ActionController::Parameters.new({customer: {email: 'customer@gmail.com', company_name: 'Company name', accelerator_id: accelerator.id}})}
 
     before {params.permit!}
 

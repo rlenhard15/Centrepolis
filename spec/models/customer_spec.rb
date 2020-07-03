@@ -10,17 +10,19 @@ RSpec.describe Customer, type: :model do
   end
 
   describe "callbacks" do
-    let!(:admin)      { create(:admin) }
-      let!(:customer) { create(:customer, created_by: admin.id) }
+    let!(:accelerator) { create(:accelerator) }
+    let!(:admin)       { create(:admin, accelerator_id: accelerator.id) }
+      let!(:customer)  { create(:customer, created_by: admin.id, accelerator_id: accelerator.id) }
 
     it { expect(customer).to callback(:send_email).after(:create) }
   end
 
   describe "Method 'assessments_risk_list'" do
-    let!(:admin)                   { create(:admin) }
-      let!(:customer)              { create(:customer, created_by: admin.id) }
-      let!(:customer_2)            { create(:customer, created_by: admin.id) }
-      let!(:customer_3)            { create(:customer, created_by: admin.id) }
+    let!(:accelerator)             { create(:accelerator) }
+    let!(:admin)                   { create(:admin, accelerator_id: accelerator.id) }
+      let!(:customer)              { create(:customer, created_by: admin.id, accelerator_id: accelerator.id) }
+      let!(:customer_2)            { create(:customer, created_by: admin.id, accelerator_id: accelerator.id) }
+      let!(:customer_3)            { create(:customer, created_by: admin.id, accelerator_id: accelerator.id) }
     let!(:assessments)             { create_list(:assessment, 2) }
       let!(:assessment_progress)   { create(:assessment_progress, customer_id: customer.id, assessment_id: assessments.first.id) }
       let!(:assessment_progress_2) { create(:assessment_progress, customer_id: customer_2.id, assessment_id: assessments.last.id) }

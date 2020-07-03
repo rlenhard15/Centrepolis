@@ -18,7 +18,8 @@ RSpec.describe AssessmentPolicy, type: :policy do
 
   describe "user's type: Admin" do
     let!(:assessments) {create_list(:assessment, 3)}
-    let!(:user)  { create(:admin) }
+    let!(:accelerator) { create(:accelerator) }
+    let!(:user)        { create(:admin, accelerator_id: accelerator.id) }
 
     it "shows all assessments" do
       expect(policy_scope).to eq(assessments)
@@ -29,8 +30,9 @@ RSpec.describe AssessmentPolicy, type: :policy do
 
   describe "user's type: Customer" do
     let!(:assessments) {create_list(:assessment, 3)}
-    let!(:admin)  { create(:admin) }
-      let!(:user)  { create(:customer, created_by: admin.id) }
+    let!(:accelerator) { create(:accelerator) }
+    let!(:admin)       { create(:admin,  accelerator_id: accelerator.id) }
+      let!(:user)      { create(:customer, created_by: admin.id,  accelerator_id: accelerator.id) }
 
     it "shows all assessments" do
       expect(policy_scope).to eq(assessments)

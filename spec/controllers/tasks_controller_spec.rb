@@ -4,10 +4,11 @@ RSpec.describe TasksController, type: :controller do
   it { should use_before_action(:authenticate_user!) }
   it { should use_before_action(:set_task) }
 
-  let!(:admin)            { create(:admin) }
-  let!(:admin_2)          { create(:admin) }
-    let!(:customer)       { create(:customer, created_by: admin.id) }
-    let!(:customer_2)     { create(:customer, created_by: admin_2.id) }
+  let!(:accelerator)      { create(:accelerator) }
+  let!(:admin)            { create(:admin, accelerator_id: accelerator.id) }
+  let!(:admin_2)          { create(:admin, accelerator_id: accelerator.id) }
+    let!(:customer)       { create(:customer, created_by: admin.id, accelerator_id: accelerator.id) }
+    let!(:customer_2)     { create(:customer, created_by: admin_2.id, accelerator_id: accelerator.id) }
   let!(:assessment)       { create(:assessment) }
     let!(:category)       { create(:category, assessment_id: assessment.id) }
       let!(:sub_category) { create(:sub_category, category_id: category.id) }
