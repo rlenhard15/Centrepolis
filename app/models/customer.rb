@@ -16,6 +16,10 @@ class Customer < User
     end
   end
 
+  def frontend_hostname
+    ENV[accelerator.hostname]
+  end
+
   private
 
   def send_email
@@ -23,9 +27,5 @@ class Customer < User
     UsersMailer.with(
       customer: self
     ).email_for_restore_password.deliver_later
-  end
-
-  def frontend_hostname
-    accelerator.hostname
   end
 end
