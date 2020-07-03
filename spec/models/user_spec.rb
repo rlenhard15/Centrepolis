@@ -86,4 +86,31 @@ RSpec.describe User, type: :model do
       expect(admin.customer?).to eq(false)
     end
   end
+
+  describe "Method 'reset_password_by_token'" do
+    let!(:attributes)  {ActionController::Parameters.new({reset_password_token: "reset_password_token", password: "123456", password_confirmation: "123456"})}
+
+    before { attributes.permit! }
+
+    it "return empty instance if user doesnt exist" do
+      set_user = User.set_user_by_password_token(attributes)
+      expect(set_user.id).to eq(nil)
+      expect(set_user).to be_an_instance_of(User)
+    end
+  end
+
+  describe "Method 'reset_password_by_token'" do
+    let!(:accelerator) { create(:accelerator) }
+    let!(:user)        { create(:user, accelerator_id: accelerator.id) }
+    let!(:attributes)  {ActionController::Parameters.new({reset_password_token: "reset_password_token", password: "123456", password_confirmation: "123456"})}
+
+    before { attributes.permit! }
+
+    it "return user if reset_password_token is valid" do
+      password_before = user.password
+      user_after_reset_password = user.reset_password_by_token(attributes)
+      expect(user_after_reset_password).to eq(User.last)
+      expect(user_after_reset_password).to_not eq(password_before)
+    end
+  end
 end
