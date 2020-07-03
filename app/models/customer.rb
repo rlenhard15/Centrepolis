@@ -24,4 +24,8 @@ class Customer < User
       customer: self
     ).email_for_restore_password.deliver_later
   end
+
+  def frontend_hostname
+    accelerator.hostname
+  end
 end
