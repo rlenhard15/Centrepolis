@@ -23,19 +23,25 @@ module Users
           "updated_at": "2020-03-20T10:46:25.226Z",
           "first_name": "Xu",
           "last_name": "Xian",
-          "company_name": "MSI"
+          "company_name": "MSI",
+          "accelerator_id": 1
         }
       }
     DESC
 
     def update
-      self.resource = resource_class.reset_password_by_token(update_password_params)
-
-      if resource.errors.empty? && resource.accelerator_id == accelerator_id && resource.update(update_customer_params)
-        resource.unlock_access! if unlockable?(resource)
-        if Devise.sign_in_after_reset_password
-          resource.after_database_authentication
-          render json: resource.payload
+      resource = resource_class.set_user_by_password_token(update_password_params)
+      if resource && resource.accelerator_id == accelerator_id
+        resource = resource.reset_password_by_token(update_password_params)
+        if resource.errors.empty? && resource.update(update_customer_params)
+          resource.unlock_access! if unlockable?(resource)
+          if Devise.sign_in_after_reset_password
+            resource.after_database_authentication
+            render json: resource.payload
+          end
+        else
+          render json:
+            bad_request_params(resource.errors), status: :bad_request
         end
       else
         render json:
