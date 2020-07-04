@@ -103,7 +103,7 @@ RSpec.describe User, type: :model do
     let!(:accelerator) { create(:accelerator) }
     let!(:user)        { create(:user, accelerator_id: accelerator.id) }
     let!(:attributes)  {ActionController::Parameters.new({reset_password_token: "reset_password_token", password: "123456", password_confirmation: "123456"})}
-
+    
     before { attributes.permit! }
 
     it "return user if reset_password_token is valid" do

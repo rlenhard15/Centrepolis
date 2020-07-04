@@ -2,8 +2,9 @@ require 'rails_helper'
 
 RSpec.describe ApplicationController, type: :controller do
   before do
+    allow_any_instance_of(ApplicationController).to receive(:authenticate_user!).and_return("skip_authenticate")
     Rails.application.routes.draw do
-      get 'api/application', to: 'application#check_auth', as: "check_auth"
+      post 'api/application', to: 'application#check_auth', as: "check_auth"
     end
   end
   after do
@@ -20,29 +21,37 @@ RSpec.describe ApplicationController, type: :controller do
         accelerator_id = request.headers['Accelerator-Id'].to_i
       end
       ApplicationController.define_method(method_name) do
-        response_auth =  ((current_user.present?)  && current_user.accelerator_id == accelerator_id) ?  "success login" : "faild login"
-        render json: response_auth.to_json
+        user = User.find_for_database_authentication(
+          email: params[:user][:email]
+        )
+        if user&.valid_password?(params[:user][:password]) && user.accelerator_id == accelerator_id
+          render json: "success login"
+        else
+          render json: "faild login"
+        end
       end
     end
   end
 
   describe "check authenticate of user" do
     include_context "a dynamic method"
-    it 'return success message if accelerator_id belongs to user' do
+    it 'return success message if accelerator_id belongs to user and params are valid' do
+      params = ActionController::Parameters.new({ user: { email: user.email, password: user.password }})
+      params.permit!
       create_method_application_controller
       allow_any_instance_of(ApplicationController).to receive(:accelerator_id).and_return(accelerator.id)
-      sign_in user
-      get :check_auth
-      expect(JSON.parse(response.body)).to eq("success login")
+      post :check_auth, params: params
+      expect(response.body).to eq("success login")
       expect(response.content_type).to eq('application/json; charset=utf-8')
     end
 
-    it 'return faild login message if accelerator_id doesnnt belong to user' do
+    it 'return success message if accelerator_id doesnt belong to user or params arent valid' do
+      params = ActionController::Parameters.new({ user: { email: user.email, password: user.password }})
+      params.permit!
       create_method_application_controller
       allow_any_instance_of(ApplicationController).to receive(:accelerator_id).and_return(rand(1..600))
-      sign_in user
-      get :check_auth
-      expect(JSON.parse(response.body)).to eq("faild login")
+      post :check_auth, params: params
+      expect(response.body).to eq("faild login")
       expect(response.content_type).to eq('application/json; charset=utf-8')
     end
   end
