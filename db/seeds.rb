@@ -538,5 +538,5 @@ accelerators = [
 ]
 
 accelerators.each do |accelerator|
-  Accelerator.where(name: accelerator[:name]).first_or_create
+  Accelerator.where(name: accelerator[:name], hostname: accelerator[:hostname]).first_or_create
 end
