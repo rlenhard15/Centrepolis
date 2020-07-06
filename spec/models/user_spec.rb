@@ -103,12 +103,14 @@ RSpec.describe User, type: :model do
     let!(:accelerator) { create(:accelerator) }
     let!(:user)        { create(:user, accelerator_id: accelerator.id) }
     let!(:attributes)  {ActionController::Parameters.new({reset_password_token: "reset_password_token", password: "123456", password_confirmation: "123456"})}
-    
+
     before { attributes.permit! }
 
     it "return user if reset_password_token is valid" do
       password_before = user.password
-      user_after_reset_password = user.reset_password_by_token(attributes)
+      set_user = User.set_user_by_password_token(attributes)
+      user_after_reset_password = set_user.reset_password_by_token(attributes)
+      byebug
       expect(user_after_reset_password).to eq(User.last)
       expect(user_after_reset_password).to_not eq(password_before)
     end

@@ -21,10 +21,8 @@ RSpec.describe ApplicationController, type: :controller do
         accelerator_id = request.headers['Accelerator-Id'].to_i
       end
       ApplicationController.define_method(method_name) do
-        user = User.find_for_database_authentication(
-          email: params[:user][:email]
-        )
-        if user&.valid_password?(params[:user][:password]) && user.accelerator_id == accelerator_id
+        user = User.find_by_email(params[:user][:email])
+        if user.accelerator_id == accelerator_id
           render json: "success login"
         else
           render json: "faild login"
@@ -35,21 +33,23 @@ RSpec.describe ApplicationController, type: :controller do
 
   describe "check authenticate of user" do
     include_context "a dynamic method"
-    it 'return success message if accelerator_id belongs to user and params are valid' do
+    let!(:auth_token) { JwtWrapper.encode(user_id: user.id) }
+
+    it 'return success message if accelerator_id belongs to user' do
       params = ActionController::Parameters.new({ user: { email: user.email, password: user.password }})
+      request.headers.merge!({ "Accelerator-Id": "#{accelerator.id}", "Authentication": "Bearer #{auth_token}" })
       params.permit!
       create_method_application_controller
-      allow_any_instance_of(ApplicationController).to receive(:accelerator_id).and_return(accelerator.id)
       post :check_auth, params: params
       expect(response.body).to eq("success login")
       expect(response.content_type).to eq('application/json; charset=utf-8')
     end
 
-    it 'return success message if accelerator_id doesnt belong to user or params arent valid' do
+    it 'return faild login message if accelerator_id doesnt belong to user' do
       params = ActionController::Parameters.new({ user: { email: user.email, password: user.password }})
+      request.headers.merge!({ "Accelerator-Id": rand(1..600), "Authentication": "Bearer #{auth_token}" })
       params.permit!
       create_method_application_controller
-      allow_any_instance_of(ApplicationController).to receive(:accelerator_id).and_return(rand(1..600))
       post :check_auth, params: params
       expect(response.body).to eq("faild login")
       expect(response.content_type).to eq('application/json; charset=utf-8')
