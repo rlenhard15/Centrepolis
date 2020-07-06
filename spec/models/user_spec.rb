@@ -87,32 +87,38 @@ RSpec.describe User, type: :model do
     end
   end
 
-  describe "Method 'reset_password_by_token'" do
-    let!(:attributes)  {ActionController::Parameters.new({reset_password_token: "reset_password_token", password: "123456", password_confirmation: "123456"})}
+  describe "Method 'set_user_by_password_token'" do
+    let!(:accelerator)    { create(:accelerator) }
+    let!(:user)           { create(:admin, accelerator_id: accelerator.id) }
+    let!(:password_token) { user.send(:set_reset_password_token) }
 
-    before { attributes.permit! }
-
-    it "return empty instance if user doesnt exist" do
+    it "return user if there is user with current password token" do
+      attributes = ActionController::Parameters.new({reset_password_token: password_token, password: "123456", password_confirmation: "123456"})
+      attributes.permit!
       set_user = User.set_user_by_password_token(attributes)
-      expect(set_user.id).to eq(nil)
-      expect(set_user).to be_an_instance_of(User)
+      expect(set_user).to eq(user)
+    end
+
+    it "return empty instance of user if there isnt user with current password token" do
+      attributes = ActionController::Parameters.new({reset_password_token: "password_token", password: "123456", password_confirmation: "123456"})
+      attributes.permit!
+      set_user = User.set_user_by_password_token(attributes)
+      expect([set_user.id, set_user.email]).to eq([nil, ""])
     end
   end
 
   describe "Method 'reset_password_by_token'" do
-    let!(:accelerator) { create(:accelerator) }
-    let!(:user)        { create(:user, accelerator_id: accelerator.id) }
-    let!(:attributes)  {ActionController::Parameters.new({reset_password_token: "reset_password_token", password: "123456", password_confirmation: "123456"})}
+    let!(:accelerator)    { create(:accelerator) }
+    let!(:user)           { create(:user, accelerator_id: accelerator.id) }
+    let!(:password_token) { user.send(:set_reset_password_token) }
+    let!(:attributes)     {ActionController::Parameters.new({reset_password_token: password_token, password: "123456", password_confirmation: "123456"})}
 
     before { attributes.permit! }
-
-    it "return user if reset_password_token is valid" do
-      password_before = user.password
-      set_user = User.set_user_by_password_token(attributes)
-      user_after_reset_password = set_user.reset_password_by_token(attributes)
-      byebug
-      expect(user_after_reset_password).to eq(User.last)
-      expect(user_after_reset_password).to_not eq(password_before)
+    
+    it "return user with updated password" do
+      user_after_reset_password = user.reset_password_by_token(attributes)
+      expect(user_after_reset_password).to eq(user)
+      expect(user_after_reset_password.password).to eq("123456")
     end
   end
 end
