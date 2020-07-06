@@ -44,6 +44,7 @@ RSpec.describe NotificationPolicy, type: :policy do
     it "show notifications for current customer" do
       expect(policy_scope).to eq(user.notifications)
     end
+    
     it { is_expected.to permit_actions(%i[index mark_as_readed_all]) }
   end
 end
