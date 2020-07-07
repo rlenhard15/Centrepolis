@@ -37,7 +37,7 @@ RSpec.describe ApplicationController, type: :controller do
     end
 
     it 'return faild login message if accelerator_id doesnt belong to user' do
-      request.headers.merge!({ "Accelerator-Id": 1, "Authentication": "Bearer #{auth_token}" })
+      request.headers.merge!({ "Accelerator-Id": "#{accelerator.id + 1}", "Authentication": "Bearer #{auth_token}" })
       sign_in user
       create_method_application_controller
       get :check_auth
