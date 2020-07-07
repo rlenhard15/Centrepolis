@@ -5,10 +5,11 @@ RSpec.describe AssessmentsController, type: :controller do
   it { should use_before_action(:set_customer) }
   it { should use_before_action(:set_assessment) }
 
-  let!(:admin)                { create(:admin) }
-  let!(:admin_2)              { create(:admin) }
-    let!(:customer)           { create(:customer, created_by: admin.id) }
-    let!(:customer_2)         { create(:customer, created_by: admin_2.id) }
+  let!(:accelerator)          { create(:accelerator) }
+  let!(:admin)                { create(:admin, accelerator_id: accelerator.id) }
+  let!(:admin_2)              { create(:admin, accelerator_id: accelerator.id) }
+    let!(:customer)           { create(:customer, created_by: admin.id, accelerator_id: accelerator.id) }
+    let!(:customer_2)         { create(:customer, created_by: admin_2.id, accelerator_id: accelerator.id) }
   let!(:assessments)          { create_list(:assessment, 2) }
     let!(:assessment_progress){ create(:assessment_progress, customer_id: customer.id, assessment_id: assessments.first.id) }
     let!(:categories)         { create_list(:category, 2, assessment_id: assessments.first.id) }
@@ -25,6 +26,7 @@ RSpec.describe AssessmentsController, type: :controller do
 
   describe 'GET index action' do
     it 'return all assessments with risk_value for current customer in json format with status success if customer authenticated' do
+      request.headers.merge!({ "Accelerator-Id": "#{accelerator.id}"})
       sign_in customer
       get :index
       expect(parse_json(response.body).count).to eq(Assessment.count)
@@ -34,6 +36,7 @@ RSpec.describe AssessmentsController, type: :controller do
     end
 
     it 'return all assessments with risk_value for current admin in json format with status success if admin authenticated' do
+      request.headers.merge!({ "Accelerator-Id": "#{accelerator.id}"})
       sign_in admin
       get :index, params: params_2
       expect(parse_json(response.body).count).to eq(Assessment.count)
@@ -43,6 +46,7 @@ RSpec.describe AssessmentsController, type: :controller do
     end
 
     it 'return error with status 403 if customer doesnt belong to admin' do
+      request.headers.merge!({ "Accelerator-Id": "#{accelerator.id}"})
       sign_in admin
       get :index, params: params_3
       expect(response.body).to eq({'notice': 'You do not have permission to perform this action'}.to_json)
@@ -53,6 +57,7 @@ RSpec.describe AssessmentsController, type: :controller do
 
   describe 'GET show action' do
     it 'return specific assessment with child models in json format with status success if customer authenticated' do
+      request.headers.merge!({ "Accelerator-Id": "#{accelerator.id}"})
       sign_in customer
       get :show, params: params
       expect(parse_json(response.body)).to eq(parse_json(assessments.first.as_json(methods: :description_with_child_models).to_json))
@@ -61,6 +66,7 @@ RSpec.describe AssessmentsController, type: :controller do
     end
 
     it 'return specific assessment with child models in json format with status success if admin authenticated' do
+      request.headers.merge!({ "Accelerator-Id": "#{accelerator.id}"})
       sign_in admin
       get :show, params: params
       expect(parse_json(response.body)).to eq(parse_json(assessments.first.as_json(methods: :description_with_child_models).to_json))

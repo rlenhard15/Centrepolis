@@ -8,7 +8,7 @@ RSpec.describe CategoryPolicy, type: :policy do
   end
 
   describe "not auth user" do
-    let!(:assessment) {create(:assessment)}
+    let!(:assessment)   {create(:assessment)}
       let!(:categories) {create_list(:category, 3, assessment_id: assessment.id)}
     let!(:user)  { nil }
 
@@ -20,7 +20,9 @@ RSpec.describe CategoryPolicy, type: :policy do
   describe "user's type: Admin" do
     let!(:assessment) {create(:assessment)}
       let!(:categories) {create_list(:category, 3, assessment_id: assessment.id)}
-    let!(:user)  { create(:admin) }
+
+    let!(:accelerator) { create(:accelerator) }
+    let!(:user)        { create(:admin, accelerator_id: accelerator.id) }
 
     it "shows all categories" do
       expect(policy_scope).to eq(categories)
@@ -32,8 +34,9 @@ RSpec.describe CategoryPolicy, type: :policy do
   describe "user's type: Customer" do
     let!(:assessment) {create(:assessment)}
       let!(:categories) {create_list(:category, 3, assessment_id: assessment.id)}
-    let!(:admin)  { create(:admin) }
-      let!(:user)  { create(:customer, created_by: admin.id) }
+    let!(:accelerator) { create(:accelerator) }
+    let!(:admin)       { create(:admin, accelerator_id: accelerator.id) }
+      let!(:user)      { create(:customer, created_by: admin.id, accelerator_id: accelerator.id) }
 
     it "shows all categories" do
       expect(policy_scope).to eq(categories)
