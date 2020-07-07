@@ -35,6 +35,7 @@ RSpec.describe SubCategoriesController, type: :controller do
       before { params_4.permit! }
 
       it "return success messege and risk_value" do
+        request.headers.merge!({ "Accelerator-Id": "#{accelerator.id}"})
         sign_in admin
         post :update_progress, params: params.merge(params_3).merge(params_4)
         sub_category_progress.reload
@@ -47,6 +48,7 @@ RSpec.describe SubCategoriesController, type: :controller do
       end
 
       it "return error in json with status forbidden if admin try to update progress not for his customer" do
+        request.headers.merge!({ "Accelerator-Id": "#{accelerator.id}"})
         sign_in admin
         post :update_progress, params: params.merge(params_2)
         expect(response.body).to eq({'notice': 'You do not have permission to perform this action'}.to_json)
@@ -55,6 +57,7 @@ RSpec.describe SubCategoriesController, type: :controller do
       end
 
       it "return success messege and risk_value for current customer" do
+        request.headers.merge!({ "Accelerator-Id": "#{accelerator.id}"})
         sign_in customer
         post :update_progress, params: params.merge(params_3)
         sub_category_progress.reload
@@ -67,6 +70,7 @@ RSpec.describe SubCategoriesController, type: :controller do
       end
 
       it "if there is customer_id and customer try to update progress with this id, its only update his progress" do
+        request.headers.merge!({ "Accelerator-Id": "#{accelerator.id}"})
         sign_in customer
         post :update_progress, params: params.merge(params_2).merge(params_3)
         sub_category_progress.reload

@@ -22,6 +22,7 @@ RSpec.describe CategoriesController, type: :controller do
 
   describe 'GET index action' do
     it 'return all categories in json format with status success if customer authenticated' do
+      request.headers.merge!({ "Accelerator-Id": "#{accelerator.id}"})
       sign_in customer
       get :index, params: params
       expect(parse_json(response.body).count).to eq(Category.count)
@@ -31,6 +32,7 @@ RSpec.describe CategoriesController, type: :controller do
     end
 
     it 'return all categories in json format with status success if admin authenticated' do
+      request.headers.merge!({ "Accelerator-Id": "#{accelerator.id}"})
       sign_in admin
       get :index, params: params
       expect(parse_json(response.body).count).to eq(Category.count)
@@ -42,6 +44,7 @@ RSpec.describe CategoriesController, type: :controller do
 
   describe 'GET show action' do
     it 'return category with sub_categories progresses in json format with status success if admin authenticated' do
+      request.headers.merge!({ "Accelerator-Id": "#{accelerator.id}"})
       sign_in admin
       get :show, params: params.merge(params_2)
       expect(parse_json(response.body)).to eq(parse_json(categories.first.as_json.merge(
@@ -51,6 +54,7 @@ RSpec.describe CategoriesController, type: :controller do
     end
 
     it 'return category with sub_categories progresses in json format with status success if customer authenticated' do
+      request.headers.merge!({ "Accelerator-Id": "#{accelerator.id}"})
       sign_in customer
       get :show, params: params.merge(params_2)
       expect(parse_json(response.body)).to eq(parse_json(categories.first.as_json.merge(

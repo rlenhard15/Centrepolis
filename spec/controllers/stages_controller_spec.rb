@@ -18,6 +18,7 @@ RSpec.describe StagesController, type: :controller do
 
   describe 'GET index action' do
     it 'return all stages in json format with status success if admin authenticated' do
+      request.headers.merge!({ "Accelerator-Id": "#{accelerator.id}"})
       sign_in admin
       get :index, params: params
       expect(parse_json(response.body).count).to eq(Stage.count)
@@ -27,6 +28,7 @@ RSpec.describe StagesController, type: :controller do
     end
 
     it 'return all stages in json format with status success if customer authenticated' do
+      request.headers.merge!({ "Accelerator-Id": "#{accelerator.id}"})
       sign_in customer
       get :index, params: params
       expect(parse_json(response.body).count).to eq(Stage.count)

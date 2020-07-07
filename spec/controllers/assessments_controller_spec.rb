@@ -26,6 +26,7 @@ RSpec.describe AssessmentsController, type: :controller do
 
   describe 'GET index action' do
     it 'return all assessments with risk_value for current customer in json format with status success if customer authenticated' do
+      request.headers.merge!({ "Accelerator-Id": "#{accelerator.id}"})
       sign_in customer
       get :index
       expect(parse_json(response.body).count).to eq(Assessment.count)
@@ -35,6 +36,7 @@ RSpec.describe AssessmentsController, type: :controller do
     end
 
     it 'return all assessments with risk_value for current admin in json format with status success if admin authenticated' do
+      request.headers.merge!({ "Accelerator-Id": "#{accelerator.id}"})
       sign_in admin
       get :index, params: params_2
       expect(parse_json(response.body).count).to eq(Assessment.count)
@@ -44,6 +46,7 @@ RSpec.describe AssessmentsController, type: :controller do
     end
 
     it 'return error with status 403 if customer doesnt belong to admin' do
+      request.headers.merge!({ "Accelerator-Id": "#{accelerator.id}"})
       sign_in admin
       get :index, params: params_3
       expect(response.body).to eq({'notice': 'You do not have permission to perform this action'}.to_json)
@@ -54,6 +57,7 @@ RSpec.describe AssessmentsController, type: :controller do
 
   describe 'GET show action' do
     it 'return specific assessment with child models in json format with status success if customer authenticated' do
+      request.headers.merge!({ "Accelerator-Id": "#{accelerator.id}"})
       sign_in customer
       get :show, params: params
       expect(parse_json(response.body)).to eq(parse_json(assessments.first.as_json(methods: :description_with_child_models).to_json))
@@ -62,6 +66,7 @@ RSpec.describe AssessmentsController, type: :controller do
     end
 
     it 'return specific assessment with child models in json format with status success if admin authenticated' do
+      request.headers.merge!({ "Accelerator-Id": "#{accelerator.id}"})
       sign_in admin
       get :show, params: params
       expect(parse_json(response.body)).to eq(parse_json(assessments.first.as_json(methods: :description_with_child_models).to_json))
