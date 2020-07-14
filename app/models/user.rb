@@ -5,6 +5,7 @@ class User < ApplicationRecord
          :recoverable, :rememberable, :validatable
 
   has_many :tasks, dependent: :destroy
+  belongs_to :accelerator
 
   USER_TYPES = [
     ADMIN = 'Admin',
@@ -30,5 +31,21 @@ class User < ApplicationRecord
 
   def customer?
     type == CUSTOMER
+  end
+
+  def self.set_user_by_password_token(attributes={})
+    original_token       = attributes[:reset_password_token]
+    reset_password_token = Devise.token_generator.digest(self, :reset_password_token, original_token)
+    find_or_initialize_with_error_by(:reset_password_token, reset_password_token)
+  end
+
+  def reset_password_by_token(attributes={})
+    if reset_password_period_valid?
+      reset_password(attributes[:password], attributes[:password_confirmation])
+    else
+      errors.add(:reset_password_token, :expired)
+    end
+    reset_password_token = original_token if reset_password_token.present?
+    self
   end
 end

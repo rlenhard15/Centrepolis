@@ -45,6 +45,7 @@ module Admins
     param :user, Hash, required: true do
       param :email, String, desc: 'Unique email for customer', required: true
       param :company_name, String, desc: 'Unique company name for customer', required: true
+      param :accelerator_id, String, desc: 'Accelerator ID', required: true
     end
 
     description <<-DESC
@@ -88,7 +89,7 @@ module Admins
     private
 
     def user_params
-      params.require(:customer).permit(:email, :company_name)
+      params.require(:customer).permit(:email, :company_name, :accelerator_id)
     end
 
     def customer_random_password

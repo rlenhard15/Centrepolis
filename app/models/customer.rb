@@ -16,6 +16,10 @@ class Customer < User
     end
   end
 
+  def frontend_hostname
+    ENV[accelerator.hostname]
+  end
+
   private
 
   def send_email

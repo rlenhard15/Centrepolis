@@ -11,6 +11,7 @@ module Users
       last_name
       password
       password_confirmation
+      accelerator_id
     ].freeze
 
     api :POST, '/users/sign_up', 'Admin registration'
@@ -18,6 +19,7 @@ module Users
       param :email, String, desc: 'Unique email', required: true
       param :first_name, String, desc: 'First name of user', required: true
       param :last_name, String, desc: 'Last name of user', required: true
+      param :accelerator_id, Integer, desc: 'Accelerator ID', required: true
       param :password, String, desc: 'Password', required: true
       param :password_confirmation, String, desc: 'Password Confirmation', required: true
     end
@@ -33,6 +35,7 @@ module Users
           "updated_at": "2020-03-02T12:43:28.691Z",
           "first_name": "David",
           "last_name": "Smith",
+          "accelerator_id": 1,
           "company_name": null,
           "created_by": null
         }

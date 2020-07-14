@@ -3,8 +3,9 @@ require 'rails_helper'
 RSpec.describe Admins::CustomersController, type: :controller do
   it { should use_before_action(:authenticate_user!) }
 
-  let!(:admin)                 { create(:admin) }
-    let!(:customers)           { create_list(:customer, 2, created_by: admin.id) }
+  let!(:accelerator)           { create(:accelerator) }
+  let!(:admin)                 { create(:admin, accelerator_id: accelerator.id) }
+    let!(:customers)           { create_list(:customer, 2, created_by: admin.id, accelerator_id: accelerator.id) }
   let!(:assessment)            { create(:assessment) }
     let!(:assessment_progress) { create(:assessment_progress, customer_id: customers.first.id, assessment_id: assessment.id) }
     let!(:category)            { create(:category, assessment_id: assessment.id) }
@@ -13,6 +14,7 @@ RSpec.describe Admins::CustomersController, type: :controller do
 
   describe "GET index action" do
     it "return customers with list of assessment_risk for current admin" do
+      request.headers.merge!({ "Accelerator-Id": "#{accelerator.id}"})
       sign_in admin
       get :index
       expect(parse_json(response.body).count).to eq(2)
@@ -22,6 +24,7 @@ RSpec.describe Admins::CustomersController, type: :controller do
     end
 
     it "return error in json with status forbidden if sign in as customer" do
+      request.headers.merge!({ "Accelerator-Id": "#{accelerator.id}"})
       sign_in customers.first
       get :index
       expect(response.body).to eq({'notice': 'You do not have permission to perform this action'}.to_json)
@@ -31,11 +34,12 @@ RSpec.describe Admins::CustomersController, type: :controller do
   end
 
   describe "POST create action" do
-    let!(:params) {ActionController::Parameters.new({customer: {email: 'customer@gmail.com', company_name: 'Company name'}})}
+    let!(:params) {ActionController::Parameters.new({customer: {email: 'customer@gmail.com', company_name: 'Company name', accelerator_id: accelerator.id}})}
 
     before {params.permit!}
 
     it "return customer who was created by admin" do
+      request.headers.merge!({ "Accelerator-Id": "#{accelerator.id}"})
       sign_in admin
       post :create, params: params
       expect(parse_json(response.body)).to eq(parse_json(Customer.last.to_json))
@@ -44,6 +48,7 @@ RSpec.describe Admins::CustomersController, type: :controller do
     end
 
     it "return error in json with status forbidden if sign in as customer" do
+      request.headers.merge!({ "Accelerator-Id": "#{accelerator.id}"})
       sign_in customers.first
       post :create, params: params
       expect(response.body).to eq({'notice': 'You do not have permission to perform this action'}.to_json)

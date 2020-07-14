@@ -34,6 +34,7 @@ module Devise
         return fail! unless claims
         return fail! unless claims.has_key?('user_id')
         return fail! unless user_from_db
+        return fail! unless user_from_db.accelerator_id == request.headers['Accelerator-Id'].to_i
         false
       end
     end

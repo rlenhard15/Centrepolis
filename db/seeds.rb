@@ -521,3 +521,22 @@ records.each do |assesment|
     end
   end
 end
+
+accelerators = [
+  {
+    name: 'Centeropolis',
+    hostname: 'CENTEROPOLIS_HOST'
+  },
+  {
+    name: 'LeanRocketLab',
+    hostname: 'LEANROCKETLAB_HOST'
+  },
+  {
+    name: 'FuzeHub',
+    hostname: 'FUZEHUB_HOST'
+  }
+]
+
+accelerators.each do |accelerator|
+  Accelerator.where(name: accelerator[:name], hostname: accelerator[:hostname]).first_or_create
+end
