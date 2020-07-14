@@ -33,6 +33,10 @@ class User < ApplicationRecord
     type == CUSTOMER
   end
 
+  def frontend_hostname
+    ENV[accelerator.hostname]
+  end
+
   def self.set_user_by_password_token(attributes={})
     original_token       = attributes[:reset_password_token]
     reset_password_token = Devise.token_generator.digest(self, :reset_password_token, original_token)
