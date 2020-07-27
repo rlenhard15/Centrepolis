@@ -7,11 +7,12 @@ RSpec.describe Notification, type: :model do
   end
 
   describe "Method 'with_task_and_admin_info'" do
-    let!(:admin)              { create(:admin) }
-      let!(:customer)         { create(:customer, created_by: admin.id) }
-      let!(:customer_1)       { create(:customer, created_by: admin.id) }
-      let!(:customer_2)       { create(:customer, created_by: admin.id) }
-      let!(:customer_3)       { create(:customer, created_by: admin.id) }
+    let!(:accelerator)        { create(:accelerator) }
+    let!(:admin)              { create(:admin, accelerator_id: accelerator.id) }
+      let!(:customer)         { create(:customer, created_by: admin.id,  accelerator_id: accelerator.id) }
+      let!(:customer_1)       { create(:customer, created_by: admin.id,  accelerator_id: accelerator.id) }
+      let!(:customer_2)       { create(:customer, created_by: admin.id,  accelerator_id: accelerator.id) }
+      let!(:customer_3)       { create(:customer, created_by: admin.id,  accelerator_id: accelerator.id) }
     let!(:assessment)         { create(:assessment) }
     let!(:assessment_2)       { create(:assessment) }
       let!(:category)         { create(:category, assessment_id: assessment.id) }

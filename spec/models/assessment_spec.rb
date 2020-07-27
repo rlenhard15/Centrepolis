@@ -8,10 +8,11 @@ RSpec.describe Assessment, type: :model do
   end
 
   describe "Method 'with_assessment_progresses'" do
-    let!(:admin)                     { create(:admin) }
-      let!(:customer)                { create(:customer, created_by: admin.id) }
-      let!(:customer_2)              { create(:customer, created_by: admin.id) }
-      let!(:customer_3)              { create(:customer, created_by: admin.id) }
+    let!(:accelerator)               { create(:accelerator) }
+    let!(:admin)                     { create(:admin, accelerator_id: accelerator.id) }
+      let!(:customer)                { create(:customer, created_by: admin.id, accelerator_id: accelerator.id) }
+      let!(:customer_2)              { create(:customer, created_by: admin.id, accelerator_id: accelerator.id) }
+      let!(:customer_3)              { create(:customer, created_by: admin.id, accelerator_id: accelerator.id) }
     let!(:assessments)               { create_list(:assessment, 2) }
       let!(:assessment_progress_1)   { create(:assessment_progress, customer_id: customer.id, assessment_id: assessments.first.id) }
       let!(:assessment_progress_2)   { create(:assessment_progress, customer_id: customer.id, assessment_id: assessments.last.id) }
@@ -121,10 +122,12 @@ RSpec.describe Assessment, type: :model do
   end
 
   describe "Method 'assessment_risk'" do
-    let!(:admin)                           { create(:admin) }
-      let!(:customer)                      { create(:customer, created_by: admin.id) }
-      let!(:customer_2)                    { create(:customer, created_by: admin.id) }
-      let!(:customer_3)                    { create(:customer, created_by: admin.id) }
+
+    let!(:accelerator)                     { create(:accelerator) }
+    let!(:admin)                           { create(:admin, accelerator_id: accelerator.id) }
+      let!(:customer)                      { create(:customer, created_by: admin.id, accelerator_id: accelerator.id) }
+      let!(:customer_2)                    { create(:customer, created_by: admin.id, accelerator_id: accelerator.id) }
+      let!(:customer_3)                    { create(:customer, created_by: admin.id, accelerator_id: accelerator.id) }
     let!(:assessment)                      { create(:assessment) }
     let!(:assessment_2)                    { create(:assessment) }
       let!(:category)                      { create(:category, assessment_id: assessment.id) }

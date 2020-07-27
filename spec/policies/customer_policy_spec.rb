@@ -8,8 +8,9 @@ RSpec.describe CustomerPolicy, type: :policy do
   end
 
   describe "not auth user" do
-    let!(:admin) {create(:admin)}
-      let!(:customers) {create_list(:customer, 3, created_by: admin.id)}
+    let!(:accelerator) { create(:accelerator) }
+    let!(:admin)       {create(:admin, accelerator_id: accelerator.id)}
+      let!(:customers) {create_list(:customer, 3, created_by: admin.id, accelerator_id: accelerator.id)}
     let!(:user)  { nil }
 
     it "doesn't show all categories" do
@@ -18,8 +19,9 @@ RSpec.describe CustomerPolicy, type: :policy do
   end
 
   describe "user's type: Admin" do
-    let!(:user)        { create(:admin) }
-      let!(:customers) {create_list(:customer, 3, created_by: user.id)}
+    let!(:accelerator) { create(:accelerator) }
+    let!(:user)        { create(:admin, accelerator_id: accelerator.id) }
+      let!(:customers) {create_list(:customer, 3, created_by: user.id, accelerator_id: accelerator.id)}
 
     it "shows customers which admin created" do
       expect(policy_scope).to eq(user.customers)
@@ -29,9 +31,10 @@ RSpec.describe CustomerPolicy, type: :policy do
   end
 
   describe "user's type: Customer" do
-    let!(:admin) {create(:admin)}
-      let!(:customers) {create_list(:customer, 3, created_by: admin.id)}
-    let!(:user)  { create(:customer, created_by: admin.id) }
+    let!(:accelerator) { create(:accelerator) }
+    let!(:admin)       {create(:admin, accelerator_id: accelerator.id)}
+      let!(:customers) {create_list(:customer, 3, created_by: admin.id, accelerator_id: accelerator.id)}
+    let!(:user)        { create(:customer, created_by: admin.id, accelerator_id: accelerator.id) }
 
     it "dont shows list of customers" do
       expect(policy_scope).to eq([])

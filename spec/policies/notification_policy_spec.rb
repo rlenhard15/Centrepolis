@@ -7,8 +7,9 @@ RSpec.describe NotificationPolicy, type: :policy do
     described_class::Scope.new(user, Notification.all).resolve
   end
 
-  let!(:admin)                 {create(:admin)}
-    let!(:customer)            {create(:customer, created_by: admin.id)}
+  let!(:accelerator)           { create(:accelerator) }
+  let!(:admin)                 {create(:admin, accelerator_id: accelerator.id)}
+    let!(:customer)            {create(:customer, created_by: admin.id, accelerator_id: accelerator.id)}
   let!(:assessment)            {create(:assessment)}
     let!(:category)            {create(:category, assessment_id: assessment.id)}
       let!(:sub_category)      {create(:sub_category, category_id: category.id)}
@@ -25,7 +26,8 @@ RSpec.describe NotificationPolicy, type: :policy do
   end
 
   describe "user's type: Admin" do
-    let!(:user) { create(:admin) }
+    let!(:accelerator) { create(:accelerator) }
+    let!(:user)        { create(:admin, accelerator_id: accelerator.id) }
 
     it "dont show customers which admin created" do
       expect(policy_scope).to eq([])
@@ -35,12 +37,14 @@ RSpec.describe NotificationPolicy, type: :policy do
   end
 
   describe "user's type: Customer" do
-    let!(:admin) {create(:admin)}
-      let!(:user)  { create(:customer, created_by: admin.id) }
+    let!(:accelerator) { create(:accelerator) }
+    let!(:admin)       {create(:admin, accelerator_id: accelerator.id)}
+      let!(:user)      { create(:customer, created_by: admin.id, accelerator_id: accelerator.id) }
 
     it "show notifications for current customer" do
       expect(policy_scope).to eq(user.notifications)
     end
+    
     it { is_expected.to permit_actions(%i[index mark_as_readed_all]) }
   end
 end

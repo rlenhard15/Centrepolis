@@ -4,10 +4,11 @@ RSpec.describe TasksController, type: :controller do
   it { should use_before_action(:authenticate_user!) }
   it { should use_before_action(:set_task) }
 
-  let!(:admin)            { create(:admin) }
-  let!(:admin_2)          { create(:admin) }
-    let!(:customer)       { create(:customer, created_by: admin.id) }
-    let!(:customer_2)     { create(:customer, created_by: admin_2.id) }
+  let!(:accelerator)      { create(:accelerator) }
+  let!(:admin)            { create(:admin, accelerator_id: accelerator.id) }
+  let!(:admin_2)          { create(:admin, accelerator_id: accelerator.id) }
+    let!(:customer)       { create(:customer, created_by: admin.id, accelerator_id: accelerator.id) }
+    let!(:customer_2)     { create(:customer, created_by: admin_2.id, accelerator_id: accelerator.id) }
   let!(:assessment)       { create(:assessment) }
     let!(:category)       { create(:category, assessment_id: assessment.id) }
       let!(:sub_category) { create(:sub_category, category_id: category.id) }
@@ -22,6 +23,7 @@ RSpec.describe TasksController, type: :controller do
     before { params.permit! }
 
     it 'return all tasks for current customer in json format with status success if customer authenticated' do
+      request.headers.merge!({ "Accelerator-Id": "#{accelerator.id}"})
       sign_in customer
       get :index
       expect(parse_json(response.body).count).to eq(customer.tasks.count)
@@ -31,6 +33,7 @@ RSpec.describe TasksController, type: :controller do
     end
 
     it 'return all tasks for current admin in json format with status success if admin authenticated' do
+      request.headers.merge!({ "Accelerator-Id": "#{accelerator.id}"})
       sign_in admin
       get :index, params: params
       expect(parse_json(response.body).count).to eq(admin.tasks.count)
@@ -48,6 +51,7 @@ RSpec.describe TasksController, type: :controller do
     before { params_2.permit! }
 
     it 'return specific task in json format with status success if customer authenticated' do
+      request.headers.merge!({ "Accelerator-Id": "#{accelerator.id}"})
       sign_in customer
       get :show, params: params_1
       expect(parse_json(response.body)).to eq(parse_json(Task.with_all_required_info_for_tasks.where(id: tasks.first.id).first.to_json))
@@ -56,6 +60,7 @@ RSpec.describe TasksController, type: :controller do
     end
 
     it 'return error with status 403 if task doesnt belong to customer' do
+      request.headers.merge!({ "Accelerator-Id": "#{accelerator.id}"})
       sign_in customer
       get :show, params: params_2
       expect(response.body).to eq({'notice': 'You do not have permission to perform this action'}.to_json)
@@ -64,6 +69,7 @@ RSpec.describe TasksController, type: :controller do
     end
 
     it 'return specific task in json format with status success if admin authenticated' do
+      request.headers.merge!({ "Accelerator-Id": "#{accelerator.id}"})
       sign_in admin
       get :show, params: params_1
       expect(parse_json(response.body)).to eq(parse_json(Task.with_all_required_info_for_tasks.where(id: tasks.first.id).first.to_json))
@@ -72,6 +78,7 @@ RSpec.describe TasksController, type: :controller do
     end
 
     it 'return error with status 403 if task doesnt belong to admin' do
+      request.headers.merge!({ "Accelerator-Id": "#{accelerator.id}"})
       sign_in admin
       get :show, params: params_2
       expect(response.body).to eq({'notice': 'You do not have permission to perform this action'}.to_json)
@@ -86,6 +93,7 @@ RSpec.describe TasksController, type: :controller do
     before { params.permit! }
 
     it 'return new task in json format with status success if admin authenticated' do
+      request.headers.merge!({ "Accelerator-Id": "#{accelerator.id}"})
       sign_in admin
       post :create, params: params
       expect(parse_json(response.body)).to eq(parse_json(Task.last.to_json))
@@ -96,6 +104,7 @@ RSpec.describe TasksController, type: :controller do
     end
 
     it 'return error with status 403 if customer authenticated' do
+      request.headers.merge!({ "Accelerator-Id": "#{accelerator.id}"})
       sign_in customer
       post :create, params: params
       expect(response.body).to eq({'notice': 'You do not have permission to perform this action'}.to_json)
@@ -115,6 +124,7 @@ RSpec.describe TasksController, type: :controller do
     before { params_3.permit! }
 
     it 'return updated task in json format with status success if admin authenticated' do
+      request.headers.merge!({ "Accelerator-Id": "#{accelerator.id}"})
       sign_in admin
       put :update, params: params.merge(params_2)
       task_2.reload
@@ -125,6 +135,7 @@ RSpec.describe TasksController, type: :controller do
     end
 
     it 'return error with status 403 if task doesnt belong to admin' do
+      request.headers.merge!({ "Accelerator-Id": "#{accelerator.id}"})
       sign_in admin
       put :update, params: params.merge(params_3)
       expect(response.body).to eq({'notice': 'You do not have permission to perform this action'}.to_json)
@@ -133,6 +144,7 @@ RSpec.describe TasksController, type: :controller do
     end
 
     it 'return error with status 403 if customer authenticated' do
+      request.headers.merge!({ "Accelerator-Id": "#{accelerator.id}"})
       sign_in customer
       put :update, params: params.merge(params_3)
       expect(response.body).to eq({'notice': 'You do not have permission to perform this action'}.to_json)
@@ -150,6 +162,7 @@ RSpec.describe TasksController, type: :controller do
     before { params_2.permit! }
 
     it 'return updated task status to completed in json format with status success if admin authenticated' do
+      request.headers.merge!({ "Accelerator-Id": "#{accelerator.id}"})
       sign_in admin
       put :mark_task_as_completed, params: params
       task_2.reload
@@ -160,6 +173,7 @@ RSpec.describe TasksController, type: :controller do
     end
 
     it 'return error with status 403 if task doesnt belong to admin' do
+      request.headers.merge!({ "Accelerator-Id": "#{accelerator.id}"})
       sign_in admin
       put :mark_task_as_completed, params: params_2
       expect(response.body).to eq({'notice': 'You do not have permission to perform this action'}.to_json)
@@ -168,6 +182,7 @@ RSpec.describe TasksController, type: :controller do
     end
 
     it 'return updated task status to completed in json format with status success if customer authenticated' do
+      request.headers.merge!({ "Accelerator-Id": "#{accelerator.id}"})
       sign_in customer
       put :mark_task_as_completed, params: params
       task_2.reload
@@ -178,6 +193,7 @@ RSpec.describe TasksController, type: :controller do
     end
 
     it 'return error with status 403 if task doesnt belong to customer' do
+      request.headers.merge!({ "Accelerator-Id": "#{accelerator.id}"})
       sign_in admin
       put :mark_task_as_completed, params: params_2
       expect(response.body).to eq({'notice': 'You do not have permission to perform this action'}.to_json)
@@ -195,6 +211,7 @@ RSpec.describe TasksController, type: :controller do
     before { params_2.permit! }
 
     it 'return successfully message in json' do
+      request.headers.merge!({ "Accelerator-Id": "#{accelerator.id}"})
       sign_in admin
       delete :destroy, params: params
       expect(Task.find_by_id(task_3.id)).to eq(nil)
@@ -204,6 +221,7 @@ RSpec.describe TasksController, type: :controller do
     end
 
     it 'return error with status 403 if task doesnt belong to admin' do
+      request.headers.merge!({ "Accelerator-Id": "#{accelerator.id}"})
       sign_in admin
       delete :destroy, params: params_2
       expect(response.body).to eq({'notice': 'You do not have permission to perform this action'}.to_json)
@@ -212,6 +230,7 @@ RSpec.describe TasksController, type: :controller do
     end
 
     it 'return error with status 403 if customer authenticated' do
+      request.headers.merge!({ "Accelerator-Id": "#{accelerator.id}"})
       sign_in customer
       post :create, params: params
       expect(response.body).to eq({'notice': 'You do not have permission to perform this action'}.to_json)
