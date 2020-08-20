@@ -262,55 +262,6 @@ records = [
            }
           ]
           },
-          {
-            title: 'Management Team Risk',
-            sub_categories: [
-              {
-                title: 'Management Team',
-                stages: [
-                  {title: 'No notable experience'},
-                  {title: 'Technology or domain experience only'},
-                  {title: 'Technology / domain expert along with sales / marketing expertise'},
-                  {title: 'Team with notable experience, but gaps exists'},
-                  {title: 'Solid team with notable experience'},
-                  {title: 'Very strong team with notable experience and prior successful startups'}
-                ]
-              },
-              {
-                title: 'Alliance/Partners',
-                stages: [
-                  {title: 'Unknown'},
-                  {title: 'Alliance partners identified'},
-                  {title: 'Talks with potential partners commenced'},
-                  {title: 'Negotiations with all necessary partners commenced'},
-                  {title: 'Some alliances with partners closed but others still outstanding'},
-                  {title: 'All necessary alliances closed with A-List partners'}
-                ]
-              },
-              {
-                title: 'Advisory Board',
-                stages: [
-                  {title: 'Not addressed'},
-                  {title: 'Advisors identified'},
-                  {title: 'Some advisors approached but uncommitted'},
-                  {title: 'Some advisors committed'},
-                  {title: 'Some strong advisors committed'},
-                  {title: 'A-List technology & business advisors committed'}
-                ]
-              },
-              {
-                title: 'Implementation Plan',
-                stages: [
-                  {title: 'Not addressed'},
-                  {title: 'Incomplete'},
-                  {title: 'Difficult to assess due to significant gaps'},
-                  {title: 'Fairly realistic but planning incomplete'},
-                  {title: 'Realistic with thorough planning'},
-                  {title: 'Highly realistic, easy to follow, thoroughly planned'}
-                ]
-              }
-            ]
-           },
            {
               title: 'Manufacturing Risk',
               sub_categories: [
