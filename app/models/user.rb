@@ -8,6 +8,7 @@ class User < ApplicationRecord
   belongs_to :accelerator
 
   USER_TYPES = [
+    SUPER_ADMIN = 'SuperAdmin',
     ADMIN = 'Admin',
     CUSTOMER = 'Customer'
   ].freeze
@@ -23,6 +24,10 @@ class User < ApplicationRecord
       user_type: type,
       user: as_json
     }
+  end
+
+  def super_admin?
+    type == SUPER_ADMIN
   end
 
   def admin?

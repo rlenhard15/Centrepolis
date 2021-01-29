@@ -59,6 +59,25 @@ RSpec.describe User, type: :model do
     end
   end
 
+  describe "Method 'super_admin?'" do
+    let!(:accelerator) { create(:accelerator) }
+      let!(:super_admin) { create(:user, type:'SuperAdmin',  accelerator_id: accelerator.id) }
+      let!(:admin)       { create(:user, type:'Admin',  accelerator_id: accelerator.id) }
+      let!(:customer)    { create(:user, type:'Customer',  accelerator_id: accelerator.id) }
+
+    it "return true if user's type 'SuperAdmin'" do
+      expect(super_admin.super_admin?).to eq(true)
+    end
+
+    it "return false if user's type isn't 'SuperAdmin'" do
+      expect(admin.super_admin?).to eq(false)
+    end
+
+    it "return false if user's type isn't 'SuperAdmin'" do
+      expect(customer.super_admin?).to eq(false)
+    end
+  end
+
   describe "Method 'admin?'" do
     let!(:accelerator) { create(:accelerator) }
     let!(:admin)       { create(:user, type:'Admin',  accelerator_id: accelerator.id) }
@@ -114,7 +133,7 @@ RSpec.describe User, type: :model do
     let!(:attributes)     {ActionController::Parameters.new({reset_password_token: password_token, password: "123456", password_confirmation: "123456"})}
 
     before { attributes.permit! }
-    
+
     it "return user with updated password" do
       user_after_reset_password = user.reset_password_by_token(attributes)
       expect(user_after_reset_password).to eq(user)
