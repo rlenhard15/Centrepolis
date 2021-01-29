@@ -18,7 +18,6 @@ RSpec.describe Admins::CustomersController, type: :controller do
       sign_in admin
       get :index
       expect(parse_json(response.body).count).to eq(2)
-      byebug
       expect(parse_json(response.body)).to eq(admin.customers.as_json(methods: :assessments_risk_list, except: [:created_at, :updated_at]))
       expect(response.content_type).to eq('application/json; charset=utf-8')
       expect(response).to have_http_status(:success)
