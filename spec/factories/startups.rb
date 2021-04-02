@@ -1,6 +1,5 @@
 FactoryBot.define do
   factory :startup do
-    name { "MyString" }
-    accelerator_id { 1 }
+    name { Faker::Company.name }
   end
 end
