@@ -1,7 +1,6 @@
 class Task < ApplicationRecord
   belongs_to :stage
   has_one :notification
-  belongs_to :startup, foreign_key: "created_for"
 
   enum status: [:started, :completed]
   enum priority: [:low, :medium, :high]

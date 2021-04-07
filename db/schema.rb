@@ -88,7 +88,7 @@ ActiveRecord::Schema.define(version: 2021_04_05_083259) do
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
     t.integer "status", default: 0
-    t.integer "created_for"
+    t.integer "created_by"
     t.integer "priority"
     t.datetime "due_date"
   end
