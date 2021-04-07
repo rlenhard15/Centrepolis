@@ -1,6 +1,6 @@
 class Member < User
   has_many :sub_category_progresses, dependent: :destroy
-  belongs_to :startup, foreign_key: "startup_id"
+  belongs_to :startup
   has_many :assessment_progresses, dependent: :destroy
   has_many :notifications
 
@@ -20,7 +20,7 @@ class Member < User
   def send_email
     # TODO: We should pass simple data types instead of object
     UsersMailer.with(
-      customer: self
+      member: self
     ).email_for_restore_password.deliver_later
   end
 end

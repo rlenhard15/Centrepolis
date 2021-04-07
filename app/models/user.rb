@@ -3,8 +3,12 @@ class User < ApplicationRecord
   # :confirmable, :lockable, :timeoutable, :trackable and :omniauthable
   devise :database_authenticatable, :registerable,
          :recoverable, :rememberable, :validatable
-         
+
   belongs_to :accelerator
+  has_many :task_users, dependent: :destroy
+  has_many :tasks, through: :task_users
+
+  scope :members, -> { where(type: "Member") }
 
   USER_TYPES = [
     SUPER_ADMIN = 'SuperAdmin',

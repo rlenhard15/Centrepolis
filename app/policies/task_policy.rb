@@ -10,12 +10,20 @@ class TaskPolicy < ApplicationPolicy
     def resolve
       return scope.none unless user
 
-      if user.admin?
-        scope.where(created_by: user.id)
-      elsif user.customer?
-        scope.where(user_id: user.id)
+      if user.super_admin?
+        scope.joins(:task_users).where("task_users.user_id IN (?)", user.accelerator.user_ids).uniq
+      elsif user.admin?
+        scope.joins(:users).where("users.startup_id IN (?)", user.startup_ids).uniq
+      elsif user.startup_admin?
+        scope.joins(:users).where("users.startup_id = ?", user.startup.id).uniq
+      elsif user.member?
+        scope.joins(:task_users).where("task_users.user_id = ?", user.id).uniq
       end
     end
+  end
+
+  def create?
+    startup_admin?
   end
 
   def destroy?

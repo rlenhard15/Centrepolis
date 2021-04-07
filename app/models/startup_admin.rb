@@ -1,3 +1,3 @@
 class StartupAdmin < User
-  belongs_to :startup, foreign_key: "startup_id"
+  belongs_to :startup
 end

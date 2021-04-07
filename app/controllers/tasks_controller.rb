@@ -1,6 +1,6 @@
 class TasksController < ApplicationController
   before_action :set_task_for_show, only: :show
-  before_action :set_customer, only: [:index, :create]
+  before_action :set_customer, only: [:index]
   before_action :set_task, only: [:update, :mark_task_as_completed, :destroy]
 
   api :GET, 'api/tasks', "Tasks list for customer"
@@ -59,35 +59,50 @@ class TasksController < ApplicationController
     render json: @task
   end
 
-  api :POST, 'api/tasks', "Create new task and notification for this task for customer"
+  api :POST, 'api/tasks', "Create new task and assign its to the specific users of the startup"
 
   param :task, Hash, required: true do
-    param :stage_id, Integer, desc: "id of stage",  required: true
+    param :stage_id, Integer, desc: "id of stage", required: true
     param :title, String, desc: 'Name of task', required: true
     param :priority, String, desc: 'Task execution priority', required: true
     param :due_date, DateTime, desc: 'Deadline date', required: true
-    param :customer_id, Integer, desc: 'Customer who is owner of task', required: true
+    param :task_users_attributes, Array, required: true do
+      param :user_id, Integer, desc: 'Id of users who have access to the task', required: true
+    end
   end
 
   description <<-DESC
 
   === Request headers
-    Only admin can perform this action
+    Only StartupAdmin can perform this action
       Authentication - string - required
         Example of Authentication header : "Bearer TOKEN_FETCHED_FROM_SERVER_DURING_REGISTRATION"
+      Accelerator-Id - integer - required
+        Example of Accelerator-Id header : 1
 
   === Success response body
   {
-    "id": 122,
-    "title": "Task",
-    "stage_id": 20,
-    "created_at": "2020-04-27T12:23:54.883Z",
-    "updated_at": "2020-04-27T12:23:54.883Z",
-    "user_id": 290,
+    "id": 8,
+    "title": "New task",
+    "stage_id": 4,
+    "created_at": "2021-04-07T10:05:54.080Z",
+    "updated_at": "2021-04-07T10:05:54.080Z",
     "status": "started",
-    "created_by": 101,
     "priority": "low",
-    "due_date": "2020-04-24T00:00:00.000Z"
+    "due_date": "2021-09-09T00:00:00.000Z",
+    "users": [
+      {
+        "id": 5,
+        "email": "example_member@gmail.com",
+        "created_at": "2021-04-06T10:48:34.453Z",
+        "updated_at": "2021-04-06T10:48:45.909Z",
+        "first_name": "Emily",
+        "last_name": "Smith",
+        "startup_id": 1,
+        "accelerator_id": 1
+      },
+      ...
+    ]
   }
 
   DESC
@@ -95,19 +110,9 @@ class TasksController < ApplicationController
   def create
     authorize current_user, policy_class: TaskPolicy
 
-    @task = Task.new(
-      tasks_params.merge({
-        created_by: current_user.id,
-        user_id: @customer.id
-      })
-    )
+    @task = Task.new(task_members_params)
     if @task.save
-      if @task.create_notification(customer_id: @customer.id)
-        render json: @task, status: :created
-      else
-        # add errors of notification
-        render json: { error: "Notification was not created" }, status: :unprocessable_entity
-      end
+      render json: @task.as_json(include: :users), status: :created
     else
       render json: @task.errors, status: :unprocessable_entity
     end
@@ -205,9 +210,17 @@ class TasksController < ApplicationController
 
   private
 
-    def set_customer
-      customer_id = params[:customer_id]
-      raise Pundit::NotAuthorizedError unless @customer = current_user.admin? ? policy_scope(Customer).find_by_id(customer_id || params[:task][:customer_id]) : current_user
+    def task_members_params
+      user_ids_for_task = tasks_params[:task_users_attributes].map { |user| user[:user_id] }
+      raise Pundit::NotAuthorizedError unless @members = policy_scope(User).where(id: user_ids_for_task)
+      validated_users_ids_hash = []
+      @members.each do |member|
+        validated_users_ids_hash.push({user_id: member.id})
+      end
+      tasks_params_hash = tasks_params.to_h
+      tasks_params_hash[:task_users_attributes] = validated_users_ids_hash
+
+      tasks_params_hash
     end
 
     def set_task
@@ -221,6 +234,6 @@ class TasksController < ApplicationController
 
     # Only allow a trusted parameter "white list" through.
     def tasks_params
-      params.require(:task).permit(:title, :stage_id, :priority, :due_date)
+      params.require(:task).permit(:title, :stage_id, :priority, :due_date, task_users_attributes: [ :user_id ])
     end
 end
