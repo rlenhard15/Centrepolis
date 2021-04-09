@@ -1,5 +1,5 @@
 class SubCategoryProgress < ApplicationRecord
-  belongs_to :customer
+  belongs_to :member
   belongs_to :sub_category
 
   validates :customer_id, uniqueness: { scope: :sub_category_id }

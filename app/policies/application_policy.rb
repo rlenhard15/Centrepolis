@@ -30,8 +30,8 @@ class ApplicationPolicy
     user.admin?
   end
 
-  def customer?
-    user.customer?
+  def member?
+    user.member?
   end
 
   class Scope

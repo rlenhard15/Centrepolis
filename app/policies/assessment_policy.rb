@@ -12,7 +12,7 @@ class AssessmentPolicy < ApplicationPolicy
 
       if user.admin?
         scope.all
-      elsif user.customer?
+      elsif user.member?
         scope.all
       end
     end

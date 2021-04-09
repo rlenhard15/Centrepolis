@@ -12,7 +12,7 @@ class TaskPolicy < ApplicationPolicy
 
       if user.admin?
         scope.where(created_by: user.id)
-      elsif user.customer?
+      elsif user.member?
         scope.where(user_id: user.id)
       end
     end
@@ -43,6 +43,6 @@ class TaskPolicy < ApplicationPolicy
   end
 
   def can_customer_do_it?
-    customer? && user.id == record.user_id
+    member? && user.id == record.user_id
   end
 end
