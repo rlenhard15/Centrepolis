@@ -10,7 +10,11 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
+<<<<<<< HEAD
 ActiveRecord::Schema.define(version: 2021_04_07_102353) do
+=======
+ActiveRecord::Schema.define(version: 2021_04_09_135605) do
+>>>>>>> create_StartupAdmin_model_02_04_21
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -20,6 +24,13 @@ ActiveRecord::Schema.define(version: 2021_04_07_102353) do
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
     t.string "hostname"
+  end
+
+  create_table "admins_startups", force: :cascade do |t|
+    t.integer "startup_id"
+    t.integer "admin_id"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
   end
 
   create_table "assessment_progresses", force: :cascade do |t|
@@ -64,7 +75,6 @@ ActiveRecord::Schema.define(version: 2021_04_07_102353) do
     t.integer "accelerator_id"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
-    t.integer "created_by"
   end
 
   create_table "sub_categories", force: :cascade do |t|
@@ -94,6 +104,7 @@ ActiveRecord::Schema.define(version: 2021_04_07_102353) do
     t.integer "stage_id"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
+    t.integer "user_id"
     t.integer "status", default: 0
     t.integer "priority"
     t.datetime "due_date"
@@ -110,8 +121,8 @@ ActiveRecord::Schema.define(version: 2021_04_07_102353) do
     t.string "first_name"
     t.string "last_name"
     t.string "type"
-    t.integer "startup_id"
     t.integer "accelerator_id"
+    t.integer "startup_id"
     t.index ["email"], name: "index_users_on_email", unique: true
     t.index ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true
   end
