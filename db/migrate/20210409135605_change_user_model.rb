@@ -2,7 +2,7 @@ class ChangeUserModel < ActiveRecord::Migration[6.0]
   def change
     add_column :users, :startup_id, :integer
     User.reset_column_information
-    
+
     customers = Customer.all
     customers.update_all(type: "Member")
     members = Member.all

@@ -18,4 +18,8 @@ class Task < ApplicationRecord
       stages.title AS stage_title"
     )
   }
+
+  def members_for_task
+    users.where("users.type = ?", "Member")
+  end
 end

@@ -10,11 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-<<<<<<< HEAD
-ActiveRecord::Schema.define(version: 2021_04_07_102353) do
-=======
-ActiveRecord::Schema.define(version: 2021_04_09_135605) do
->>>>>>> create_StartupAdmin_model_02_04_21
+ActiveRecord::Schema.define(version: 2021_04_12_083303) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -34,7 +30,7 @@ ActiveRecord::Schema.define(version: 2021_04_09_135605) do
   end
 
   create_table "assessment_progresses", force: :cascade do |t|
-    t.integer "member_id"
+    t.integer "customer_id"
     t.integer "assessment_id"
     t.decimal "risk_value"
     t.datetime "created_at", precision: 6, null: false
@@ -56,7 +52,7 @@ ActiveRecord::Schema.define(version: 2021_04_09_135605) do
 
   create_table "notifications", force: :cascade do |t|
     t.integer "task_id"
-    t.integer "member_id"
+    t.integer "customer_id"
     t.boolean "read", default: false
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
@@ -85,7 +81,7 @@ ActiveRecord::Schema.define(version: 2021_04_09_135605) do
   end
 
   create_table "sub_category_progresses", force: :cascade do |t|
-    t.bigint "member_id"
+    t.bigint "customer_id"
     t.bigint "sub_category_id"
     t.bigint "current_stage_id", null: false
     t.datetime "created_at", precision: 6, null: false
@@ -104,7 +100,6 @@ ActiveRecord::Schema.define(version: 2021_04_09_135605) do
     t.integer "stage_id"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
-    t.integer "user_id"
     t.integer "status", default: 0
     t.integer "priority"
     t.datetime "due_date"

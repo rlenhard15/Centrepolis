@@ -11,11 +11,11 @@ class UserPolicy < ApplicationPolicy
       return scope.none unless user
 
       if user.super_admin?
-        scope.where(accelerator_id: user.id)
+        scope.where(accelerator_id: user.accelerator_id)
       elsif user.admin?
         scope.where(startup_id: user.startup_ids)
       elsif user.startup_admin?
-        scope.where(startup_id: user.startup.id)
+        scope.where(startup_id: user.startup_id)
       elsif user.member?
         scope.none
       end

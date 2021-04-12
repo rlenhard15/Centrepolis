@@ -11,13 +11,13 @@ class TaskPolicy < ApplicationPolicy
       return scope.none unless user
 
       if user.super_admin?
-        scope.joins(:task_users).where("task_users.user_id IN (?)", user.accelerator.user_ids).uniq
+        scope.joins(:users).where("users.accelerator_id = ? ", user.accelerator_id).uniq
       elsif user.admin?
-        scope.joins(:users).where("users.startup_id IN (?)", user.startup_ids).uniq
+        scope.joins(:users).where("users.startup_id IN (?) ", user.startup_ids).uniq
       elsif user.startup_admin?
-        scope.joins(:users).where("users.startup_id = ?", user.startup.id).uniq
+        scope.joins(:users).where("task_users.user_id = ?", user.id)
       elsif user.member?
-        scope.joins(:task_users).where("task_users.user_id = ?", user.id).uniq
+        scope.joins(:users).where("task_users.user_id = ?", user.id)
       end
     end
   end

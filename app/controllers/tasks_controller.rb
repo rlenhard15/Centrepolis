@@ -112,7 +112,7 @@ class TasksController < ApplicationController
 
     @task = Task.new(task_members_params)
     if @task.save
-      render json: @task.as_json(include: :users), status: :created
+      render json: @task.as_json(methods: :members_for_task), status: :created
     else
       render json: @task.errors, status: :unprocessable_entity
     end
@@ -217,6 +217,7 @@ class TasksController < ApplicationController
       @members.each do |member|
         validated_users_ids_hash.push({user_id: member.id})
       end
+      validated_users_ids_hash.push({user_id: current_user.id})
       tasks_params_hash = tasks_params.to_h
       tasks_params_hash[:task_users_attributes] = validated_users_ids_hash
 
