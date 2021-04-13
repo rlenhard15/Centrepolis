@@ -1,6 +1,5 @@
 class Task < ApplicationRecord
   belongs_to :stage
-  has_one :notification
   has_many :task_users, dependent: :destroy
   has_many :users, through: :task_users
 
