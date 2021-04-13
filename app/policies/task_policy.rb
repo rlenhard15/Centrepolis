@@ -11,13 +11,13 @@ class TaskPolicy < ApplicationPolicy
       return scope.none unless user
 
       if user.super_admin?
-        scope.joins(:users).where("users.accelerator_id = ? ", user.accelerator_id).uniq
+        scope.joins(:users).where("users.accelerator_id = ? ", user.accelerator_id)
       elsif user.admin?
-        scope.joins(:users).where("users.startup_id IN (?) ", user.startup_ids).uniq
+        scope.joins(:users).where("users.startup_id IN (?) ", user.startup_ids)
       elsif user.startup_admin?
-        scope.joins(:users).where("task_users.user_id = ?", user.id)
+        scope.joins(:users).where("tasks.id IN (?)", user.task_ids)
       elsif user.member?
-        scope.joins(:users).where("task_users.user_id = ?", user.id)
+        scope.joins(:users).where("users.id = ?", user.id)
       end
     end
   end
@@ -27,11 +27,11 @@ class TaskPolicy < ApplicationPolicy
   end
 
   def destroy?
-    can_admin_do_it?
+    can_startup_admin_do_it?
   end
 
   def update?
-    can_admin_do_it?
+    can_startup_admin_do_it?
   end
 
   def mark_task_as_completed?
@@ -43,14 +43,22 @@ class TaskPolicy < ApplicationPolicy
   end
 
   def can_do_it?
-    can_admin_do_it? || can_customer_do_it?
+    can_super_admin_do_it? || can_admin_do_it? || can_startup_admin_do_it? || can_member_do_it?
+  end
+
+  def can_super_admin_do_it?
+    super_admin? && user.accelerator_id == record.users&.where(accelerator_id: user.accelerator_id)&.first&.accelerator_id
   end
 
   def can_admin_do_it?
-    admin? && user.id == record.created_by
+    admin? && user.startup_ids.include?(record.users&.members&.where(startup_id: user.startup_ids)&.first&.startup_id)
   end
 
-  def can_customer_do_it?
-    member? && user.id == record.user_id
+  def can_startup_admin_do_it?
+    startup_admin? && user.id == record.users&.where("users.id = ?", user.id)&.first&.id
+  end
+
+  def can_member_do_it?
+    member? && user.task_ids&.include?(record.id)
   end
 end

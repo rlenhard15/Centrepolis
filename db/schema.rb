@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2021_04_12_083303) do
+ActiveRecord::Schema.define(version: 2021_04_12_103503) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -30,7 +30,7 @@ ActiveRecord::Schema.define(version: 2021_04_12_083303) do
   end
 
   create_table "assessment_progresses", force: :cascade do |t|
-    t.integer "customer_id"
+    t.integer "member_id"
     t.integer "assessment_id"
     t.decimal "risk_value"
     t.datetime "created_at", precision: 6, null: false
@@ -52,7 +52,7 @@ ActiveRecord::Schema.define(version: 2021_04_12_083303) do
 
   create_table "notifications", force: :cascade do |t|
     t.integer "task_id"
-    t.integer "customer_id"
+    t.integer "member_id"
     t.boolean "read", default: false
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
@@ -81,7 +81,7 @@ ActiveRecord::Schema.define(version: 2021_04_12_083303) do
   end
 
   create_table "sub_category_progresses", force: :cascade do |t|
-    t.bigint "customer_id"
+    t.bigint "member_id"
     t.bigint "sub_category_id"
     t.bigint "current_stage_id", null: false
     t.datetime "created_at", precision: 6, null: false
