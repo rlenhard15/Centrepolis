@@ -9,6 +9,5 @@ class ApplicationController < ActionController::API
         notice: 'You do not have permission to perform this action'
       }, status: 403
   end
-  
 
 end
