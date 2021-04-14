@@ -5,4 +5,5 @@ class Startup < ApplicationRecord
   has_many :admins, through: :admins_startups
 
   accepts_nested_attributes_for :admins_startups
+  
 end
