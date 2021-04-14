@@ -4,7 +4,6 @@ class ApplicationController < ActionController::API
   before_action :authenticate_user!
 
   rescue_from(Pundit::NotAuthorizedError) do
-    
     render json:
       {
         notice: 'You do not have permission to perform this action'
