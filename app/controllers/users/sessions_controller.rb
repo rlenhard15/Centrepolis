@@ -13,6 +13,10 @@ module Users
       param :password, String, desc: 'Password', required: true
     end
     description <<-DESC
+      === Request headers
+        Accelerator-Id - integer - required
+          Example of Accelerator-Id header : 1
+
       === Success response body
       {
         "auth_token": "Token",
@@ -24,12 +28,13 @@ module Users
           "updated_at": "2020-03-02T12:43:28.691Z",
           "first_name": "David",
           "last_name": "Smith",
-          "company_name": null,
-          "created_by": null
+          "startup_id": null,
+          "accelerator_id": 1
         }
       }
     DESC
     def create
+
       user = User.find_for_database_authentication(
         email: params[:user][:email]
       )

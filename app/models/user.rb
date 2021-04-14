@@ -4,13 +4,17 @@ class User < ApplicationRecord
   devise :database_authenticatable, :registerable,
          :recoverable, :rememberable, :validatable
 
-  has_many :tasks, dependent: :destroy
   belongs_to :accelerator
+  has_many :task_users, dependent: :destroy
+  has_many :tasks, through: :task_users
+
+  scope :members, -> { where(type: "Member") }
 
   USER_TYPES = [
     SUPER_ADMIN = 'SuperAdmin',
     ADMIN = 'Admin',
-    CUSTOMER = 'Customer'
+    STARTUP_ADMIN = 'StartupAdmin',
+    MEMBER = 'Member'
   ].freeze
 
   def payload
@@ -34,8 +38,12 @@ class User < ApplicationRecord
     type == ADMIN
   end
 
-  def customer?
-    type == CUSTOMER
+  def startup_admin?
+    type == STARTUP_ADMIN
+  end
+
+  def member?
+    type == MEMBER
   end
 
   def frontend_hostname

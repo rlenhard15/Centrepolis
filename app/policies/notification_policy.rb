@@ -10,7 +10,7 @@ class NotificationPolicy < ApplicationPolicy
     def resolve
       return scope.none unless user
 
-      if user.customer?
+      if user.member?
         scope.where(customer_id: user.id)
       elsif user.admin?
         scope.none
@@ -23,7 +23,7 @@ class NotificationPolicy < ApplicationPolicy
   end
 
   def mark_as_readed_all?
-    customer?  
+    customer?
   end
 
   def index?
@@ -31,6 +31,6 @@ class NotificationPolicy < ApplicationPolicy
   end
 
   def can_customer_do_it
-    customer? && user.id == record.customer_id
+    member? && user.id == record.customer_id
   end
 end

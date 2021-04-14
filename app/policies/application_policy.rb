@@ -7,31 +7,39 @@ class ApplicationPolicy
   end
 
   def index?
-    admin?
+    super_admin?
   end
 
   def show?
-    admin?
+    super_admin?
   end
 
   def create?
-    admin?
+    super_admin?
   end
 
   def update?
-    admin?
+    super_admin?
   end
 
   def destroy?
-    admin?
+    super_admin?
+  end
+
+  def super_admin?
+    user.super_admin?
   end
 
   def admin?
     user.admin?
   end
 
-  def customer?
-    user.customer?
+  def startup_admin?
+    user.startup_admin?
+  end
+
+  def member?
+    user.member?
   end
 
   class Scope
@@ -45,7 +53,7 @@ class ApplicationPolicy
     def resolve
       return scope.none unless user
 
-      if user.admin?
+      if user.super_admin?
         scope.all
       end
     end

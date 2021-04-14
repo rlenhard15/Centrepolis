@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2021_04_02_112401) do
+ActiveRecord::Schema.define(version: 2021_04_12_103503) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -22,8 +22,15 @@ ActiveRecord::Schema.define(version: 2021_04_02_112401) do
     t.string "hostname"
   end
 
+  create_table "admins_startups", force: :cascade do |t|
+    t.integer "startup_id"
+    t.integer "admin_id"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+  end
+
   create_table "assessment_progresses", force: :cascade do |t|
-    t.integer "customer_id"
+    t.integer "member_id"
     t.integer "assessment_id"
     t.decimal "risk_value"
     t.datetime "created_at", precision: 6, null: false
@@ -45,7 +52,7 @@ ActiveRecord::Schema.define(version: 2021_04_02_112401) do
 
   create_table "notifications", force: :cascade do |t|
     t.integer "task_id"
-    t.integer "customer_id"
+    t.integer "member_id"
     t.boolean "read", default: false
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
@@ -74,9 +81,16 @@ ActiveRecord::Schema.define(version: 2021_04_02_112401) do
   end
 
   create_table "sub_category_progresses", force: :cascade do |t|
-    t.bigint "customer_id"
+    t.bigint "member_id"
     t.bigint "sub_category_id"
     t.bigint "current_stage_id", null: false
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+  end
+
+  create_table "task_users", force: :cascade do |t|
+    t.integer "task_id"
+    t.integer "user_id"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
   end
@@ -86,9 +100,7 @@ ActiveRecord::Schema.define(version: 2021_04_02_112401) do
     t.integer "stage_id"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
-    t.integer "user_id"
     t.integer "status", default: 0
-    t.integer "created_by"
     t.integer "priority"
     t.datetime "due_date"
   end
@@ -103,11 +115,9 @@ ActiveRecord::Schema.define(version: 2021_04_02_112401) do
     t.datetime "updated_at", precision: 6, null: false
     t.string "first_name"
     t.string "last_name"
-    t.string "company_name"
     t.string "type"
-    t.integer "created_by"
     t.integer "accelerator_id"
-    t.index ["company_name"], name: "index_users_on_company_name", unique: true
+    t.integer "startup_id"
     t.index ["email"], name: "index_users_on_email", unique: true
     t.index ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true
   end

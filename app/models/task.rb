@@ -1,8 +1,9 @@
 class Task < ApplicationRecord
   belongs_to :stage
-  belongs_to :admin, foreign_key: "created_by"
-  belongs_to :customer, foreign_key: "user_id"
-  has_one :notification
+  has_many :task_users, dependent: :destroy
+  has_many :users, through: :task_users
+
+  accepts_nested_attributes_for :task_users
 
   enum status: [:started, :completed]
   enum priority: [:low, :medium, :high]
@@ -16,4 +17,10 @@ class Task < ApplicationRecord
       stages.title AS stage_title"
     )
   }
+
+  scope :tasks_for_user, ->(user_id) { joins(:users).where("users.id = ?", user_id) }
+
+  def members_for_task
+    users.where("users.type = ?", "Member")
+  end
 end

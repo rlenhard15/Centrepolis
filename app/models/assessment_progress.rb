@@ -1,4 +1,4 @@
 class AssessmentProgress < ApplicationRecord
   belongs_to :assessment
-  belongs_to :customer
+  belongs_to :member
 end
