@@ -19,10 +19,29 @@ class StartupsController < ApplicationController
         Example of Accelerator-Id header : 1
 
   === Success response body
+  {
+    "id": 12,
+    "name": "Company name",
+    "accelerator_id": 1,
+    "created_at": "2021-04-16T09:53:05.871Z",
+    "updated_at": "2021-04-16T09:53:05.871Z",
+    "admins_for_startup": [
+      {
+        "id": 2,
+        "email": "admin@gmail.com",
+        "created_at": "2021-04-09T18:49:34.985Z",
+        "updated_at": "2021-04-09T18:49:34.985Z",
+        "first_name": "Admin2",
+        "last_name": "Adm2",
+        "accelerator_id": 1,
+        "startup_id": null
+      },
+      ...
+    ]
+  }
 
   DESC
-
-
+  
   def create
     authorize current_user, policy_class: StartupPolicy
 
