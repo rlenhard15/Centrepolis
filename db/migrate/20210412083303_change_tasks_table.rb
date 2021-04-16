@@ -1,10 +1,10 @@
 class ChangeTasksTable < ActiveRecord::Migration[6.0]
   def change
     tasks = Task.all
-    
+
     tasks.each do |t|
-      user = Member.find(t.user_id)
-      admin = Admin.find(t.created_by)
+      user = Member.find_by_id(t.user_id)
+      admin = Admin.find_by_id(t.created_by)
 
       if user && admin
         TaskUser.create(task_id: t.id, user_id: user.id)
