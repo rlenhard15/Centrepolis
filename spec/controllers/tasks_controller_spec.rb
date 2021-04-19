@@ -42,8 +42,9 @@ RSpec.describe TasksController, type: :controller do
       request.headers.merge!({ "Accelerator-Id": "#{accelerator.id}"})
       sign_in super_admin
       get :index, params: params
-      expect(parse_json(response.body).count).to eq(Task.joins(:users).where("users.accelerator_id = ? AND users.id = ?", super_admin.accelerator_id, member.id).count)
-      expect(parse_json(response.body)).to eq(parse_json(Task.joins(:users).where("users.accelerator_id = ? AND users.id = ?", super_admin.accelerator_id, member.id).order(created_at: :asc).with_all_required_info_for_tasks.to_json))
+      expect(parse_json(response.body)[0][1]).to eq(1)
+      expect(parse_json(response.body)[1][1].count).to eq(Task.tasks_for_user(member.id).count)
+      expect(recursively_delete_timestamps(parse_json(response.body)[1][1])).to eq(parse_json(Task.joins(:users).where("users.id = ?", member.id).with_all_required_info_for_tasks.limit(10).to_json))
       expect(response.content_type).to eq('application/json; charset=utf-8')
       expect(response).to have_http_status(:success)
     end
@@ -52,8 +53,9 @@ RSpec.describe TasksController, type: :controller do
       request.headers.merge!({ "Accelerator-Id": "#{accelerator.id}"})
       sign_in admin
       get :index, params: params
-      expect(parse_json(response.body).count).to eq(Task.joins(:users).where("users.startup_id IN (?) AND users.id = ?", admin.startup_ids, member.id).count)
-      expect(parse_json(response.body)).to eq(parse_json(Task.joins(:users).where("users.startup_id IN (?) AND users.id = ?", admin.startup_ids, member.id).order(created_at: :asc).with_all_required_info_for_tasks.to_json))
+      expect(parse_json(response.body)[0][1]).to eq(1)
+      expect(parse_json(response.body)[1][1].count).to eq(Task.tasks_for_user(member.id).count)
+      expect(recursively_delete_timestamps(parse_json(response.body)[1][1])).to eq(parse_json(Task.joins(:users).where("users.startup_id IN (?) AND users.id = ?", admin.startup_ids, member.id).order(created_at: :asc).with_all_required_info_for_tasks.limit(10).to_json))
       expect(response.content_type).to eq('application/json; charset=utf-8')
       expect(response).to have_http_status(:success)
     end
@@ -62,8 +64,8 @@ RSpec.describe TasksController, type: :controller do
       request.headers.merge!({ "Accelerator-Id": "#{accelerator.id}"})
       sign_in startup_admin
       get :index, params: params
-      expect(parse_json(response.body).count).to eq(startup_admin.tasks.count)
-      expect(parse_json(response.body)).to eq(parse_json(startup_admin.tasks.with_all_required_info_for_tasks.to_json))
+      expect(parse_json(response.body)[1][1].count).to eq(startup_admin.tasks.count)
+      expect(recursively_delete_timestamps(parse_json(response.body)[1][1])).to eq(parse_json(startup_admin.tasks.with_all_required_info_for_tasks.limit(10).to_json))
       expect(response.content_type).to eq('application/json; charset=utf-8')
       expect(response).to have_http_status(:success)
     end
@@ -72,8 +74,8 @@ RSpec.describe TasksController, type: :controller do
       request.headers.merge!({ "Accelerator-Id": "#{accelerator.id}"})
       sign_in member
       get :index
-      expect(parse_json(response.body).count).to eq(member.tasks.count)
-      expect(parse_json(response.body)).to eq(parse_json(member.tasks.with_all_required_info_for_tasks.to_json))
+      expect(parse_json(response.body)[1][1].count).to eq(member.tasks.count)
+      expect(recursively_delete_timestamps(parse_json(response.body)[1][1])).to eq(parse_json(member.tasks.with_all_required_info_for_tasks.limit(10).to_json))
       expect(response.content_type).to eq('application/json; charset=utf-8')
       expect(response).to have_http_status(:success)
     end

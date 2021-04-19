@@ -29,6 +29,7 @@ gem 'jwt'
 gem 'pundit'
 gem 'apipie-rails'
 gem 'rack-cors'
+gem 'kaminari'
 
 group :development, :test do
   gem 'rspec-rails'

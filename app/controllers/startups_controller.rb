@@ -1,5 +1,75 @@
 class StartupsController < ApplicationController
 
+  api :GET, 'api/startups', "List of startups"
+  param :page, Integer, desc: "Page for startups iteration (10 items per page)"
+
+  description <<-DESC
+
+  === Request headers
+    SuperAdmin or Admin can perform this action
+      SuperAdmin   - all startups of the accelerator;
+      Admin        - all startups assigned to him;
+    Authentication - string - required
+      Example of Authentication header : "Bearer TOKEN_FETCHED_FROM_SERVER_DURING_REGISTRATION"
+    Accelerator-Id - integer - required
+      Example of Accelerator-Id header : 1
+
+  === Success response body
+  {
+    "current_page": 1,
+    "total_pages": 2,
+    "startups": [
+      {
+        "id": 1,
+        "name": "MSI",
+        "accelerator_id": 1,
+        "created_at": "2021-04-09T19:04:59.356Z",
+        "updated_at": "2021-04-09T19:04:59.356Z",
+        "members": [
+          {
+            "id": 3,
+            "email": "eva@gmail.com",
+            "created_at": "2021-04-09T18:51:32.967Z",
+            "updated_at": "2021-04-09T19:04:59.508Z",
+            "first_name": "Eva",
+            "last_name": "Evans",
+            "accelerator_id": 1,
+            "startup_id": 1
+          },
+          ...
+        ],
+        "startup_admins": [
+          {
+            "id": 8,
+            "email": "startup_admin@gmail.com",
+            "created_at": "2021-04-12T08:55:37.469Z",
+            "updated_at": "2021-04-12T08:55:37.469Z",
+            "first_name": "Nikole",
+            "last_name": "Smith",
+            "accelerator_id": 1,
+            "startup_id": 1
+          },
+          ...
+        ]
+      },
+      ...
+    ]
+  }
+
+  DESC
+
+  def index
+    authorize current_user, policy_class: StartupPolicy
+
+    @startups = policy_scope(Startup).page(page_params)
+
+    render json: {
+      current_page: @startups.current_page,
+      total_pages: @startups.total_pages,
+      startups: @startups.as_json(methods: [:members, :startup_admins])
+    }
+  end
+
   api :POST, 'api/startups', "Create new startup and assign its to the specific admins"
 
   param :startup, Hash, required: true do
@@ -54,6 +124,10 @@ class StartupsController < ApplicationController
   end
 
   private
+
+  def page_params
+    params[:page]
+  end
 
   def startup_admins_params
     if startup_params[:admins_startups_attributes]
