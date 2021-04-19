@@ -59,7 +59,6 @@ class StartupsController < ApplicationController
     if startup_params[:admins_startups_attributes]
       admins_ids_for_startup = startup_params[:admins_startups_attributes].map { |admin| admin[:admin_id] }
     end
-    
 
     @admins = current_user.super_admin? ? policy_scope(User).where({id: admins_ids_for_startup, type: "Admin"}) : [current_user]
     raise Pundit::NotAuthorizedError if @admins.empty? || @admins.nil?
