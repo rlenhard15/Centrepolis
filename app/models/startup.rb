@@ -5,5 +5,9 @@ class Startup < ApplicationRecord
   has_many :admins, through: :admins_startups
 
   accepts_nested_attributes_for :admins_startups
-  
+
+  def admins_for_startup
+    admins.where("users.type = ?", "Admin")
+  end
+
 end
