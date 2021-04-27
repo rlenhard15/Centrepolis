@@ -3,6 +3,8 @@ class Task < ApplicationRecord
   has_many :task_users, dependent: :destroy
   has_many :users, through: :task_users
 
+  paginates_per 10
+
   accepts_nested_attributes_for :task_users
 
   enum status: [:started, :completed]

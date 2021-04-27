@@ -25,7 +25,7 @@ RSpec.describe StartupPolicy, type: :policy do
       expect(policy_scope).to eq(Startup.where(accelerator_id: super_admin.accelerator_id))
     end
 
-    it { is_expected.to permit_actions(%i[create]) }
+    it { is_expected.to permit_actions(%i[create index]) }
   end
 
   describe "user's type: Admin" do
@@ -36,7 +36,7 @@ RSpec.describe StartupPolicy, type: :policy do
       expect(policy_scope).to eq(admin.startups)
     end
 
-    it { is_expected.to permit_actions(%i[create]) }
+    it { is_expected.to permit_actions(%i[create index]) }
   end
 
   describe "user's type: StartupAdmin" do
@@ -47,7 +47,7 @@ RSpec.describe StartupPolicy, type: :policy do
       expect(policy_scope).to eq(startup_admin.startup)
     end
 
-    it { is_expected.to forbid_actions(%i[create]) }
+    it { is_expected.to forbid_actions(%i[create index]) }
   end
 
   describe "user's type: Member" do
@@ -58,6 +58,6 @@ RSpec.describe StartupPolicy, type: :policy do
       expect(policy_scope).to eq(member.startup)
     end
 
-    it { is_expected.to forbid_actions(%i[create]) }
+    it { is_expected.to forbid_actions(%i[create index]) }
   end
 end

@@ -6,6 +6,7 @@ class TasksController < ApplicationController
   api :GET, 'api/tasks', "Tasks list for customer"
 
   param :member_id, Integer, desc: "id of member of the startup, required if current_user is SuperAdmin or Admin or StartupAdmin"
+  param :page, Integer, desc: "Page for tasks iteration (10 items per page)"
 
   description <<-DESC
   === Request headers
@@ -20,24 +21,32 @@ class TasksController < ApplicationController
       Example of Accelerator-Id header : 1
 
   === Success response body
-  [
-    {
-      "id": 63,
-      "title": "Task",
-      "priority": "high",
-      "due_date": "2020-03-02T16:30:43.044Z",
-      "master_assessment": "Assessment",
-      "category": "Category",
-      "sub_category": "SubCategory",
-      "stage_title": "Stage"
-    },
-    ...
-  ]
+  {
+    "current_page": 2,
+    "total_pages": 4,
+    "tasks": [
+      {
+        "id": 63,
+        "title": "Task",
+        "priority": "high",
+        "due_date": "2020-03-02T16:30:43.044Z",
+        "master_assessment": "Assessment",
+        "category": "Category",
+        "sub_category": "SubCategory",
+        "stage_title": "Stage"
+      },
+      ...
+    ]
+  }
   DESC
   def index
-    @tasks = policy_scope(Task).tasks_for_user(@member.id)
+    @tasks = policy_scope(Task).tasks_for_user(@member.id).page(page_params)
 
-    render json: @tasks.with_all_required_info_for_tasks
+    render json: {
+      current_page: @tasks.current_page,
+      total_pages: @tasks.total_pages,
+      tasks: @tasks.with_all_required_info_for_tasks
+    }
   end
 
   api :GET, 'api/tasks/:id', "Request for a certain task"
@@ -253,6 +262,10 @@ class TasksController < ApplicationController
   end
 
   private
+
+    def page_params
+      params[:page]
+    end
 
     def set_member
       raise Pundit::NotAuthorizedError unless @member = current_user.member? ? current_user : policy_scope(User).members.find_by_id(params[:member_id])
