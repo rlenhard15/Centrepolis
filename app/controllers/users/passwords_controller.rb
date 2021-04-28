@@ -11,6 +11,9 @@ module Users
     param :last_name, String, desc: 'Last name of customer', required: true
 
     description <<-DESC
+      === Request headers
+        Accelerator-Id - integer - required
+          Example of Accelerator-Id header : 1
       === Success response body
       {
         "auth_token": "Token",

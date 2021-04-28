@@ -9,6 +9,7 @@ class User < ApplicationRecord
   has_many :tasks, through: :task_users
 
   scope :members, -> { where(type: "Member") }
+  scope :admins, -> { where(type: "Admin") }
 
   USER_TYPES = [
     SUPER_ADMIN = 'SuperAdmin',
