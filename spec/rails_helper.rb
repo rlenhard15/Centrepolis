@@ -66,6 +66,7 @@ RSpec.configure do |config|
   config.include JSONHelpers, :type => :controller
   config.include Warden::Test::Helpers
   config.include ModelHelpers, :type => :model
+  config.include ModelHelpers, :type => :controller
   # Filter lines from Rails gems in backtraces.
   config.filter_rails_from_backtrace!
   # arbitrary gems may also be filtered via:

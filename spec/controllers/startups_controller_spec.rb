@@ -9,8 +9,53 @@ RSpec.describe StartupsController, type: :controller do
   let!(:admins)               { create_list(:admin, 3, accelerator_id: accelerator.id) }
   let!(:admin)                { create(:admin, accelerator_id: accelerator_2.id) }
   let!(:startup)              { create(:startup, accelerator_id: accelerator.id, admins_startups_attributes: [{admin_id: admins.first.id}]) }
+  let!(:startups)             { create_list(:startup, 14, accelerator_id: accelerator.id, admins_startups_attributes: [{admin_id: admins.first.id}]) }
+  let!(:startups_2)           { create_list(:startup, 9, accelerator_id: accelerator.id, admins_startups_attributes: [{admin_id: admins.last.id}]) }
   let!(:startup_admin)        { create(:startup_admin, accelerator_id: accelerator.id, startup_id: startup.id) }
   let!(:member)               { create(:member, startup_id: startup.id, accelerator_id: accelerator.id) }
+
+  describe 'GET index action' do
+
+    it 'return all startups of the accelerator of current super_admin in json format with status success if super_admin authenticated' do
+      request.headers.merge!({ "Accelerator-Id": "#{accelerator.id}"})
+      sign_in super_admin
+      get :index
+      expect(parse_json(response.body)[0][1]).to eq(1)
+      expect(parse_json(response.body)[1][1].count).to eq(10)
+      expect(recursively_delete_timestamps(parse_json(response.body)[1][1][1])).to eq(recursively_delete_timestamps(startups.first.as_json(methods: [:members, :startup_admins])))
+      expect(response.content_type).to eq('application/json; charset=utf-8')
+      expect(response).to have_http_status(:success)
+    end
+
+    it 'return all startups of the current admin in json format with status success if super_admin authenticated' do
+      request.headers.merge!({ "Accelerator-Id": "#{accelerator.id}"})
+      sign_in admins.last
+      get :index
+      expect(parse_json(response.body)[0][1]).to eq(1)
+      expect(parse_json(response.body)[1][1].count).to eq(9)
+      expect(recursively_delete_timestamps(parse_json(response.body)[1][1][1])).to eq(recursively_delete_timestamps(startups_2.second.as_json(methods: [:members, :startup_admins])))
+      expect(response.content_type).to eq('application/json; charset=utf-8')
+      expect(response).to have_http_status(:success)
+    end
+
+    it 'return error with status 403 if startup_admin authenticated' do
+      request.headers.merge!({ "Accelerator-Id": "#{accelerator.id}"})
+      sign_in startup_admin
+      get :index
+      expect(response.body).to eq({'notice': 'You do not have permission to perform this action'}.to_json)
+      expect(response.content_type).to eq('application/json; charset=utf-8')
+      expect(response).to have_http_status(:forbidden)
+    end
+
+    it 'return error with status 403 if member authenticated' do
+      request.headers.merge!({ "Accelerator-Id": "#{accelerator.id}"})
+      sign_in member
+      get :index
+      expect(response.body).to eq({'notice': 'You do not have permission to perform this action'}.to_json)
+      expect(response.content_type).to eq('application/json; charset=utf-8')
+      expect(response).to have_http_status(:forbidden)
+    end
+  end
 
   describe 'POST create action' do
     let!(:params)   { ActionController::Parameters.new({ startup: {name: "New startup", admins_startups_attributes: [{admin_id: admins.first.id}, {admin_id: admins.last.id}, {admin_id: admin.id}] }}) }
