@@ -10,6 +10,8 @@ class User < ApplicationRecord
 
   scope :members, -> { where(type: "Member") }
   scope :admins, -> { where(type: "Admin") }
+  scope :startup_admins, -> { where(type: "StartupAdmin") }
+
 
   USER_TYPES = [
     SUPER_ADMIN = 'SuperAdmin',
