@@ -17,6 +17,8 @@ Rails.application.routes.draw do
     end
     resources :startups, only: %i[index create]
     resources :members, only: %i[index create], module: 'admins'
+    resources :admins, only: %i[index create], module: 'admins'
+    resources :startup_admins, only: %i[index create], module: 'admins'
     resources :assessments, only: %i[index show] do
       resources :categories, only: %i[index show] do
         resources :sub_categories, only: :index do
