@@ -2,8 +2,9 @@ require 'rails_helper'
 
 RSpec.describe User, type: :model do
   describe "Associations" do
-    it { should have_many(:tasks).dependent(:destroy) }
     it { should belong_to(:accelerator) }
+    it { should have_many(:task_users).dependent(:destroy) }
+    it { should have_many(:tasks).through(:task_users) }
   end
 
   describe "Method 'payload'" do
@@ -23,9 +24,8 @@ RSpec.describe User, type: :model do
             "email"=> "test_user@gmail.com",
             "first_name"=> user.first_name,
             "last_name"=> user.last_name,
-            "company_name"=> user.company_name,
-            "created_by"=> user.created_by,
-            "accelerator_id"=> accelerator.id
+            "accelerator_id"=> accelerator.id,
+            "startup_id"=> user.startup_id
           },
           :user_type => "Admin"
         }
@@ -49,9 +49,8 @@ RSpec.describe User, type: :model do
             "email"=> "test_user@gmail.com",
             "first_name"=> user.first_name,
             "last_name"=> user.last_name,
-            "company_name"=> user.company_name,
-            "created_by"=> user.created_by,
-            "accelerator_id"=> accelerator.id
+            "accelerator_id"=> accelerator.id,
+            "startup_id"=> user.startup_id
           },
           :user_type => "Admin"
         }
@@ -60,10 +59,12 @@ RSpec.describe User, type: :model do
   end
 
   describe "Method 'super_admin?'" do
-    let!(:accelerator) { create(:accelerator) }
-      let!(:super_admin) { create(:user, type:'SuperAdmin',  accelerator_id: accelerator.id) }
-      let!(:admin)       { create(:user, type:'Admin',  accelerator_id: accelerator.id) }
-      let!(:customer)    { create(:user, type:'Customer',  accelerator_id: accelerator.id) }
+    let!(:accelerator)   { create(:accelerator) }
+    let!(:super_admin)   { create(:user, type:'SuperAdmin',  accelerator_id: accelerator.id) }
+    let!(:admin)         { create(:user, type:'Admin', accelerator_id: accelerator.id) }
+      let!(:startup)     { create(:startup, accelerator_id: accelerator.id, admins_startups_attributes: [{admin_id: admin.id}]) }
+    let!(:startup_admin) { create(:user, type:'StartupAdmin', accelerator_id: accelerator.id, startup_id: startup.id) }
+    let!(:member)        { create(:user, type:'Member', accelerator_id: accelerator.id, startup_id: startup.id) }
 
     it "return true if user's type 'SuperAdmin'" do
       expect(super_admin.super_admin?).to eq(true)
@@ -74,36 +75,87 @@ RSpec.describe User, type: :model do
     end
 
     it "return false if user's type isn't 'SuperAdmin'" do
-      expect(customer.super_admin?).to eq(false)
+      expect(startup_admin.super_admin?).to eq(false)
+    end
+
+    it "return false if user's type isn't 'SuperAdmin'" do
+      expect(member.super_admin?).to eq(false)
     end
   end
 
   describe "Method 'admin?'" do
-    let!(:accelerator) { create(:accelerator) }
-    let!(:admin)       { create(:user, type:'Admin',  accelerator_id: accelerator.id) }
-    let!(:customer)    { create(:user, type:'Customer',  accelerator_id: accelerator.id) }
+    let!(:accelerator)   { create(:accelerator) }
+    let!(:super_admin)   { create(:user, type:'SuperAdmin',  accelerator_id: accelerator.id) }
+    let!(:admin)         { create(:user, type:'Admin', accelerator_id: accelerator.id) }
+      let!(:startup)     { create(:startup, accelerator_id: accelerator.id, admins_startups_attributes: [{admin_id: admin.id}]) }
+    let!(:startup_admin) { create(:user, type:'StartupAdmin', accelerator_id: accelerator.id, startup_id: startup.id) }
+    let!(:member)        { create(:user, type:'Member', accelerator_id: accelerator.id, startup_id: startup.id) }
 
     it "return true if user's type 'Admin'" do
       expect(admin.admin?).to eq(true)
     end
 
     it "return false if user's type isn't 'Admin'" do
-      expect(customer.admin?).to eq(false)
+      expect(super_admin.admin?).to eq(false)
+    end
+
+    it "return false if user's type isn't 'Admin'" do
+      expect(startup_admin.admin?).to eq(false)
+    end
+
+    it "return false if user's type isn't 'Admin'" do
+      expect(member.admin?).to eq(false)
     end
   end
 
-  describe "Method 'customer?'" do
-    let!(:accelerator) { create(:accelerator) }
-    let!(:admin)       { create(:user, type:'Admin',  accelerator_id: accelerator.id) }
-    let!(:customer)    { create(:user, type:'Customer',  accelerator_id: accelerator.id) }
+  describe "Method 'startup_admin?'" do
+    let!(:accelerator)   { create(:accelerator) }
+    let!(:super_admin)   { create(:user, type:'SuperAdmin',  accelerator_id: accelerator.id) }
+    let!(:admin)         { create(:user, type:'Admin', accelerator_id: accelerator.id) }
+      let!(:startup)     { create(:startup, accelerator_id: accelerator.id, admins_startups_attributes: [{admin_id: admin.id}]) }
+    let!(:startup_admin) { create(:user, type:'StartupAdmin', accelerator_id: accelerator.id, startup_id: startup.id) }
+    let!(:member)        { create(:user, type:'Member', accelerator_id: accelerator.id, startup_id: startup.id) }
 
-    it "return true if user's type 'Customer'" do
-      expect(customer.customer?).to eq(true)
+    it "return true if user's type 'StartupAdmin'" do
+      expect(startup_admin.startup_admin?).to eq(true)
     end
 
-    it "return false if user's type isn't 'Customer'" do
-      expect(admin.customer?).to eq(false)
+    it "return false if user's type isn't 'StartupAdmin'" do
+      expect(super_admin.startup_admin?).to eq(false)
     end
+
+    it "return false if user's type isn't 'StartupAdmin'" do
+      expect(admin.startup_admin?).to eq(false)
+    end
+
+    it "return false if user's type isn't 'StartupAdmin'" do
+      expect(member.startup_admin?).to eq(false)
+    end
+  end
+
+    describe "Method 'member?'" do
+      let!(:accelerator)   { create(:accelerator) }
+      let!(:super_admin)   { create(:user, type:'SuperAdmin',  accelerator_id: accelerator.id) }
+      let!(:admin)         { create(:user, type:'Admin', accelerator_id: accelerator.id) }
+        let!(:startup)     { create(:startup, accelerator_id: accelerator.id, admins_startups_attributes: [{admin_id: admin.id}]) }
+      let!(:startup_admin) { create(:user, type:'StartupAdmin', accelerator_id: accelerator.id, startup_id: startup.id) }
+      let!(:member)        { create(:user, type:'Member', accelerator_id: accelerator.id, startup_id: startup.id) }
+
+      it "return true if user's type 'Member'" do
+        expect(member.member?).to eq(true)
+      end
+
+      it "return false if user's type isn't 'Member'" do
+        expect(super_admin.member?).to eq(false)
+      end
+
+      it "return false if user's type isn't 'Member'" do
+        expect(admin.member?).to eq(false)
+      end
+
+      it "return false if user's type isn't 'Member'" do
+        expect(startup_admin.member?).to eq(false)
+      end
   end
 
   describe "Method 'set_user_by_password_token'" do
@@ -138,6 +190,69 @@ RSpec.describe User, type: :model do
       user_after_reset_password = user.reset_password_by_token(attributes)
       expect(user_after_reset_password).to eq(user)
       expect(user_after_reset_password.password).to eq("123456")
+    end
+  end
+
+  describe "Methods for select users with specific type" do
+    let!(:accelerator)   { create(:accelerator) }
+    let!(:super_admin)   { create(:super_admin, accelerator_id: accelerator.id) }
+    let!(:admins)        { create_list(:admin, 3, accelerator_id: accelerator.id) }
+      let!(:startup)     { create(:startup, accelerator_id: accelerator.id, admins_startups_attributes: [{admin_id: admins.first.id}]) }
+    let!(:startup_admins){ create_list(:startup_admin, 4, accelerator_id: accelerator.id, startup_id: startup.id) }
+    let!(:members)       { create_list(:member, 2, accelerator_id: accelerator.id, startup_id: startup.id) }
+
+    it "Scope 'members' return all members" do
+      members_info = User.members.order(created_at: :asc).as_json
+
+      recursively_delete_timestamps(members_info)
+
+      expect(members_info.count).to eq(2)
+      expect(members_info[0]).to eq(
+        {
+          "id"=> members.first.id,
+          "email"=> members.first.email,
+          "first_name"=> members.first.first_name,
+          "last_name"=> members.first.last_name,
+          "accelerator_id"=> members.first.accelerator_id,
+          "startup_id"=> members.first.startup_id
+        }
+      )
+    end
+
+    it "Scope 'admins' return all members" do
+      admins_info = User.admins.order(created_at: :asc).as_json
+
+      recursively_delete_timestamps(admins_info)
+
+      expect(admins_info.count).to eq(3)
+      expect(admins_info[0]).to eq(
+        {
+          "id"=> admins.first.id,
+          "email"=> admins.first.email,
+          "first_name"=> admins.first.first_name,
+          "last_name"=> admins.first.last_name,
+          "accelerator_id"=> admins.first.accelerator_id,
+          "startup_id"=> admins.first.startup_id
+        }
+      )
+    end
+
+    it "Scope 'startup_admins' return all members" do
+      startup_admins_info = User.startup_admins.order(created_at: :asc).as_json
+
+      recursively_delete_timestamps(startup_admins_info)
+
+      expect(startup_admins_info.count).to eq(4)
+      expect(startup_admins_info[0]).to eq(
+        {
+          "id"=> startup_admins.first.id,
+          "email"=> startup_admins.first.email,
+          "first_name"=> startup_admins.first.first_name,
+          "last_name"=> startup_admins.first.last_name,
+          "accelerator_id"=> startup_admins.first.accelerator_id,
+          "startup_id"=> startup_admins.first.startup_id
+        }
+      )
     end
   end
 end
