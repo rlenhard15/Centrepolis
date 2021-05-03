@@ -4,7 +4,7 @@ module Admins
     description <<-DESC
 
     === Request headers
-      Only SuperAdmin, Admin can perform this action
+      Only SuperAdmin can perform this action
         SuperAdmin   - all admins of the accelerator;
 
         Authentication - string - required
@@ -51,7 +51,6 @@ module Admins
     api :POST, 'api/admins', 'Only SuperAdmin can create account for admin and invite his on email'
     param :user, Hash, required: true do
       param :email, String, desc: 'Unique email for admin', required: true
-      param :accelerator_id, String, desc: 'Accelerator ID', required: true
     end
 
     description <<-DESC
@@ -80,6 +79,7 @@ module Admins
     def create
       @admin = Admin.new(
         user_params.merge({
+          accelerator_id: current_user.accelerator_id,
           password: user_random_password
         })
       )
@@ -95,7 +95,7 @@ module Admins
     private
 
     def user_params
-      params.require(:user).permit(:email, :accelerator_id)
+      params.require(:user).permit(:email)
     end
   end
 end
