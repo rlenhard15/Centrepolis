@@ -50,7 +50,6 @@ module Admins
 
     DESC
     def index
-      
       authorize current_user, policy_class: UserPolicy
 
       render json: policy_scope(User).members.as_json(include: :startup, methods: [:assessments_risk_list])
