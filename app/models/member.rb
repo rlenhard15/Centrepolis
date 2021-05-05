@@ -14,13 +14,4 @@ class Member < User
       }
     end
   end
-
-  private
-
-  def send_email
-    # TODO: We should pass simple data types instead of object
-    UsersMailer.with(
-      member: self
-    ).email_for_restore_password.deliver_later
-  end
 end
