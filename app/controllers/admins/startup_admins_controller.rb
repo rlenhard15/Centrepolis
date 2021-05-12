@@ -5,7 +5,7 @@ module Admins
 
     === Request headers
       Only SuperAdmin, Admin can perform this action
-        SuperAdmin   - all startup_admins of the accelerator;
+        SuperAdmin   - all startup_admins of any accelerator;
         Admin        - all startup_admins of the admins startups;
 
         Authentication - string - required
@@ -77,7 +77,7 @@ module Admins
     def create
       @startup_admin = StartupAdmin.new(
         user_params.merge({
-          accelerator_id: current_user.accelerator_id,
+          accelerator_id: user_accelerator_id,
           password: user_random_password
         })
       )

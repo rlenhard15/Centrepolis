@@ -38,7 +38,7 @@ module Users
       user = User.find_for_database_authentication(
         email: params[:user][:email]
       )
-      if user&.valid_password?(params[:user][:password]) && user&.accelerator_id == accelerator_id
+      if user&.valid_password?(params[:user][:password]) && valid_accelerator_id(user)
         render json: user.payload
       else
         render json: {
@@ -49,8 +49,12 @@ module Users
 
     private
 
-    def accelerator_id
-      @accelerator_id ||= request.headers['Accelerator-Id'].to_i
+    def valid_accelerator_id user
+      if !user.super_admin?
+        user&.accelerator_id == accelerator_id
+      else
+        Accelerator.ids.include?(accelerator_id)
+      end
     end
 
     # DELETE /resource/sign_out

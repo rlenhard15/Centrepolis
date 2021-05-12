@@ -5,7 +5,7 @@ module Admins
 
     === Request headers
       Only SuperAdmin can perform this action
-        SuperAdmin   - all admins of the accelerator;
+        SuperAdmin   - all admins of any accelerator;
 
         Authentication - string - required
           Example of Authentication header : "Bearer TOKEN_FETCHED_FROM_SERVER_DURING_REGISTRATION"
@@ -45,7 +45,7 @@ module Admins
     def index
       authorize current_user, policy_class: AdminPolicy
 
-      render json: policy_scope(User).admins.as_json(methods: :startups)
+      render json: policy_scope(User).admins.for_accelerator(user_accelerator_id).as_json(methods: :startups)
     end
 
     api :POST, 'api/admins', 'Only SuperAdmin can create account for admin and invite his on email'
@@ -79,7 +79,7 @@ module Admins
     def create
       @admin = Admin.new(
         user_params.merge({
-          accelerator_id: current_user.accelerator_id,
+          accelerator_id: user_accelerator_id,
           password: user_random_password
         })
       )

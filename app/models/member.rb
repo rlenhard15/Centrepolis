@@ -3,6 +3,7 @@ class Member < User
   belongs_to :startup
   has_many :assessment_progresses, dependent: :destroy
   has_many :notifications
+  belongs_to :accelerator, foreign_key: "accelerator_id"
 
   after_create :send_email
 
