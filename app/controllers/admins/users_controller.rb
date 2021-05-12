@@ -10,6 +10,8 @@ module Admins
 
       === Request headers
         SuperAdmin can only invite Admin and Member
+        Admin can only invite SuperAdmin and Member
+        StartupAdmin can only invite Member
           Authentication - string - required
             Example of Authentication header : "Bearer TOKEN_FETCHED_FROM_SERVER_DURING_REGISTRATION"
           Accelerator-Id - integer - required

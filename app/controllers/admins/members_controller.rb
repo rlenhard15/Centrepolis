@@ -50,45 +50,45 @@ module Admins
 
     DESC
     def index
-      
       authorize current_user, policy_class: UserPolicy
 
       render json: policy_scope(User).members.as_json(include: :startup, methods: [:assessments_risk_list])
     end
 
-    api :POST, 'api/customers', 'Only admin can create account for customer and invite his on email'
+    api :POST, 'api/members', 'To invite startup members on his email'
     param :user, Hash, required: true do
-      param :email, String, desc: 'Unique email for customer', required: true
-      param :company_name, String, desc: 'Unique company name for customer', required: true
-      param :accelerator_id, String, desc: 'Accelerator ID', required: true
+      param :email, String, desc: 'Unique email for member', required: true
+      param :startup_id, String, desc: 'Required if the endpoint is performed by SuperAdmin, Admin'
     end
 
     description <<-DESC
 
       === Request headers
-        Only admin can perform this action
+        Only SuperAdmin, Admin or StartupAdmin can perform this action
           Authentication - string - required
             Example of Authentication header : "Bearer TOKEN_FETCHED_FROM_SERVER_DURING_REGISTRATION"
+          Accelerator-Id - integer - required
+            Example of Accelerator-Id header : 1
 
       === Success response body
       {
-        "user": {
-          "id": 49,
-          "email": "customer_example@gmail.com",
-          "created_at": "2020-03-02T12:43:28.691Z",
-          "updated_at": "2020-03-02T12:43:28.691Z",
-          "first_name": null,
-          "last_name": null,
-          "company_name": "MSI",
-          "created_by": 1
-        }
+        "id": 27,
+        "email": "member@gmail.com",
+        "created_at": "2021-05-05T14:19:23.819Z",
+        "updated_at": "2021-05-05T14:19:23.819Z",
+        "first_name": null,
+        "last_name": null,
+        "accelerator_id": 1,
+        "startup_id": 1
       }
     DESC
 
     def create
       @member = Member.new(
         user_params.merge({
-          password: member_random_password
+          accelerator_id: current_user.accelerator_id,
+          password: user_random_password,
+          startup_id: user_startup_id
         })
       )
       authorize @member
@@ -102,12 +102,14 @@ module Admins
 
     private
 
-    def user_params
-      params.require(:member).permit(:email, :accelerator_id, :startup_id)
+    def user_startup_id
+      startup_id = current_user.startup_admin? ? current_user.startup_id : params[:user][:startup_id]
     end
 
-    def member_random_password
-      Devise.friendly_token.first(8)
+
+    def user_params
+      params.require(:user).permit(:email)
     end
+
   end
 end
