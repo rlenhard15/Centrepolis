@@ -11,7 +11,7 @@ class StartupAdminPolicy < ApplicationPolicy
       return scope.none unless user
 
       if user.super_admin?
-        scope.where(accelerator_id: user.accelerator_id)
+        scope.all
       elsif user.admin?
         scope.where(startup_id: user.startup_ids)
       else

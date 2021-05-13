@@ -5,7 +5,7 @@ RSpec.describe Admins::MembersController, type: :controller do
 
   let!(:accelerator)           { create(:accelerator) }
   let!(:accelerator_2)         { create(:accelerator) }
-  let!(:super_admin)           { create(:super_admin, accelerator_id: accelerator.id) }
+  let!(:super_admin)           { create(:super_admin) }
   let!(:admins)                { create_list(:admin, 2, accelerator_id: accelerator.id) }
   let!(:admin)                 { create(:admin, accelerator_id: accelerator_2.id) }
   let!(:startup)               { create(:startup, accelerator_id: accelerator.id, admins_startups_attributes: [{admin_id: admins.first.id}]) }
@@ -28,7 +28,7 @@ RSpec.describe Admins::MembersController, type: :controller do
       sign_in super_admin
       get :index
       expect(parse_json(response.body).count).to eq(5)
-      expect(parse_json(response.body)).to eq(recursively_delete_timestamps(accelerator.users.where(type: "Member").as_json(include: :startup, methods: [:assessments_risk_list])))
+      expect(parse_json(response.body)).to eq(recursively_delete_timestamps(Member.for_accelerator(accelerator.id).as_json(include: :startup, methods: [:assessments_risk_list])))
       expect(response.content_type).to eq('application/json; charset=utf-8')
       expect(response).to have_http_status(:success)
     end
@@ -38,7 +38,7 @@ RSpec.describe Admins::MembersController, type: :controller do
       sign_in admins.first
       get :index
       expect(parse_json(response.body).count).to eq(3)
-      expect(parse_json(response.body)).to eq(recursively_delete_timestamps(Member.where(startup_id: admins.first.startup_ids).as_json(include: :startup, methods: [:assessments_risk_list])))
+      expect(parse_json(response.body)).to eq(recursively_delete_timestamps(Member.where(startup_id: admins.first.startup_ids).for_accelerator(accelerator.id).as_json(include: :startup, methods: [:assessments_risk_list])))
       expect(response.content_type).to eq('application/json; charset=utf-8')
       expect(response).to have_http_status(:success)
     end
@@ -48,7 +48,7 @@ RSpec.describe Admins::MembersController, type: :controller do
       sign_in startup_admin
       get :index
       expect(parse_json(response.body).count).to eq(3)
-      expect(parse_json(response.body)).to eq(recursively_delete_timestamps(Member.where(startup_id: startup_admin.startup_id).as_json(include: :startup, methods: [:assessments_risk_list])))
+      expect(parse_json(response.body)).to eq(recursively_delete_timestamps(Member.where(startup_id: startup_admin.startup_id).for_accelerator(accelerator.id).as_json(include: :startup, methods: [:assessments_risk_list])))
       expect(response.content_type).to eq('application/json; charset=utf-8')
       expect(response).to have_http_status(:success)
     end
@@ -57,68 +57,6 @@ RSpec.describe Admins::MembersController, type: :controller do
       request.headers.merge!({ "Accelerator-Id": "#{accelerator.id}"})
       sign_in members.first
       get :index
-      expect(response.body).to eq({'notice': 'You do not have permission to perform this action'}.to_json)
-      expect(response.content_type).to eq('application/json; charset=utf-8')
-      expect(response).to have_http_status(:forbidden)
-    end
-  end
-
-  describe "POST create action" do
-    let!(:params)     {ActionController::Parameters.new({user: {email: 'member@gmail.com', startup_id: startup.id}})}
-    let!(:params_2)   {ActionController::Parameters.new({user: {email: 'member@gmail.com', startup_id: startup_3.id}})}
-
-    before {params.permit!}
-    before {params_2.permit!}
-
-    it "return member if SuperAdmin is authenticated" do
-      request.headers.merge!({ "Accelerator-Id": "#{accelerator.id}"})
-      sign_in super_admin
-      post :create, params: params
-      expect(parse_json(response.body)).to eq(parse_json(Member.last.to_json))
-      expect(response.content_type).to eq('application/json; charset=utf-8')
-      expect(response).to have_http_status(:created)
-    end
-
-    it "return error in json with status forbidden if SuperAdmin try create member to start doesnt belong to him" do
-      request.headers.merge!({ "Accelerator-Id": "#{accelerator.id}"})
-      sign_in super_admin
-      post :create, params: params_2
-      expect(response.body).to eq({'notice': 'You do not have permission to perform this action'}.to_json)
-      expect(response.content_type).to eq('application/json; charset=utf-8')
-      expect(response).to have_http_status(:forbidden)
-    end
-
-    it "return member if Admin is authenticated" do
-      request.headers.merge!({ "Accelerator-Id": "#{accelerator.id}"})
-      sign_in admins.first
-      post :create, params: params
-      expect(parse_json(response.body)).to eq(parse_json(Member.last.to_json))
-      expect(response.content_type).to eq('application/json; charset=utf-8')
-      expect(response).to have_http_status(:created)
-    end
-
-    it "return error in json with status forbidden if Admin try create member to start doesnt belong to him" do
-      request.headers.merge!({ "Accelerator-Id": "#{accelerator.id}"})
-      sign_in admins.first
-      post :create, params: params_2
-      expect(response.body).to eq({'notice': 'You do not have permission to perform this action'}.to_json)
-      expect(response.content_type).to eq('application/json; charset=utf-8')
-      expect(response).to have_http_status(:forbidden)
-    end
-
-    it "return member if StartupAdmin is authenticated" do
-      request.headers.merge!({ "Accelerator-Id": "#{accelerator.id}"})
-      sign_in startup_admin
-      post :create, params: params
-      expect(parse_json(response.body)).to eq(parse_json(Member.last.to_json))
-      expect(response.content_type).to eq('application/json; charset=utf-8')
-      expect(response).to have_http_status(:created)
-    end
-
-    it "return error in json with status forbidden if user sign in as member" do
-      request.headers.merge!({ "Accelerator-Id": "#{accelerator.id}"})
-      sign_in members.first
-      post :create, params: params
       expect(response.body).to eq({'notice': 'You do not have permission to perform this action'}.to_json)
       expect(response.content_type).to eq('application/json; charset=utf-8')
       expect(response).to have_http_status(:forbidden)

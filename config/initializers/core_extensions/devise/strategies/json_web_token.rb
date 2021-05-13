@@ -34,8 +34,16 @@ module Devise
         return fail! unless claims
         return fail! unless claims.has_key?('user_id')
         return fail! unless user_from_db
-        return fail! unless user_from_db.accelerator_id == request.headers['Accelerator-Id'].to_i
+        return fail! unless accelerator_id_for_user_type
         false
+      end
+
+      def accelerator_id_for_user_type
+        if !user_from_db.super_admin?
+          user_from_db.accelerator_id == request.headers['Accelerator-Id'].to_i
+        else
+          Accelerator.ids.include?(request.headers['Accelerator-Id'].to_i)
+        end
       end
     end
   end

@@ -4,7 +4,7 @@ RSpec.describe MemberPolicy, type: :policy do
   subject { described_class.new(user, member) }
 
   let!(:accelerator)      { create(:accelerator) }
-  let!(:super_admin)      { create(:super_admin, accelerator_id: accelerator.id) }
+  let!(:super_admin)      { create(:super_admin) }
   let!(:admin)            {create(:admin, accelerator_id: accelerator.id)}
   let!(:startup)          { create(:startup, accelerator_id: accelerator.id, admins_startups_attributes: [{admin_id: admin.id}]) }
     let!(:startup_admin)  {create(:startup_admin, accelerator_id: accelerator.id, startup_id: startup.id) }
@@ -26,7 +26,7 @@ RSpec.describe MemberPolicy, type: :policy do
     let!(:user)  { super_admin }
 
     it "shows members wof the accelerator" do
-      expect(policy_scope).to eq(user.accelerator.users.where(type: "Member"))
+      expect(policy_scope).to eq(Member.all)
     end
 
     it { is_expected.to permit_actions(%i[index create]) }

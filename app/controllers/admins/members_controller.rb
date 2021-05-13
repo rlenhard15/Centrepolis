@@ -50,66 +50,9 @@ module Admins
 
     DESC
     def index
-      authorize current_user, policy_class: UserPolicy
+      authorize current_user, policy_class: MemberPolicy
 
-      render json: policy_scope(User).members.as_json(include: :startup, methods: [:assessments_risk_list])
+      render json: policy_scope(User).members.for_accelerator(user_accelerator_id).as_json(include: :startup, methods: [:assessments_risk_list])
     end
-
-    api :POST, 'api/members', 'To invite startup members on his email'
-    param :user, Hash, required: true do
-      param :email, String, desc: 'Unique email for member', required: true
-      param :startup_id, String, desc: 'Required if the endpoint is performed by SuperAdmin, Admin'
-    end
-
-    description <<-DESC
-
-      === Request headers
-        Only SuperAdmin, Admin or StartupAdmin can perform this action
-          Authentication - string - required
-            Example of Authentication header : "Bearer TOKEN_FETCHED_FROM_SERVER_DURING_REGISTRATION"
-          Accelerator-Id - integer - required
-            Example of Accelerator-Id header : 1
-
-      === Success response body
-      {
-        "id": 27,
-        "email": "member@gmail.com",
-        "created_at": "2021-05-05T14:19:23.819Z",
-        "updated_at": "2021-05-05T14:19:23.819Z",
-        "first_name": null,
-        "last_name": null,
-        "accelerator_id": 1,
-        "startup_id": 1
-      }
-    DESC
-
-    def create
-      @member = Member.new(
-        user_params.merge({
-          accelerator_id: current_user.accelerator_id,
-          password: user_random_password,
-          startup_id: user_startup_id
-        })
-      )
-      authorize @member
-
-      if @member.save
-        render json: @member, status: :created
-      else
-        render json: @member.errors, status: :unprocessable_entity
-      end
-    end
-
-    private
-
-    def user_startup_id
-      startup_id = current_user.startup_admin? ? current_user.startup_id : params[:user][:startup_id]
-    end
-
-
-    def user_params
-      params.require(:user).permit(:email)
-    end
-
   end
 end

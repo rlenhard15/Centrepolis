@@ -5,7 +5,7 @@ RSpec.describe StartupsController, type: :controller do
 
   let!(:accelerator)          { create(:accelerator) }
   let!(:accelerator_2)        { create(:accelerator) }
-  let!(:super_admin)          { create(:super_admin, accelerator_id: accelerator.id) }
+  let!(:super_admin)          { create(:super_admin) }
   let!(:admins)               { create_list(:admin, 3, accelerator_id: accelerator.id) }
   let!(:admin)                { create(:admin, accelerator_id: accelerator_2.id) }
   let!(:startup)              { create(:startup, accelerator_id: accelerator.id, admins_startups_attributes: [{admin_id: admins.first.id}]) }

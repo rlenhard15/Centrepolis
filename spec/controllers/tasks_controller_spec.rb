@@ -6,8 +6,8 @@ RSpec.describe TasksController, type: :controller do
 
   let!(:accelerator)          { create(:accelerator) }
   let!(:accelerator_2)        { create(:accelerator) }
-  let!(:super_admin)          { create(:super_admin, accelerator_id: accelerator.id) }
-  let!(:super_admin_2)        { create(:super_admin, accelerator_id: accelerator_2.id) }
+  let!(:super_admin)          { create(:super_admin) }
+  let!(:super_admin_2)        { create(:super_admin) }
   let!(:admin)                { create(:admin, accelerator_id: accelerator.id) }
     let!(:startup)            { create(:startup, accelerator_id: accelerator.id, admins_startups_attributes: [{admin_id: admin.id}]) }
   let!(:admin_2)              { create(:admin, accelerator_id: accelerator.id) }
@@ -34,7 +34,7 @@ RSpec.describe TasksController, type: :controller do
 
 
   describe 'GET index action' do
-    let!(:params) { ActionController::Parameters.new({'member_id': member.id}) }
+    let!(:params) { ActionController::Parameters.new({'startup_id': startup.id}) }
 
     before { params.permit! }
 
@@ -43,8 +43,7 @@ RSpec.describe TasksController, type: :controller do
       sign_in super_admin
       get :index, params: params
       expect(parse_json(response.body)[0][1]).to eq(1)
-      expect(parse_json(response.body)[1][1].count).to eq(Task.tasks_for_user(member.id).count)
-      expect(recursively_delete_timestamps(parse_json(response.body)[1][1])).to eq(parse_json(Task.joins(:users).where("users.id = ?", member.id).with_all_required_info_for_tasks.limit(10).to_json))
+      expect(parse_json(response.body)[1][1].count).to eq(Task.joins(:users).tasks_for_startup(startup.id).distinct.count)
       expect(response.content_type).to eq('application/json; charset=utf-8')
       expect(response).to have_http_status(:success)
     end
@@ -54,8 +53,7 @@ RSpec.describe TasksController, type: :controller do
       sign_in admin
       get :index, params: params
       expect(parse_json(response.body)[0][1]).to eq(1)
-      expect(parse_json(response.body)[1][1].count).to eq(Task.tasks_for_user(member.id).count)
-      expect(recursively_delete_timestamps(parse_json(response.body)[1][1])).to eq(parse_json(Task.joins(:users).where("users.startup_id IN (?) AND users.id = ?", admin.startup_ids, member.id).order(created_at: :asc).with_all_required_info_for_tasks.limit(10).to_json))
+      expect(parse_json(response.body)[1][1].count).to eq(Task.joins(:users).tasks_for_startup(startup.id).distinct.count)
       expect(response.content_type).to eq('application/json; charset=utf-8')
       expect(response).to have_http_status(:success)
     end
@@ -65,7 +63,7 @@ RSpec.describe TasksController, type: :controller do
       sign_in startup_admin
       get :index, params: params
       expect(parse_json(response.body)[1][1].count).to eq(startup_admin.tasks.count)
-      expect(recursively_delete_timestamps(parse_json(response.body)[1][1])).to eq(parse_json(startup_admin.tasks.with_all_required_info_for_tasks.limit(10).to_json))
+      expect(recursively_delete_timestamps(parse_json(response.body)[1][1])).to eq(parse_json(startup_admin.tasks.with_all_required_info_for_tasks.limit(10).as_json(methods: :members_for_task).to_json))
       expect(response.content_type).to eq('application/json; charset=utf-8')
       expect(response).to have_http_status(:success)
     end
@@ -75,7 +73,7 @@ RSpec.describe TasksController, type: :controller do
       sign_in member
       get :index
       expect(parse_json(response.body)[1][1].count).to eq(member.tasks.count)
-      expect(recursively_delete_timestamps(parse_json(response.body)[1][1])).to eq(parse_json(member.tasks.with_all_required_info_for_tasks.limit(10).to_json))
+      expect(recursively_delete_timestamps(parse_json(response.body)[1][1])).to eq(parse_json(member.tasks.with_all_required_info_for_tasks.limit(10).as_json(methods: :members_for_task).to_json))
       expect(response.content_type).to eq('application/json; charset=utf-8')
       expect(response).to have_http_status(:success)
     end
@@ -97,15 +95,6 @@ RSpec.describe TasksController, type: :controller do
       expect(parse_json(response.body)).to eq(parse_json(Task.with_all_required_info_for_tasks.where(id: tasks.first.id).first.as_json(methods: :members_for_task).to_json))
       expect(response.content_type).to eq('application/json; charset=utf-8')
       expect(response).to have_http_status(:success)
-    end
-
-    it 'return error with status 403 if task doesnt belong to super_admin' do
-      request.headers.merge!({ "Accelerator-Id": "#{accelerator.id}"})
-      sign_in super_admin
-      get :show, params: params_3
-      expect(response.body).to eq({'notice': 'You do not have permission to perform this action'}.to_json)
-      expect(response.content_type).to eq('application/json; charset=utf-8')
-      expect(response).to have_http_status(:forbidden)
     end
 
     it 'return specific task in json format with status success if admin authenticated' do
@@ -289,15 +278,6 @@ RSpec.describe TasksController, type: :controller do
       expect(task_2.status).to eq('completed')
       expect(response.content_type).to eq('application/json; charset=utf-8')
       expect(response).to have_http_status(:success)
-    end
-
-    it 'return error with status 403 if task doesnt belong to super_admin' do
-      request.headers.merge!({ "Accelerator-Id": "#{accelerator.id}"})
-      sign_in super_admin
-      put :mark_task_as_completed, params: params_2
-      expect(response.body).to eq({'notice': 'You do not have permission to perform this action'}.to_json)
-      expect(response.content_type).to eq('application/json; charset=utf-8')
-      expect(response).to have_http_status(:forbidden)
     end
 
     it 'return updated task status to completed in json format with status success if admin authenticated' do

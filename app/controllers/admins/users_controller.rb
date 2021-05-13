@@ -4,6 +4,8 @@ module Admins
     api :POST, 'api/users', 'Only SuperAdmin, Admin, StartupAdmin can create account for certain type of user and invite his on email'
     param :user, Hash, required: true do
       param :email, String, desc: 'Unique email for user', required: true
+      param :type, String, desc: 'Type for user (valid values are Admin, StartupAdmin or Member)', required: true
+      param :startup_id, Integer, desc: "Id of a startup (required only for SuperAdmin and Admin)", required: true
     end
 
     description <<-DESC
@@ -32,25 +34,21 @@ module Admins
     DESC
 
     def create
-      @admin = Admin.new(
-        user_params.merge({
-          accelerator_id: user_accelerator_id,
-          password: user_random_password
-        })
-      )
-      authorize @admin
+      @user = UsersService::CreateUser.call(user_params, user_accelerator_id, current_user)
 
-      if @admin.save
-        render json: @admin, status: :created
+      authorize @user if @user
+
+      if @user.save
+        render json: @user, status: :created
       else
-        render json: @admin.errors, status: :unprocessable_entity
+        render json: @user.errors, status: :unprocessable_entity
       end
     end
 
     private
 
     def user_params
-      params.require(:user).permit(:email)
+      params.require(:user).permit(:email, :startup_id, :type)
     end
   end
 end

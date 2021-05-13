@@ -9,8 +9,8 @@ RSpec.describe StartupPolicy, type: :policy do
 
   let!(:accelerator)      { create(:accelerator) }
   let!(:accelerator_2)    { create(:accelerator) }
-  let!(:super_admin)      { create(:super_admin, accelerator_id: accelerator.id) }
-  let!(:super_admin_2)    { create(:super_admin, accelerator_id: accelerator_2.id) }
+  let!(:super_admin)      { create(:super_admin) }
+  let!(:super_admin_2)    { create(:super_admin) }
   let!(:admin)            {create(:admin, accelerator_id: accelerator.id)}
   let!(:admin_2)          {create(:admin, accelerator_id: accelerator_2.id)}
   let!(:startup)          { create(:startup, accelerator_id: accelerator.id, admins_startups_attributes: [{admin_id: admin.id}]) }
@@ -19,13 +19,13 @@ RSpec.describe StartupPolicy, type: :policy do
 
   describe "user's type: SuperAdmin" do
     let!(:accelerator) { create(:accelerator) }
-    let!(:user)        { create(:super_admin, accelerator_id: accelerator.id) }
+    let!(:user)        { create(:super_admin) }
 
     it "show startups for current super_admin" do
-      expect(policy_scope).to eq(Startup.where(accelerator_id: super_admin.accelerator_id))
+      expect(policy_scope).to eq(Startup.all)
     end
 
-    it { is_expected.to permit_actions(%i[create index]) }
+    it { is_expected.to permit_actions(%i[index]) }
   end
 
   describe "user's type: Admin" do
@@ -36,7 +36,7 @@ RSpec.describe StartupPolicy, type: :policy do
       expect(policy_scope).to eq(admin.startups)
     end
 
-    it { is_expected.to permit_actions(%i[create index]) }
+    it { is_expected.to permit_actions(%i[index]) }
   end
 
   describe "user's type: StartupAdmin" do
@@ -47,7 +47,7 @@ RSpec.describe StartupPolicy, type: :policy do
       expect(policy_scope).to eq(startup_admin.startup)
     end
 
-    it { is_expected.to forbid_actions(%i[create index]) }
+    it { is_expected.to forbid_actions(%i[index]) }
   end
 
   describe "user's type: Member" do
@@ -58,6 +58,6 @@ RSpec.describe StartupPolicy, type: :policy do
       expect(policy_scope).to eq(member.startup)
     end
 
-    it { is_expected.to forbid_actions(%i[create index]) }
+    it { is_expected.to forbid_actions(%i[index]) }
   end
 end

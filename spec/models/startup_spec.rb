@@ -9,7 +9,7 @@ RSpec.describe Startup, type: :model do
   end
 
   let!(:accelerator)          { create(:accelerator) }
-  let!(:super_admin)          { create(:super_admin, accelerator_id: accelerator.id) }
+  let!(:super_admin)          { create(:super_admin) }
   let!(:admins)               { create_list(:admin, 2, accelerator_id: accelerator.id) }
     let!(:startup)            { create(:startup, accelerator_id: accelerator.id, admins_startups_attributes: [{admin_id: admins.first.id}, {admin_id: admins.last.id}]) }
 

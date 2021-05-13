@@ -8,7 +8,7 @@ RSpec.describe TaskPolicy, type: :policy do
   end
 
   let!(:accelerator)      { create(:accelerator) }
-  let!(:super_admin)      { create(:super_admin, accelerator_id: accelerator.id) }
+  let!(:super_admin)      { create(:super_admin) }
   let!(:admin)            {create(:admin, accelerator_id: accelerator.id)}
     let!(:member)         { create(:member, accelerator_id: accelerator.id, startup_id: startup.id) }
   let!(:startup)          { create(:startup, accelerator_id: accelerator.id, admins_startups_attributes: [{admin_id: admin.id}]) }
@@ -21,10 +21,10 @@ RSpec.describe TaskPolicy, type: :policy do
 
   describe "user's type: SuperAdmin" do
     let!(:accelerator) { create(:accelerator) }
-    let!(:user)        { create(:super_admin, accelerator_id: accelerator.id) }
+    let!(:user)        { create(:super_admin) }
 
     it "show tasks for current super_admin" do
-      expect(policy_scope).to eq(Task.joins(:users).where("users.accelerator_id = ? ", user.accelerator_id))
+      expect(policy_scope).to eq(Task.joins(:users))
     end
 
     it { is_expected.to forbid_actions(%i[create destroy update]) }
@@ -49,8 +49,6 @@ RSpec.describe TaskPolicy, type: :policy do
     it "show tasks for current startup_admin" do
       expect(policy_scope).to eq(user.tasks)
     end
-
-    it { is_expected.to forbid_actions(%i[index show mark_task_as_completed]) }
   end
 
   describe "user's type: Member" do
@@ -60,7 +58,5 @@ RSpec.describe TaskPolicy, type: :policy do
     it "show tasks for current member" do
       expect(policy_scope).to eq(user.tasks)
     end
-
-    it { is_expected.to forbid_actions(%i[index show mark_task_as_completed]) }
   end
 end

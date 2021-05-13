@@ -20,7 +20,7 @@ class Task < ApplicationRecord
     )
   }
 
-  scope :tasks_for_user, ->(user_id) { joins(:users).where("users.id = ?", user_id) }
+  scope :tasks_for_startup, ->(startup_id) { where("users.startup_id = ?", startup_id) }
 
   def members_for_task
     users.where("users.type = ?", "Member")

@@ -2,7 +2,6 @@ require 'rails_helper'
 
 RSpec.describe User, type: :model do
   describe "Associations" do
-    it { should belong_to(:accelerator) }
     it { should have_many(:task_users).dependent(:destroy) }
     it { should have_many(:tasks).through(:task_users) }
   end
@@ -60,7 +59,7 @@ RSpec.describe User, type: :model do
 
   describe "Method 'super_admin?'" do
     let!(:accelerator)   { create(:accelerator) }
-    let!(:super_admin)   { create(:user, type:'SuperAdmin',  accelerator_id: accelerator.id) }
+    let!(:super_admin)   { create(:user, type:'SuperAdmin') }
     let!(:admin)         { create(:user, type:'Admin', accelerator_id: accelerator.id) }
       let!(:startup)     { create(:startup, accelerator_id: accelerator.id, admins_startups_attributes: [{admin_id: admin.id}]) }
     let!(:startup_admin) { create(:user, type:'StartupAdmin', accelerator_id: accelerator.id, startup_id: startup.id) }
@@ -85,7 +84,7 @@ RSpec.describe User, type: :model do
 
   describe "Method 'admin?'" do
     let!(:accelerator)   { create(:accelerator) }
-    let!(:super_admin)   { create(:user, type:'SuperAdmin',  accelerator_id: accelerator.id) }
+    let!(:super_admin)   { create(:user, type:'SuperAdmin') }
     let!(:admin)         { create(:user, type:'Admin', accelerator_id: accelerator.id) }
       let!(:startup)     { create(:startup, accelerator_id: accelerator.id, admins_startups_attributes: [{admin_id: admin.id}]) }
     let!(:startup_admin) { create(:user, type:'StartupAdmin', accelerator_id: accelerator.id, startup_id: startup.id) }
@@ -110,7 +109,7 @@ RSpec.describe User, type: :model do
 
   describe "Method 'startup_admin?'" do
     let!(:accelerator)   { create(:accelerator) }
-    let!(:super_admin)   { create(:user, type:'SuperAdmin',  accelerator_id: accelerator.id) }
+    let!(:super_admin)   { create(:user, type:'SuperAdmin') }
     let!(:admin)         { create(:user, type:'Admin', accelerator_id: accelerator.id) }
       let!(:startup)     { create(:startup, accelerator_id: accelerator.id, admins_startups_attributes: [{admin_id: admin.id}]) }
     let!(:startup_admin) { create(:user, type:'StartupAdmin', accelerator_id: accelerator.id, startup_id: startup.id) }
@@ -135,7 +134,7 @@ RSpec.describe User, type: :model do
 
     describe "Method 'member?'" do
       let!(:accelerator)   { create(:accelerator) }
-      let!(:super_admin)   { create(:user, type:'SuperAdmin',  accelerator_id: accelerator.id) }
+      let!(:super_admin)   { create(:user, type:'SuperAdmin') }
       let!(:admin)         { create(:user, type:'Admin', accelerator_id: accelerator.id) }
         let!(:startup)     { create(:startup, accelerator_id: accelerator.id, admins_startups_attributes: [{admin_id: admin.id}]) }
       let!(:startup_admin) { create(:user, type:'StartupAdmin', accelerator_id: accelerator.id, startup_id: startup.id) }
@@ -195,7 +194,7 @@ RSpec.describe User, type: :model do
 
   describe "Methods for select users with specific type" do
     let!(:accelerator)   { create(:accelerator) }
-    let!(:super_admin)   { create(:super_admin, accelerator_id: accelerator.id) }
+    let!(:super_admin)   { create(:super_admin) }
     let!(:admins)        { create_list(:admin, 3, accelerator_id: accelerator.id) }
       let!(:startup)     { create(:startup, accelerator_id: accelerator.id, admins_startups_attributes: [{admin_id: admins.first.id}]) }
     let!(:startup_admins){ create_list(:startup_admin, 4, accelerator_id: accelerator.id, startup_id: startup.id) }
