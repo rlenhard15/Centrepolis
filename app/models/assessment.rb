@@ -3,8 +3,8 @@ class Assessment < ApplicationRecord
   has_many :sub_categories, through: :categories
   has_many :assessment_progresses, dependent: :destroy
 
-  scope :with_assessment_progresses, ->(member_id) {
-    joins(Arel.sql("LEFT JOIN assessment_progresses ON (assessment_progresses.assessment_id = assessments.id AND assessment_progresses.member_id = #{member_id})")).
+  scope :with_assessment_progresses, ->(startup_id) {
+    joins(Arel.sql("LEFT JOIN assessment_progresses ON (assessment_progresses.assessment_id = assessments.id AND assessment_progresses.startup_id = #{startup_id})")).
     select("assessments.*, assessment_progresses.risk_value")
   }
 

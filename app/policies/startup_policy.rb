@@ -15,9 +15,9 @@ class StartupPolicy < ApplicationPolicy
       elsif user.admin?
         scope.where(id: user.startup_ids)
       elsif user.startup_admin?
-        user.startup
+        scope.where(id: user.startup_id)
       elsif user.member?
-        user.startup
+        scope.where(id: user.startup_id)
       end
     end
   end

@@ -10,7 +10,11 @@ class AssessmentPolicy < ApplicationPolicy
     def resolve
       return scope.none unless user
 
-      if user.admin?
+      if user.super_admin?
+        scope.all
+      elsif user.admin?
+        scope.all
+      elsif user.startup_admin?
         scope.all
       elsif user.member?
         scope.all

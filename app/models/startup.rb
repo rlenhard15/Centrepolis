@@ -4,6 +4,8 @@ class Startup < ApplicationRecord
   has_many :admins_startups, dependent: :destroy
   has_many :admins, through: :admins_startups
   belongs_to :accelerator
+  has_many :sub_category_progresses, dependent: :destroy
+  has_many :assessment_progresses, dependent: :destroy
 
   paginates_per 10
 

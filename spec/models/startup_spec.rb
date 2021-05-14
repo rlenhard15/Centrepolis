@@ -6,6 +6,8 @@ RSpec.describe Startup, type: :model do
     it { should have_many(:members).with_foreign_key('startup_id') }
     it { should have_many(:admins_startups).dependent(:destroy) }
     it { should have_many(:admins).through(:admins_startups) }
+    it { should have_many(:sub_category_progresses).dependent(:destroy) }
+    it { should have_many(:assessment_progresses).dependent(:destroy) }
   end
 
   let!(:accelerator)          { create(:accelerator) }

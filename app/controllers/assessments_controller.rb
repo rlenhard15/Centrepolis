@@ -1,16 +1,22 @@
 class AssessmentsController < ApplicationController
-  before_action :set_customer, only: :index
+  before_action :set_startup, only: :index
   before_action :set_assessment, only: :show
 
-  api :GET, 'api/assessments', "List of assessments names"
-  param :customer_id, Integer, desc: "id of customer, required if current_user is admin", required: true
+  api :GET, 'api/assessments', "List of assessments names with risks for startup"
+  param :startup_id, Integer, desc: "id of a startup, required if current_user is SuperAdmin or Admin", required: true
 
   description <<-DESC
 
   === Request headers
-  Only admin and customer can perform this action
-    Authentication - string - required
-      Example of Authentication header : "Bearer TOKEN_FETCHED_FROM_SERVER_DURING_REGISTRATION"
+  SuperAdmin, Admin, StartupAdmin, Member can perform this action
+    SuperAdmin   - can see all startups of any accelerator;
+    Admin        - can see startups that were created by the admin;
+    StartupAdmin - can see only a startup of the StartupAdmin;
+    Member       - can see only a startup of the Member
+  Authentication - string - required
+    Example of Authentication header : "Bearer TOKEN_FETCHED_FROM_SERVER_DURING_REGISTRATION"
+  Accelerator-Id - integer - required
+    Example of Accelerator-Id header : 1
 
   === Success response body
   [
@@ -28,7 +34,7 @@ class AssessmentsController < ApplicationController
   def index
     @assessments = policy_scope(Assessment)
 
-    render json: @assessments.with_assessment_progresses(@customer_id)
+    render json: @assessments.with_assessment_progresses(@startup_id)
   end
 
   api :GET, 'api/assessments/:id', "Request for a certain assessment and related categories, sub_categories and stages"
@@ -86,8 +92,18 @@ class AssessmentsController < ApplicationController
 
   private
 
-  def set_customer
-    raise Pundit::NotAuthorizedError unless @customer_id = current_user.admin? ? (current_user.customers.ids & [params[:customer_id].to_i]).first : current_user.id
+  def set_startup
+    raise Pundit::NotAuthorizedError unless @startup_id = startup_id_for_current_user
+  end
+
+  def startup_id_for_current_user
+    if current_user.admin?
+      (policy_scope(Startup)&.ids & [params[:startup_id].to_i]).first
+    elsif current_user.super_admin?
+      (policy_scope(Startup)&.for_accelerator(user_accelerator_id)&.ids & [params[:startup_id].to_i]).first
+    else
+      current_user.startup_id
+    end
   end
 
   def set_assessment
