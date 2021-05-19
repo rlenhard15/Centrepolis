@@ -68,4 +68,12 @@ class User < ApplicationRecord
     reset_password_token = original_token if reset_password_token.present?
     self
   end
+
+  private
+
+    def send_email
+      UsersMailer.with(
+        user_id: self.id
+      ).email_for_restore_password.deliver_later
+    end
 end

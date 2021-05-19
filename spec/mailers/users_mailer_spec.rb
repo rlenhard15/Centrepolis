@@ -3,8 +3,9 @@ require "rails_helper"
 RSpec.describe UsersMailer, type: :mailer do
   let!(:accelerator) {create(:accelerator, hostname: 'FUZEHUB_HOST')}
   let!(:admin)       {create(:admin, accelerator_id: accelerator.id)}
-  let!(:customer)    {create(:customer, created_by: admin.id, accelerator_id: accelerator.id)}
-  let!(:params)      {ActionController::Parameters.new({customer: customer})}
+  let!(:startup)     {create(:startup, accelerator_id: accelerator.id, admins_startups_attributes: [{admin_id: admin.id}]) }
+  let!(:member)      {create(:member, startup_id: startup.id, accelerator_id: accelerator.id)}
+  let!(:params)      {ActionController::Parameters.new({user_id: member.id})}
 
   let!(:mail) {UsersMailer.with(params).email_for_restore_password}
 
@@ -21,7 +22,7 @@ RSpec.describe UsersMailer, type: :mailer do
   end
 
   it 'renders the receiver email' do
-    expect(mail.to).to eq([customer.email])
+    expect(mail.to).to eq([member.email])
   end
 
   it 'renders the sender email' do
