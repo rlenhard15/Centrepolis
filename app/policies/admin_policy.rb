@@ -11,7 +11,7 @@ class AdminPolicy < ApplicationPolicy
       return scope.none unless user
 
       if user.super_admin?
-        scope.where(accelerator_id: user.accelerator_id)
+        scope.all
       else
         scope.none
       end
@@ -19,6 +19,6 @@ class AdminPolicy < ApplicationPolicy
   end
 
   def create?
-    super_admin? && user.accelerator_id == record.accelerator_id
+    super_admin? && Accelerator.ids.include?(record.accelerator_id)
   end
 end

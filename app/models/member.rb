@@ -1,8 +1,9 @@
 class Member < User
   has_many :sub_category_progresses, dependent: :destroy
-  belongs_to :startup
+  belongs_to :startup, foreign_key: "startup_id"
   has_many :assessment_progresses, dependent: :destroy
   has_many :notifications
+  belongs_to :accelerator, foreign_key: "accelerator_id"
 
   after_create :send_email
 

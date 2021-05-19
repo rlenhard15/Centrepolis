@@ -1,17 +1,17 @@
 class TasksController < ApplicationController
   before_action :set_task_for_show, only: :show
-  before_action :set_member, only: [:index]
+  before_action :set_startup, only: [:index]
   before_action :set_task, only: [:update, :mark_task_as_completed, :destroy]
 
-  api :GET, 'api/tasks', "Tasks list for customer"
+  api :GET, 'api/tasks', "Tasks list for startup"
 
-  param :member_id, Integer, desc: "id of member of the startup, required if current_user is SuperAdmin or Admin or StartupAdmin"
+  param :startup_id, Integer, desc: "id of a startup, required if current_user is SuperAdmin or Admin"
   param :page, Integer, desc: "Page for tasks iteration (10 items per page)"
 
   description <<-DESC
   === Request headers
     SuperAdmin or Admin or StartupAdmin or Member can perform this action
-      SuperAdmin   - all tasks of the accelerator;
+      SuperAdmin   - all tasks of any accelerator;
       Admin        - all tasks of the startups that were created by the admin;
       StartupAdmin - all tasks of the startup of StartupAdmin;
       Member       - all tasks that assigned to the member
@@ -22,30 +22,46 @@ class TasksController < ApplicationController
 
   === Success response body
   {
-    "current_page": 2,
-    "total_pages": 4,
+    "current_page": 1,
+    "total_pages": 3,
     "tasks": [
       {
-        "id": 63,
-        "title": "Task",
+        "id": 2,
+        "title": "Test task 2",
+        "status": "completed",
         "priority": "high",
-        "due_date": "2020-03-02T16:30:43.044Z",
-        "master_assessment": "Assessment",
-        "category": "Category",
-        "sub_category": "SubCategory",
-        "stage_title": "Stage"
+        "due_date": "2020-03-12T00:00:00.000Z",
+        "master_assessment": "CRL (Commercial Readiness Level)",
+        "category": "IP Risk",
+        "sub_category": "Development Status",
+        "stage_title": "Basic tests showing potential",
+        "members_for_task": [
+          {
+            "id": 3,
+            "email": "member@gmail.com",
+            "created_at": "2021-04-09T18:51:32.967Z",
+            "updated_at": "2021-04-09T19:04:59.508Z",
+            "first_name": "Eva",
+            "last_name": "Evans",
+            "accelerator_id": 1,
+            "startup_id": 1
+          },
+          ...
+        ]
       },
       ...
     ]
   }
+
   DESC
+
   def index
-    @tasks = policy_scope(Task).tasks_for_user(@member.id).page(page_params)
+    @tasks = policy_scope(Task).tasks_for_startup(@startup.id).distinct.page(page_params)
 
     render json: {
       current_page: @tasks.current_page,
       total_pages: @tasks.total_pages,
-      tasks: @tasks.with_all_required_info_for_tasks
+      tasks: @tasks.with_all_required_info_for_tasks.as_json(methods: :members_for_task)
     }
   end
 
@@ -97,7 +113,7 @@ class TasksController < ApplicationController
   param :task, Hash, required: true do
     param :stage_id, Integer, desc: "id of stage", required: true
     param :title, String, desc: 'Name of task', required: true
-    param :priority, String, desc: 'Task execution priority', required: true
+    param :priority, String, desc: 'Task execution priority (can be low, medium or high)', required: true
     param :due_date, DateTime, desc: 'Deadline date', required: true
     param :task_users_attributes, Array, required: true do
       param :user_id, Integer, desc: 'Id of users who have access to the task', required: true
@@ -264,11 +280,15 @@ class TasksController < ApplicationController
   private
 
     def page_params
-      params[:page]
+      params[:page] || 1
     end
 
-    def set_member
-      raise Pundit::NotAuthorizedError unless @member = current_user.member? ? current_user : policy_scope(User).members.find_by_id(params[:member_id])
+    def set_startup
+      raise Pundit::NotAuthorizedError unless for_startup
+    end
+
+    def for_startup
+      @startup = (current_user.member? || current_user.startup_admin?) ? current_user.startup : policy_scope(Startup).where(id: params[:startup_id], accelerator_id: user_accelerator_id).first
     end
 
     def task_members_params

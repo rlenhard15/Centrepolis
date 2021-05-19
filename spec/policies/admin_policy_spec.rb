@@ -5,8 +5,8 @@ RSpec.describe AdminPolicy, type: :policy do
 
   let!(:accelerator)          { create(:accelerator) }
   let!(:accelerator_2)        { create(:accelerator) }
-  let!(:super_admin)          { create(:super_admin, accelerator_id: accelerator.id) }
-  let!(:super_admin_2)        { create(:super_admin, accelerator_id: accelerator.id) }
+  let!(:super_admin)          { create(:super_admin) }
+  let!(:super_admin_2)        { create(:super_admin) }
   let!(:admin)                { create(:admin, accelerator_id: accelerator.id) }
   let!(:admins_2)             { create_list(:admin, 3, accelerator_id: accelerator_2.id) }
   let!(:startup)              { create(:startup, accelerator_id: accelerator.id, admins_startups_attributes: [{admin_id: admin.id}]) }
@@ -29,10 +29,10 @@ RSpec.describe AdminPolicy, type: :policy do
     let!(:user)  { super_admin }
 
     it "shows admins which of the super_admin accelerator" do
-      expect(policy_scope).to eq(Admin.where(accelerator_id: user.accelerator_id))
+      expect(policy_scope).to eq(Admin.all)
     end
 
-    it { is_expected.to permit_actions(%i[index create]) }
+    it { is_expected.to permit_actions(%i[index]) }
   end
 
   describe "user's type: Admin" do
@@ -42,7 +42,7 @@ RSpec.describe AdminPolicy, type: :policy do
       expect(policy_scope).to eq([])
     end
 
-    it { is_expected.to forbid_actions(%i[index create]) }
+    it { is_expected.to forbid_actions(%i[index]) }
   end
 
   describe "user's type: StartupAdmin" do
@@ -52,7 +52,7 @@ RSpec.describe AdminPolicy, type: :policy do
       expect(policy_scope).to eq([])
     end
 
-    it { is_expected.to forbid_actions(%i[index create]) }
+    it { is_expected.to forbid_actions(%i[index]) }
   end
 
   describe "user's type: Member" do
@@ -62,6 +62,6 @@ RSpec.describe AdminPolicy, type: :policy do
       expect(policy_scope).to eq([])
     end
 
-    it { is_expected.to forbid_actions(%i[index create]) }
+    it { is_expected.to forbid_actions(%i[index]) }
   end
 end

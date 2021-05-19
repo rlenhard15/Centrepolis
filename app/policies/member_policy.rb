@@ -8,9 +8,9 @@ class MemberPolicy < ApplicationPolicy
     end
     def resolve
       return scope.none unless user
-      
+
       if user.super_admin?
-        scope.where(accelerator_id: user.accelerator_id)
+        scope.all
       elsif user.admin?
         scope.where(startup_id: user.startup_ids)
       elsif user.startup_admin?
@@ -34,7 +34,7 @@ class MemberPolicy < ApplicationPolicy
   end
 
   def can_super_admin_do_it?
-    super_admin? && user.accelerator_id == record.accelerator_id && record.startup.accelerator_id == user.accelerator_id
+    super_admin? && Accelerator.ids.include?(record.accelerator_id)
   end
 
   def can_admin_do_it?

@@ -11,15 +11,13 @@ module Users
       last_name
       password
       password_confirmation
-      accelerator_id
     ].freeze
 
-    api :POST, '/users/sign_up', 'Admin registration'
+    api :POST, '/users/sign_up', 'SuperAdmin registration'
     param :user, Hash, required: true do
       param :email, String, desc: 'Unique email', required: true
       param :first_name, String, desc: 'First name of user', required: true
       param :last_name, String, desc: 'Last name of user', required: true
-      param :accelerator_id, Integer, desc: 'Accelerator ID', required: true
       param :password, String, desc: 'Password', required: true
       param :password_confirmation, String, desc: 'Password Confirmation', required: true
     end
@@ -27,27 +25,27 @@ module Users
       === Success response body
       {
         "auth_token": "Token",
-        "user_type": "Admin",
+        "user_type": "SuperAdmin",
         "user": {
           "id": 48,
-          "email": "admin_example@gmail.com",
+          "email": "super_admin@gmail.com",
           "created_at": "2020-03-02T12:43:28.691Z",
           "updated_at": "2020-03-02T12:43:28.691Z",
           "first_name": "David",
           "last_name": "Smith",
-          "accelerator_id": 1,
+          "accelerator_id": null,
           "company_name": null,
           "created_by": null
         }
       }
     DESC
     def create
-      @admin = Admin.new(sign_up_params)
-      if @admin.save
-        render json: @admin.payload
+      @super_admin = SuperAdmin.new(sign_up_params)
+      if @super_admin.save
+        render json: @super_admin.payload
       else
         render json:
-          bad_request_params(@admin.errors), status: :bad_request
+          bad_request_params(@super_admin.errors), status: :bad_request
       end
     end
 

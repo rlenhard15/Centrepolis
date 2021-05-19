@@ -8,7 +8,7 @@ RSpec.describe Task, type: :model do
   end
 
   let!(:accelerator)       { create(:accelerator) }
-    let!(:super_admin)     { create(:super_admin, accelerator_id: accelerator.id) }
+    let!(:super_admin)     { create(:super_admin) }
     let!(:admin)           { create(:admin, accelerator_id: accelerator.id) }
       let!(:startup)       { create(:startup, accelerator_id: accelerator.id, admins_startups_attributes: [{admin_id: admin.id}]) }
     let!(:startup_admin)   { create(:startup_admin, accelerator_id: accelerator.id, startup_id: startup.id) }

@@ -11,7 +11,7 @@ class TaskPolicy < ApplicationPolicy
       return scope.none unless user
 
       if user.super_admin?
-        scope.joins(:users).where("users.accelerator_id = ? ", user.accelerator_id)
+        scope.joins(:users)
       elsif user.admin?
         scope.joins(:users).where("users.startup_id IN (?) ", user.startup_ids)
       elsif user.startup_admin?
@@ -20,6 +20,10 @@ class TaskPolicy < ApplicationPolicy
         scope.joins(:users).where("users.id = ?", user.id)
       end
     end
+  end
+
+  def index?
+    super_admin? || admin? || startup_admin? || member?
   end
 
   def create?
@@ -47,7 +51,7 @@ class TaskPolicy < ApplicationPolicy
   end
 
   def can_super_admin_do_it?
-    super_admin? && user.accelerator_id == record.users&.where(accelerator_id: user.accelerator_id)&.first&.accelerator_id
+    super_admin?
   end
 
   def can_admin_do_it?

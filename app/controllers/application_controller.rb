@@ -10,8 +10,16 @@ class ApplicationController < ActionController::API
       }, status: 403
   end
 
-  def user_random_password
-    Devise.friendly_token.first(8)
+  def accelerator_id
+    @accelerator_id ||= request.headers['Accelerator-Id'].to_i
+  end
+
+  def user_accelerator_id
+    if !current_user.super_admin?
+      current_user.accelerator_id
+    else
+      accelerator_id
+    end
   end
 
 end

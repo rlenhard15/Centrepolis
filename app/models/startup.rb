@@ -3,6 +3,7 @@ class Startup < ApplicationRecord
   has_many :members, foreign_key: "startup_id"
   has_many :admins_startups, dependent: :destroy
   has_many :admins, through: :admins_startups
+  belongs_to :accelerator
 
   paginates_per 10
 
