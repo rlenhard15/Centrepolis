@@ -131,7 +131,17 @@ class StartupsController < ApplicationController
     end
   end
 
+  def show
+    render json: @startup.as_json(methods: [:assessments_risk_list, :members, :startup_admins])
+  end
+
   private
+
+  def set_startup
+    @startup = policy_scope(Startup).find_by_id(params[:id])
+
+    authorize @startup
+  end
 
   def page_params
     params[:page]
