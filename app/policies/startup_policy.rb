@@ -15,9 +15,9 @@ class StartupPolicy < ApplicationPolicy
       elsif user.admin?
         scope.where(id: user.startup_ids)
       elsif user.startup_admin?
-        user.startup
+        scope.where(id: user.startup_id)
       elsif user.member?
-        user.startup
+        scope.where(id: user.startup_id)
       end
     end
   end
@@ -27,6 +27,10 @@ class StartupPolicy < ApplicationPolicy
   end
 
   def create?
-    super_admin? || admin?
+    super_admin? || can_admin_do_it?
+  end
+
+  def can_admin_do_it?
+    admin? && user.accelerator_id == record.accelerator_id
   end
 end

@@ -33,7 +33,7 @@ RSpec.describe StartupPolicy, type: :policy do
     let!(:user)        { admin }
 
     it "show startups for current admin" do
-      expect(policy_scope).to eq(admin.startups)
+      expect(policy_scope).to eq(user.startups)
     end
 
     it { is_expected.to permit_actions(%i[index]) }
@@ -44,7 +44,7 @@ RSpec.describe StartupPolicy, type: :policy do
     let!(:user)        { create(:startup_admin, accelerator_id: accelerator.id, startup_id: startup.id) }
 
     it "show startups for current startup_admin" do
-      expect(policy_scope).to eq(startup_admin.startup)
+      expect(policy_scope).to eq(Startup.where(id: user.startup_id))
     end
 
     it { is_expected.to forbid_actions(%i[index]) }
@@ -55,7 +55,7 @@ RSpec.describe StartupPolicy, type: :policy do
     let!(:user)        { create(:member, accelerator_id: accelerator.id, startup_id: startup.id) }
 
     it "show startups for current member" do
-      expect(policy_scope).to eq(member.startup)
+      expect(policy_scope).to eq(Startup.where(id: user.startup_id))
     end
 
     it { is_expected.to forbid_actions(%i[index]) }

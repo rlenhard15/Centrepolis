@@ -2,14 +2,14 @@ require 'rails_helper'
 
 RSpec.describe SubCategoryProgress, type: :model do
   describe "Associations" do
-    it { should belong_to(:customer).without_validating_presence }
+    it { should belong_to(:startup).without_validating_presence }
     it { should belong_to(:sub_category).without_validating_presence }
   end
 
   describe "Method 'correct_values_for_current_stage_id'" do
     let!(:accelerator)        { create(:accelerator) }
     let!(:admin)              { create(:admin,  accelerator_id: accelerator.id) }
-      let!(:customer)         { create(:customer, created_by: admin.id,  accelerator_id: accelerator.id) }
+      let!(:startup)          { create(:startup, accelerator_id: accelerator.id, admins_startups_attributes: [{admin_id: admin.id}]) }
     let!(:assessment)         { create(:assessment) }
     let!(:assessment_2)       { create(:assessment) }
       let!(:category)         { create(:category, assessment_id: assessment.id) }
@@ -22,7 +22,7 @@ RSpec.describe SubCategoryProgress, type: :model do
 
     it "check validation of current_stage_id which must exists in stages_ids" do
       params = {
-        customer_id: customer.id,
+        startup_id: startup.id,
         sub_category_id: sub_category.id,
         current_stage_id: stage.id
       }
@@ -34,7 +34,7 @@ RSpec.describe SubCategoryProgress, type: :model do
 
     it "validation doesnt allow create progress if current_stage_id doesn't exist in stages_ids" do
       params = {
-        customer_id: customer.id,
+        startup_id: startup.id,
         sub_category_id: sub_category_2.id,
         current_stage_id: stage.id
       }

@@ -3,16 +3,22 @@ require 'rails_helper'
 RSpec.describe StartupsController, type: :controller do
   it { should use_before_action(:authenticate_user!) }
 
-  let!(:accelerator)          { create(:accelerator) }
-  let!(:accelerator_2)        { create(:accelerator) }
-  let!(:super_admin)          { create(:super_admin) }
-  let!(:admins)               { create_list(:admin, 3, accelerator_id: accelerator.id) }
-  let!(:admin)                { create(:admin, accelerator_id: accelerator_2.id) }
-  let!(:startup)              { create(:startup, accelerator_id: accelerator.id, admins_startups_attributes: [{admin_id: admins.first.id}]) }
-  let!(:startups)             { create_list(:startup, 14, accelerator_id: accelerator.id, admins_startups_attributes: [{admin_id: admins.first.id}]) }
-  let!(:startups_2)           { create_list(:startup, 9, accelerator_id: accelerator.id, admins_startups_attributes: [{admin_id: admins.last.id}]) }
-  let!(:startup_admin)        { create(:startup_admin, accelerator_id: accelerator.id, startup_id: startup.id) }
-  let!(:member)               { create(:member, startup_id: startup.id, accelerator_id: accelerator.id) }
+  let!(:accelerator)             { create(:accelerator) }
+  let!(:accelerator_2)           { create(:accelerator) }
+  let!(:super_admin)             { create(:super_admin) }
+  let!(:admins)                  { create_list(:admin, 3, accelerator_id: accelerator.id) }
+  let!(:admin)                   { create(:admin, accelerator_id: accelerator_2.id) }
+  let!(:startup)                 { create(:startup, accelerator_id: accelerator.id, admins_startups_attributes: [{admin_id: admins.first.id}]) }
+  let!(:startups)                { create_list(:startup, 14, accelerator_id: accelerator.id, admins_startups_attributes: [{admin_id: admins.first.id}]) }
+  let!(:startups_2)              { create_list(:startup, 9, accelerator_id: accelerator.id, admins_startups_attributes: [{admin_id: admins.last.id}]) }
+  let!(:startup_admin)           { create(:startup_admin, accelerator_id: accelerator.id, startup_id: startup.id) }
+  let!(:member)                  { create(:member, startup_id: startup.id, accelerator_id: accelerator.id) }
+  let!(:assessment)              { create(:assessment) }
+    let!(:assessment_progress)   { create(:assessment_progress, startup_id: startup.id, assessment_id: assessment.id) }
+    let!(:assessment_progress_2) { create(:assessment_progress, startup_id: startups_2.first.id, assessment_id: assessment.id) }
+    let!(:category)              { create(:category, assessment_id: assessment.id) }
+      let!(:sub_category)        { create(:sub_category, category_id: category.id) }
+        let!(:stage)             { create(:stage, sub_category_id: sub_category.id) }
 
   describe 'GET index action' do
 
@@ -21,8 +27,9 @@ RSpec.describe StartupsController, type: :controller do
       sign_in super_admin
       get :index
       expect(parse_json(response.body)[0][1]).to eq(1)
+      expect(parse_json(response.body)[1][1][0]['assessments_risk_list']).to eq(startup.assessments_risk_list.as_json)
       expect(parse_json(response.body)[1][1].count).to eq(10)
-      expect(recursively_delete_timestamps(parse_json(response.body)[1][1][1])).to eq(recursively_delete_timestamps(startups.first.as_json(methods: [:members, :startup_admins])))
+      expect(recursively_delete_timestamps(parse_json(response.body)[1][1][1])).to eq(recursively_delete_timestamps(startups.first.as_json(methods: [:assessments_risk_list, :members, :startup_admins])))
       expect(response.content_type).to eq('application/json; charset=utf-8')
       expect(response).to have_http_status(:success)
     end
@@ -33,7 +40,8 @@ RSpec.describe StartupsController, type: :controller do
       get :index
       expect(parse_json(response.body)[0][1]).to eq(1)
       expect(parse_json(response.body)[1][1].count).to eq(9)
-      expect(recursively_delete_timestamps(parse_json(response.body)[1][1][1])).to eq(recursively_delete_timestamps(startups_2.second.as_json(methods: [:members, :startup_admins])))
+      expect(parse_json(response.body)[1][1][0]['assessments_risk_list']).to eq(startups_2.first.assessments_risk_list.as_json)
+      expect(recursively_delete_timestamps(parse_json(response.body)[1][1][1])).to eq(recursively_delete_timestamps(startups_2.second.as_json(methods: [:assessments_risk_list, :members, :startup_admins])))
       expect(response.content_type).to eq('application/json; charset=utf-8')
       expect(response).to have_http_status(:success)
     end
@@ -58,7 +66,7 @@ RSpec.describe StartupsController, type: :controller do
   end
 
   describe 'POST create action' do
-    let!(:params)   { ActionController::Parameters.new({ startup: {name: "New startup", admins_startups_attributes: [{admin_id: admins.first.id}, {admin_id: admins.last.id}, {admin_id: admin.id}] }}) }
+    let!(:params)   { ActionController::Parameters.new({ startup: {name: "New startup", admins_startups_attributes: [{admin_id: admins.first.id}, {admin_id: admins.last.id}] }}) }
     let!(:params_2) { ActionController::Parameters.new({ startup: {name: "New startup", admins_startups_attributes: [{admin_id: admin.id}] }}) }
 
     before { params.permit! }
@@ -73,15 +81,6 @@ RSpec.describe StartupsController, type: :controller do
       expect(Startup.last.admin_ids).to eq([admins.first.id, admins.last.id])
       expect(response.content_type).to eq('application/json; charset=utf-8')
       expect(response).to have_http_status(:created)
-    end
-
-    it 'return error with status 403 if super_admin try to assign all admins to the startup that dont belong to the super_admin' do
-      request.headers.merge!({ "Accelerator-Id": "#{accelerator.id}"})
-      sign_in super_admin
-      post :create, params: params_2
-      expect(response.body).to eq({'notice': 'You do not have permission to perform this action'}.to_json)
-      expect(response.content_type).to eq('application/json; charset=utf-8')
-      expect(response).to have_http_status(:forbidden)
     end
 
     it 'return new startup with assigned to the startup current admin in json format with status success if super_admin authenticated' do

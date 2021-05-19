@@ -16,10 +16,10 @@ RSpec.describe AssessmentPolicy, type: :policy do
     end
   end
 
-  describe "user's type: Admin" do
+  describe "user's type: SuperAdmin" do
     let!(:assessments) {create_list(:assessment, 3)}
     let!(:accelerator) { create(:accelerator) }
-    let!(:user)        { create(:admin, accelerator_id: accelerator.id) }
+    let!(:user)        { create(:super_admin) }
 
     it "shows all assessments" do
       expect(policy_scope).to eq(assessments)
@@ -28,11 +28,36 @@ RSpec.describe AssessmentPolicy, type: :policy do
     it { is_expected.to permit_actions(%i[show index]) }
   end
 
-  describe "user's type: Customer" do
+  describe "user's type: Admin" do
     let!(:assessments) {create_list(:assessment, 3)}
     let!(:accelerator) { create(:accelerator) }
-    let!(:admin)       { create(:admin,  accelerator_id: accelerator.id) }
-      let!(:user)      { create(:customer, created_by: admin.id,  accelerator_id: accelerator.id) }
+    let!(:user)        { create(:admin, accelerator_id: accelerator.id) }
+
+    it "shows all assessments" do
+      expect(policy_scope).to eq(assessments)
+    end
+  end
+
+  describe "user's type: StartupAdmin" do
+    let!(:assessments) {create_list(:assessment, 3)}
+    let!(:accelerator) { create(:accelerator) }
+    let!(:admin)       { create(:admin, accelerator_id: accelerator.id) }
+      let!(:startup)   { create(:startup, accelerator_id: accelerator.id, admins_startups_attributes: [{admin_id: admin.id}]) }
+        let!(:user)    { create(:startup_admin, startup_id: startup.id, accelerator_id: accelerator.id) }
+
+    it "shows all assessments" do
+      expect(policy_scope).to eq(assessments)
+    end
+
+    it { is_expected.to forbid_actions(%i[show index]) }
+  end
+
+  describe "user's type: Member" do
+    let!(:assessments) {create_list(:assessment, 3)}
+    let!(:accelerator) { create(:accelerator) }
+    let!(:admin)       { create(:admin, accelerator_id: accelerator.id) }
+      let!(:startup)   { create(:startup, accelerator_id: accelerator.id, admins_startups_attributes: [{admin_id: admin.id}]) }
+        let!(:user)    { create(:member, startup_id: startup.id, accelerator_id: accelerator.id) }
 
     it "shows all assessments" do
       expect(policy_scope).to eq(assessments)

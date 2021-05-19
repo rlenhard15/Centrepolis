@@ -3,8 +3,8 @@ class Assessment < ApplicationRecord
   has_many :sub_categories, through: :categories
   has_many :assessment_progresses, dependent: :destroy
 
-  scope :with_assessment_progresses, ->(member_id) {
-    joins(Arel.sql("LEFT JOIN assessment_progresses ON (assessment_progresses.assessment_id = assessments.id AND assessment_progresses.member_id = #{member_id})")).
+  scope :with_assessment_progresses, ->(startup_id) {
+    joins(Arel.sql("LEFT JOIN assessment_progresses ON (assessment_progresses.assessment_id = assessments.id AND assessment_progresses.startup_id = #{startup_id})")).
     select("assessments.*, assessment_progresses.risk_value")
   }
 
@@ -12,8 +12,8 @@ class Assessment < ApplicationRecord
     categories.as_json({include: {sub_categories: {include: :stages }}})
   end
 
-  def assessment_risk(member_id)
-    result_hash = sub_categories.with_stages_progresses(member_id).
+  def assessment_risk(startup_id)
+    result_hash = sub_categories.with_stages_progresses(startup_id).
     joins("LEFT JOIN stages ON (stages.id = sub_category_progresses.current_stage_id)").
     select("sub_categories.id, stages.position AS position").
     inject({percentage: 0, total_number_of_sc: 0}) do |result, current_sub|

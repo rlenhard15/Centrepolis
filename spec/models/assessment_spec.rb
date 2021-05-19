@@ -10,16 +10,24 @@ RSpec.describe Assessment, type: :model do
   describe "Method 'with_assessment_progresses'" do
     let!(:accelerator)               { create(:accelerator) }
     let!(:admin)                     { create(:admin, accelerator_id: accelerator.id) }
-      let!(:customer)                { create(:customer, created_by: admin.id, accelerator_id: accelerator.id) }
-      let!(:customer_2)              { create(:customer, created_by: admin.id, accelerator_id: accelerator.id) }
-      let!(:customer_3)              { create(:customer, created_by: admin.id, accelerator_id: accelerator.id) }
+      let!(:startup)                 { create(:startup, accelerator_id: accelerator.id, admins_startups_attributes: [{admin_id: admin.id}]) }
+        let!(:startup_admin)         { create(:startup_admin, accelerator_id: accelerator.id, startup_id: startup.id) }
+        let!(:member)                { create(:member, startup_id: startup.id, accelerator_id: accelerator.id) }
+    let!(:admin_2)                   { create(:admin, accelerator_id: accelerator.id) }
+      let!(:startup_2)               { create(:startup, accelerator_id: accelerator.id, admins_startups_attributes: [{admin_id: admin_2.id}]) }
+        let!(:startup_admin_2)       { create(:startup_admin, accelerator_id: accelerator.id, startup_id: startup_2.id) }
+        let!(:member_2)              { create(:member, startup_id: startup_2.id, accelerator_id: accelerator.id) }
+    let!(:admin_3)                   { create(:admin, accelerator_id: accelerator.id) }
+      let!(:startup_3)               { create(:startup, accelerator_id: accelerator.id, admins_startups_attributes: [{admin_id: admin_3.id}]) }
+        let!(:startup_admin_3)       { create(:startup_admin, accelerator_id: accelerator.id, startup_id: startup_3.id) }
+        let!(:member_3)              { create(:member, startup_id: startup_3.id, accelerator_id: accelerator.id) }
     let!(:assessments)               { create_list(:assessment, 2) }
-      let!(:assessment_progress_1)   { create(:assessment_progress, customer_id: customer.id, assessment_id: assessments.first.id) }
-      let!(:assessment_progress_2)   { create(:assessment_progress, customer_id: customer.id, assessment_id: assessments.last.id) }
-      let!(:assessment_progress_3)   { create(:assessment_progress, customer_id: customer_3.id, assessment_id: assessments.last.id) }
+      let!(:assessment_progress_1)   { create(:assessment_progress, startup_id: startup.id, assessment_id: assessments.first.id) }
+      let!(:assessment_progress_2)   { create(:assessment_progress, startup_id: startup.id, assessment_id: assessments.last.id) }
+      let!(:assessment_progress_3)   { create(:assessment_progress, startup_id: startup_3.id, assessment_id: assessments.last.id) }
 
-    it "return nil for risk value if customer hasnt assessment progress" do
-      assessment_with_risk = Assessment.with_assessment_progresses(customer_2.id).as_json
+    it "return nil for risk value if startup hasnt assessment progress" do
+      assessment_with_risk = Assessment.with_assessment_progresses(startup_2.id).as_json
 
       info = recursively_delete_timestamps(assessment_with_risk)
       expect(info).to eq(
@@ -39,7 +47,7 @@ RSpec.describe Assessment, type: :model do
     end
 
     it "return assessments with risk_value for customer" do
-      assessment_with_risk = Assessment.with_assessment_progresses(customer.id).as_json
+      assessment_with_risk = Assessment.with_assessment_progresses(startup.id).as_json
 
       info = recursively_delete_timestamps(assessment_with_risk)
 
@@ -125,9 +133,17 @@ RSpec.describe Assessment, type: :model do
 
     let!(:accelerator)                     { create(:accelerator) }
     let!(:admin)                           { create(:admin, accelerator_id: accelerator.id) }
-      let!(:customer)                      { create(:customer, created_by: admin.id, accelerator_id: accelerator.id) }
-      let!(:customer_2)                    { create(:customer, created_by: admin.id, accelerator_id: accelerator.id) }
-      let!(:customer_3)                    { create(:customer, created_by: admin.id, accelerator_id: accelerator.id) }
+      let!(:startup)                       { create(:startup, accelerator_id: accelerator.id, admins_startups_attributes: [{admin_id: admin.id}]) }
+        let!(:startup_admin)               { create(:startup_admin, accelerator_id: accelerator.id, startup_id: startup.id) }
+        let!(:member)                      { create(:member, startup_id: startup.id, accelerator_id: accelerator.id) }
+    let!(:admin_2)                         { create(:admin, accelerator_id: accelerator.id) }
+      let!(:startup_2)                     { create(:startup, accelerator_id: accelerator.id, admins_startups_attributes: [{admin_id: admin_2.id}]) }
+        let!(:startup_admin_2)             { create(:startup_admin, accelerator_id: accelerator.id, startup_id: startup_2.id) }
+        let!(:member_2)                    { create(:member, startup_id: startup_2.id, accelerator_id: accelerator.id) }
+    let!(:admin_3)                         { create(:admin, accelerator_id: accelerator.id) }
+      let!(:startup_3)                     { create(:startup, accelerator_id: accelerator.id, admins_startups_attributes: [{admin_id: admin_3.id}]) }
+        let!(:startup_admin_3)             { create(:startup_admin, accelerator_id: accelerator.id, startup_id: startup_3.id) }
+        let!(:member_3)                    { create(:member, startup_id: startup_3.id, accelerator_id: accelerator.id) }
     let!(:assessment)                      { create(:assessment) }
     let!(:assessment_2)                    { create(:assessment) }
       let!(:category)                      { create(:category, assessment_id: assessment.id) }
@@ -137,17 +153,17 @@ RSpec.describe Assessment, type: :model do
           let!(:stage_1)                   { create(:stage, position: 1, sub_category_id: sub_category.id) }
           let!(:stage_2)                   { create(:stage, position: 2, sub_category_id: sub_category.id) }
           let!(:stage_3)                   { create(:stage, position: 1, sub_category_id: sub_category_2.id) }
-            let!(:sub_category_progress)   { create(:sub_category_progress, sub_category_id: sub_category.id, current_stage_id: stage_2.id, customer_id: customer.id) }
-            let!(:sub_category_progress_2) { create(:sub_category_progress, sub_category_id: sub_category.id, current_stage_id: stage_1.id, customer_id: customer_3.id) }
-            let!(:sub_category_progress_3) { create(:sub_category_progress, sub_category_id: sub_category_2.id, current_stage_id: stage_3.id, customer_id: customer_3.id) }
+            let!(:sub_category_progress)   { create(:sub_category_progress, sub_category_id: sub_category.id, current_stage_id: stage_2.id, startup_id: startup.id) }
+            let!(:sub_category_progress_2) { create(:sub_category_progress, sub_category_id: sub_category.id, current_stage_id: stage_1.id, startup_id: startup_3.id) }
+            let!(:sub_category_progress_3) { create(:sub_category_progress, sub_category_id: sub_category_2.id, current_stage_id: stage_3.id, startup_id: startup_3.id) }
 
     it "return correct risk value for assessment if customer has progress" do
-      expect(assessment.assessment_risk(customer.id)).to eq(100)
-      expect(assessment.assessment_risk(customer_3.id)).to eq(50)
+      expect(assessment.assessment_risk(startup.id)).to eq(100)
+      expect(assessment.assessment_risk(startup_3.id)).to eq(50)
     end
 
     it "return 0.0 of risk_value if customer hasnt progress for assessment" do
-      expect(assessment.assessment_risk(customer_2.id)).to eq(0.0)
+      expect(assessment.assessment_risk(startup_2.id)).to eq(0.0)
     end
   end
 end

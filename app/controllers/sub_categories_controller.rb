@@ -1,24 +1,26 @@
 class SubCategoriesController < ApplicationController
 
   before_action :authorize_user!,
-                :check_customer,
+                :check_startup,
                 :set_sub_category_progress,
                 :set_assessment,
                 :set_assessment_progress
 
-  api :POST, 'api/assessments/:assessment_id/categories/:category_id/sub_categories/:id/update_progress?current_stage_id=:current_stage_id&customer_id=:customer_id', 'Only admin can update progress'
+  api :POST, 'api/assessments/:assessment_id/categories/:category_id/sub_categories/:id/update_progress?current_stage_id=:current_stage_id&startup_id=:startup_id', 'Only Admin, StartupAdmin and Member can update progress'
 
   param :assessment_id, Integer, desc: 'ID of current assessment', required: true
   param :category_id, Integer, desc: 'ID of current category', required: true
   param :id, Integer, desc: 'ID of current sub category', required: true
   param :current_stage_id, Integer, desc: 'ID of stage selected by user', required: true
-  param :customer_id, Integer, desc: 'ID of customer if current_user is admin'
+  param :startup_id, Integer, desc: 'ID of startup, required if current_user is Admin, StartupAdmin, Member'
 
   description <<-DESC
 
     === Request headers
       Authentication - string - required
           Example of Authentication header : "Bearer TOKEN_FETCHED_FROM_SERVER_DURING_REGISTRATION"
+      Accelerator-Id - integer - required
+          Example of Accelerator-Id header : 1
 
     === Success response body
     {
@@ -26,6 +28,7 @@ class SubCategoriesController < ApplicationController
       "assessment_risk": "7.45098039215686"
     }
   DESC
+  
   def update_progress
     if @sub_category_progress.update(current_stage_id: params[:current_stage_id]) && @assessment_progress.update(risk_value: assessment_risk_value)
       render json: {
@@ -43,28 +46,36 @@ class SubCategoriesController < ApplicationController
     authorize SubCategory
   end
 
-  def check_customer
-    raise Pundit::NotAuthorizedError unless set_customer
+  def check_startup
+    raise Pundit::NotAuthorizedError unless set_startup
   end
 
-  def set_customer
-    @customer = current_user.admin? ? policy_scope(Customer).where(id: params[:customer_id]).first : current_user
+  def set_startup
+    @startup = startup_for_current_user
+  end
+
+  def startup_for_current_user
+    if current_user.admin?
+      policy_scope(Startup).find_by_id(params[:startup_id])
+    else
+      current_user.startup
+    end
   end
 
   def set_assessment_progress
-    @assessment_progress = @customer.assessment_progresses.where(
+    @assessment_progress = @startup.assessment_progresses.where(
       assessment_id: @assessment.id
     ).first_or_create
   end
 
   def set_sub_category_progress
-    @sub_category_progress = @customer.sub_category_progresses.where(
+    @sub_category_progress = @startup.sub_category_progresses.where(
       sub_category_id: params[:id]
     ).first_or_create
   end
 
   def assessment_risk_value
-    @assessment_risk_value ||= @assessment.assessment_risk(@customer.id)
+    @assessment_risk_value ||= @assessment.assessment_risk(@startup.id)
   end
 
   def set_assessment

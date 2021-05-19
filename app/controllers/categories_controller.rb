@@ -1,5 +1,5 @@
 class CategoriesController < ApplicationController
-  before_action :set_category, :set_customer, only: :show
+  before_action :set_category, :set_startup, only: :show
 
   api :GET, '/api/assessments/:assessment_id/categories', "List of categories"
   param :assessment_id, Integer, desc: "id of assessment",  required: true
@@ -8,6 +8,8 @@ class CategoriesController < ApplicationController
   === Request headers
     Authentication - string - required
       Example of Authentication header : "Bearer TOKEN_FETCHED_FROM_SERVER_DURING_REGISTRATION"
+    Accelerator-Id - integer - required
+      Example of Accelerator-Id header : 1
 
   === Success response body for admin
   [
@@ -30,13 +32,15 @@ class CategoriesController < ApplicationController
   api :GET, '/api/assessments/:assessment_id/categories/:id', "Request for a certain category with sub_categories, stages and current stages"
   param :id, Integer, desc: "id of category", required: true
   param :assessment_id, Integer, desc: "id of assessment", required: true
-  param :customer_id, Integer, desc: "id of customer, required if current_user is admin", required: true
+  param :startup_id, Integer, desc: "id of a startup, required if current_user is SuperAdmin or Admin", required: true
 
   description <<-DESC
 
   === Request headers
     Authentication - string - required
       Example of Authentication header : "Bearer TOKEN_FETCHED_FROM_SERVER_DURING_REGISTRATION"
+    Accelerator-Id - integer - required
+      Example of Accelerator-Id header : 1
 
   === Success response body
   {
@@ -70,14 +74,24 @@ class CategoriesController < ApplicationController
 
   def show
     render json: @category.as_json.merge(
-      sub_categories: @category.sub_categories_with_statuses(@customer_id)
+      sub_categories: @category.sub_categories_with_statuses(@startup_id)
     )
   end
 
   private
 
-  def set_customer
-    raise Pundit::NotAuthorizedError unless @customer_id = current_user.admin? ? (current_user.customers.ids & [params[:customer_id].to_i]).first : current_user.id
+  def set_startup
+    raise Pundit::NotAuthorizedError unless @startup_id = startup_id_for_current_user
+  end
+
+  def startup_id_for_current_user
+    if current_user.admin?
+      (policy_scope(Startup)&.ids & [params[:startup_id].to_i]).first
+    elsif current_user.super_admin?
+      (policy_scope(Startup)&.for_accelerator(user_accelerator_id)&.ids & [params[:startup_id].to_i]).first
+    else
+      current_user.startup_id
+    end
   end
 
   def set_category

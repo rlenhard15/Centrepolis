@@ -1,8 +1,8 @@
 class SubCategoryProgress < ApplicationRecord
-  belongs_to :member
+  belongs_to :startup
   belongs_to :sub_category
 
-  validates :member_id, uniqueness: { scope: :sub_category_id }
+  validates :startup_id, uniqueness: { scope: :sub_category_id }
   validate :correct_values_for_current_stage_id
 
   private

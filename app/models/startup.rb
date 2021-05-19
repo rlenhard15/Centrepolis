@@ -4,6 +4,8 @@ class Startup < ApplicationRecord
   has_many :admins_startups, dependent: :destroy
   has_many :admins, through: :admins_startups
   belongs_to :accelerator
+  has_many :sub_category_progresses, dependent: :destroy
+  has_many :assessment_progresses, dependent: :destroy
 
   paginates_per 10
 
@@ -11,6 +13,15 @@ class Startup < ApplicationRecord
 
   def admins_for_startup
     admins.where("users.type = ?", "Admin")
+  end
+
+  def assessments_risk_list
+    Assessment.with_assessment_progresses(id).map do |assessment|
+      {
+        assessment: assessment.name,
+        risk_value: assessment.risk_value
+      }
+    end
   end
 
 end

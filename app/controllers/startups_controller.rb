@@ -25,6 +25,13 @@ class StartupsController < ApplicationController
         "accelerator_id": 1,
         "created_at": "2021-04-09T19:04:59.356Z",
         "updated_at": "2021-04-09T19:04:59.356Z",
+        "assessments_risk_list": [
+          {
+            "assessment": "CRL (Commercial Readiness Level)",
+            "risk_value": "3.92156862745098"
+          },
+          ...
+        ]
         "members": [
           {
             "id": 3,
@@ -66,7 +73,7 @@ class StartupsController < ApplicationController
     render json: {
       current_page: @startups.current_page,
       total_pages: @startups.total_pages,
-      startups: @startups.as_json(methods: [:members, :startup_admins])
+      startups: @startups.as_json(methods: [:assessments_risk_list, :members, :startup_admins])
     }
   end
 
@@ -113,9 +120,10 @@ class StartupsController < ApplicationController
   DESC
 
   def create
-    authorize current_user, policy_class: StartupPolicy
+    @startup = Startup.new(startup_admins_params.merge({accelerator_id: user_accelerator_id}))
 
-    @startup = Startup.new(startup_admins_params.merge({accelerator_id: current_user.accelerator_id}))
+    authorize @startup
+
     if @startup.save
       render json: @startup.as_json(methods: :admins_for_startup), status: :created
     else
