@@ -11,6 +11,8 @@ class StagesController < ApplicationController
   === Request headers
     Authentication - string - required
       Example of Authentication header : "Bearer TOKEN_FETCHED_FROM_SERVER_DURING_REGISTRATION"
+    Accelerator-Id - integer - required
+      Example of Accelerator-Id header : 1
 
   === Success response body
   [

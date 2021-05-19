@@ -12,8 +12,8 @@ class Assessment < ApplicationRecord
     categories.as_json({include: {sub_categories: {include: :stages }}})
   end
 
-  def assessment_risk(member_id)
-    result_hash = sub_categories.with_stages_progresses(member_id).
+  def assessment_risk(startup_id)
+    result_hash = sub_categories.with_stages_progresses(startup_id).
     joins("LEFT JOIN stages ON (stages.id = sub_category_progresses.current_stage_id)").
     select("sub_categories.id, stages.position AS position").
     inject({percentage: 0, total_number_of_sc: 0}) do |result, current_sub|

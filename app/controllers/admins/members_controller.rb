@@ -29,13 +29,6 @@ module Admins
         "last_name": "Smith",
         "startup_id": 1,
         "accelerator_id": 1,
-        "assessments_risk_list": [
-          {
-            "assessment": "CRL (Commercial Readiness Level)",
-            "risk_value": "3.92156862745098"
-          },
-          ...
-        ],
         "startup": {
           "id": 1,
           "name": "Example",
@@ -49,10 +42,11 @@ module Admins
     ]
 
     DESC
+
     def index
       authorize current_user, policy_class: MemberPolicy
 
-      render json: policy_scope(User).members.for_accelerator(user_accelerator_id).as_json(include: :startup, methods: [:assessments_risk_list])
+      render json: policy_scope(User).members.for_accelerator(user_accelerator_id).as_json(include: :startup)
     end
   end
 end

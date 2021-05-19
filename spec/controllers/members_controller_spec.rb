@@ -16,11 +16,6 @@ RSpec.describe Admins::MembersController, type: :controller do
   let!(:members)               { create_list(:member, 3, startup_id: startup.id, accelerator_id: accelerator.id) }
   let!(:members_2)             { create_list(:member, 2, startup_id: startup_2.id, accelerator_id: accelerator.id) }
   let!(:members_3)             { create_list(:member, 4, startup_id: startup_3.id, accelerator_id: accelerator_2.id) }
-  let!(:assessment)            { create(:assessment) }
-    let!(:assessment_progress) { create(:assessment_progress, member_id: members.first.id, assessment_id: assessment.id) }
-    let!(:category)            { create(:category, assessment_id: assessment.id) }
-      let!(:sub_category)      { create(:sub_category, category_id: category.id) }
-        let!(:stage)           { create(:stage, sub_category_id: sub_category.id) }
 
   describe "GET index action" do
     it "return members for current SuperAdmin with list of assessment_risk if user authenticated" do
@@ -28,7 +23,7 @@ RSpec.describe Admins::MembersController, type: :controller do
       sign_in super_admin
       get :index
       expect(parse_json(response.body).count).to eq(5)
-      expect(parse_json(response.body)).to eq(recursively_delete_timestamps(Member.for_accelerator(accelerator.id).as_json(include: :startup, methods: [:assessments_risk_list])))
+      expect(parse_json(response.body)).to eq(recursively_delete_timestamps(Member.for_accelerator(accelerator.id).as_json(include: :startup)))
       expect(response.content_type).to eq('application/json; charset=utf-8')
       expect(response).to have_http_status(:success)
     end
@@ -38,7 +33,7 @@ RSpec.describe Admins::MembersController, type: :controller do
       sign_in admins.first
       get :index
       expect(parse_json(response.body).count).to eq(3)
-      expect(parse_json(response.body)).to eq(recursively_delete_timestamps(Member.where(startup_id: admins.first.startup_ids).for_accelerator(accelerator.id).as_json(include: :startup, methods: [:assessments_risk_list])))
+      expect(parse_json(response.body)).to eq(recursively_delete_timestamps(Member.where(startup_id: admins.first.startup_ids).for_accelerator(accelerator.id).as_json(include: :startup)))
       expect(response.content_type).to eq('application/json; charset=utf-8')
       expect(response).to have_http_status(:success)
     end
@@ -48,7 +43,7 @@ RSpec.describe Admins::MembersController, type: :controller do
       sign_in startup_admin
       get :index
       expect(parse_json(response.body).count).to eq(3)
-      expect(parse_json(response.body)).to eq(recursively_delete_timestamps(Member.where(startup_id: startup_admin.startup_id).for_accelerator(accelerator.id).as_json(include: :startup, methods: [:assessments_risk_list])))
+      expect(parse_json(response.body)).to eq(recursively_delete_timestamps(Member.where(startup_id: startup_admin.startup_id).for_accelerator(accelerator.id).as_json(include: :startup)))
       expect(response.content_type).to eq('application/json; charset=utf-8')
       expect(response).to have_http_status(:success)
     end

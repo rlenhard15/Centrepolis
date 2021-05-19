@@ -44,9 +44,9 @@ RSpec.describe Category, type: :model do
   describe "Method 'sub_categories_with_statuses'" do
     let!(:accelerator)                     { create(:accelerator) }
     let!(:admin)                           { create(:admin, accelerator_id: accelerator.id) }
-      let!(:customer)                      { create(:customer, created_by: admin.id, accelerator_id: accelerator.id) }
-      let!(:customer_1)                    { create(:customer, created_by: admin.id, accelerator_id: accelerator.id) }
-      let!(:customer_2)                    { create(:customer, created_by: admin.id, accelerator_id: accelerator.id) }
+      let!(:startup)                       { create(:startup, accelerator_id: accelerator.id, admins_startups_attributes: [{admin_id: admin.id}]) }
+      let!(:startup_1)                     { create(:startup, accelerator_id: accelerator.id, admins_startups_attributes: [{admin_id: admin.id}]) }
+      let!(:startup_2)                     { create(:startup, accelerator_id: accelerator.id, admins_startups_attributes: [{admin_id: admin.id}]) }
     let!(:assessment)                      { create(:assessment) }
       let!(:category)                      { create(:category, assessment_id: assessment.id) }
       let!(:category_2)                    { create(:category, assessment_id: assessment.id) }
@@ -55,12 +55,12 @@ RSpec.describe Category, type: :model do
           let!(:stage_1)                   { create(:stage, position: 1, sub_category_id: sub_categories.first.id) }
           let!(:stage_2)                   { create(:stage, position: 2, sub_category_id: sub_categories.last.id) }
           let!(:stage_3)                   { create(:stage, position: 1, sub_category_id: sub_category_3.id) }
-            let!(:sub_category_progress)   { create(:sub_category_progress, sub_category_id: sub_categories.first.id, customer_id: customer.id, current_stage_id: stage_1.id) }
-            let!(:sub_category_progress_2) { create(:sub_category_progress, sub_category_id: sub_categories.last.id, customer_id: customer_2.id, current_stage_id: stage_2.id) }
+            let!(:sub_category_progress)   { create(:sub_category_progress, sub_category_id: sub_categories.first.id, startup_id: startup.id, current_stage_id: stage_1.id) }
+            let!(:sub_category_progress_2) { create(:sub_category_progress, sub_category_id: sub_categories.last.id, startup_id: startup_2.id, current_stage_id: stage_2.id) }
 
 
     it "return sub_categories with nil of current_stage_id if customer hasnt progresses" do
-      sub_categories_list = category.sub_categories_with_statuses(customer_1.id).as_json
+      sub_categories_list = category.sub_categories_with_statuses(startup_1.id).as_json
 
       recursively_delete_timestamps(sub_categories_list[0]["stages"])
       recursively_delete_timestamps(sub_categories_list[1]["stages"])
@@ -98,7 +98,7 @@ RSpec.describe Category, type: :model do
     end
 
     it "return sub_categories with all info and current stages for certain category" do
-      sub_categories_list = category.sub_categories_with_statuses(customer.id).as_json
+      sub_categories_list = category.sub_categories_with_statuses(startup.id).as_json
 
       recursively_delete_timestamps(sub_categories_list[0]["stages"])
       recursively_delete_timestamps(sub_categories_list[1]["stages"])

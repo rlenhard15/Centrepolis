@@ -7,6 +7,6 @@ class SubCategoryPolicy < ApplicationPolicy
   end
 
   def update_progress?
-    admin? || member?
+    admin? || startup_admin? || member?
   end
 end

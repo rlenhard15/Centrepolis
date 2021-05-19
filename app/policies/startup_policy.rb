@@ -27,6 +27,10 @@ class StartupPolicy < ApplicationPolicy
   end
 
   def create?
-    super_admin? || admin?
+    super_admin? || can_admin_do_it?
+  end
+
+  def can_admin_do_it?
+    admin? && user.accelerator_id == record.accelerator_id
   end
 end

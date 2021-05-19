@@ -15,4 +15,13 @@ class Startup < ApplicationRecord
     admins.where("users.type = ?", "Admin")
   end
 
+  def assessments_risk_list
+    Assessment.with_assessment_progresses(id).map do |assessment|
+      {
+        assessment: assessment.name,
+        risk_value: assessment.risk_value
+      }
+    end
+  end
+
 end
