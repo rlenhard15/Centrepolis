@@ -222,6 +222,7 @@ RSpec.describe StartupsController, type: :controller do
     it 'return error with status 403 if super_admin try to update startup that doesnt belong to the current accelerator' do
       request.headers.merge!({ "Accelerator-Id": "#{accelerator_2.id}"})
       sign_in super_admin
+      
       put :update, params: params_1.merge(params)
       expect(response.body).to eq({'notice': 'You do not have permission to perform this action'}.to_json)
       expect(response.content_type).to eq('application/json; charset=utf-8')
