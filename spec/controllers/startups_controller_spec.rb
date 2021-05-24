@@ -2,6 +2,7 @@ require 'rails_helper'
 
 RSpec.describe StartupsController, type: :controller do
   it { should use_before_action(:authenticate_user!) }
+  it { should use_before_action(:set_startup) }
 
   let!(:accelerator)             { create(:accelerator) }
   let!(:accelerator_2)           { create(:accelerator) }
@@ -189,6 +190,90 @@ RSpec.describe StartupsController, type: :controller do
       request.headers.merge!({ "Accelerator-Id": "#{accelerator.id}"})
       sign_in member
       get :show, params: params_3
+      expect(response.body).to eq({'notice': 'You do not have permission to perform this action'}.to_json)
+      expect(response.content_type).to eq('application/json; charset=utf-8')
+      expect(response).to have_http_status(:forbidden)
+    end
+  end
+
+  describe 'PUT update action' do
+    let!(:params_1) { ActionController::Parameters.new({'id': startup.id}) }
+    let!(:params)   { ActionController::Parameters.new({ startup: {name: "New startup name", admins_startups_attributes: [{admin_id: admins.first.id}, {admin_id: admins.last.id}, {admin_id: admin.id}] }}) }
+    let!(:params_2) { ActionController::Parameters.new({ startup: {name: "New startup name", admins_startups_attributes: [{admin_id: admin.id}] }}) }
+    let!(:params_3) { ActionController::Parameters.new({'id': startups_2.first.id}) }
+
+    before { params_1.permit! }
+    before { params.permit! }
+    before { params_2.permit! }
+    before { params_3.permit! }
+
+    it 'return updated startup with admins who assigned to the startup in json format with status success if super_admin authenticated' do
+      request.headers.merge!({ "Accelerator-Id": "#{accelerator.id}"})
+      sign_in super_admin
+      put :update, params: params_1.merge(params)
+      startup.reload
+      expect(parse_json(response.body)).to eq(parse_json(Startup.find(startup.id).as_json(methods: :admins_for_startup).to_json))
+      expect(Startup.find(startup.id).admins.count).to eq(2)
+      expect(Startup.find(startup.id).admin_ids).to eq([admins.first.id, admins.last.id])
+      expect(response.content_type).to eq('application/json; charset=utf-8')
+      expect(response).to have_http_status(:success)
+    end
+
+    it 'return error with status 403 if super_admin try to update startup that doesnt belong to the current accelerator' do
+      request.headers.merge!({ "Accelerator-Id": "#{accelerator_2.id}"})
+      sign_in super_admin
+      put :update, params: params_1.merge(params)
+      expect(response.body).to eq({'notice': 'You do not have permission to perform this action'}.to_json)
+      expect(response.content_type).to eq('application/json; charset=utf-8')
+      expect(response).to have_http_status(:forbidden)
+    end
+
+    it 'return updated startup with admins who assigned to the startup in json format with status success if admin authenticated' do
+      request.headers.merge!({ "Accelerator-Id": "#{accelerator.id}"})
+      sign_in  admins.first
+      put :update, params: params_1.merge(params)
+      startup.reload
+      expect(parse_json(response.body)).to eq(parse_json(Startup.find(startup.id).as_json(methods: :admins_for_startup).to_json))
+      expect(Startup.find(startup.id).admins.count).to eq(1)
+      expect(Startup.find(startup.id).admin_ids).to eq([admins.first.id])
+      expect(response.content_type).to eq('application/json; charset=utf-8')
+      expect(response).to have_http_status(:success)
+    end
+
+    it 'return error with status 403 if admin try to request startup that doesnt belong to the admin' do
+      request.headers.merge!({ "Accelerator-Id": "#{accelerator.id}"})
+      sign_in admins.first
+      put :update, params: params_3.merge(params)
+      expect(response.body).to eq({'notice': 'You do not have permission to perform this action'}.to_json)
+      expect(response.content_type).to eq('application/json; charset=utf-8')
+      expect(response).to have_http_status(:forbidden)
+    end
+
+    it 'return updated startup in json format with status success if startup_admin authenticated' do
+      request.headers.merge!({ "Accelerator-Id": "#{accelerator.id}"})
+      sign_in startup_admin
+      put :update, params: params_1.merge(params)
+      startup.reload
+      expect(parse_json(response.body)).to eq(parse_json(Startup.find(startup.id).to_json))
+      expect(Startup.find(startup.id).admins.count).to eq(1)
+      expect(Startup.find(startup.id).admin_ids).to eq([admins.first.id])
+      expect(response.content_type).to eq('application/json; charset=utf-8')
+      expect(response).to have_http_status(:success)
+    end
+
+    it 'return error with status 403 if startup_admin try to request startup that doesnt belong to the startup_admin' do
+      request.headers.merge!({ "Accelerator-Id": "#{accelerator.id}"})
+      sign_in startup_admin
+      put :update, params: params_3.merge(params)
+      expect(response.body).to eq({'notice': 'You do not have permission to perform this action'}.to_json)
+      expect(response.content_type).to eq('application/json; charset=utf-8')
+      expect(response).to have_http_status(:forbidden)
+    end
+
+    it 'return error with status 403 if member authenticated' do
+      request.headers.merge!({ "Accelerator-Id": "#{accelerator.id}"})
+      sign_in member
+      put :update, params: params_1.merge(params)
       expect(response.body).to eq({'notice': 'You do not have permission to perform this action'}.to_json)
       expect(response.content_type).to eq('application/json; charset=utf-8')
       expect(response).to have_http_status(:forbidden)

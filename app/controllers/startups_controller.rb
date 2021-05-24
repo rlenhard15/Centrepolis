@@ -1,5 +1,5 @@
 class StartupsController < ApplicationController
-  before_action :set_startup, only: :show
+  before_action :set_startup, only: [:show, :update]
 
   api :GET, 'api/startups', "List of startups"
   param :page, Integer, desc: "Page for startups iteration (10 items per page)"
@@ -196,6 +196,64 @@ class StartupsController < ApplicationController
     render json: @startup.as_json(methods: [:assessments_risk_list, :members, :startup_admins])
   end
 
+  api :PUT, 'api/startups/:id', "Update info of a certain startup and assign admins to the startups"
+  param :id, Integer, desc: "id of startup",  required: true
+
+  param :startup, Hash, required: true do
+    param :name, String, desc: "Name of the startup", required: false
+    param :admins_startups_attributes, Array, required: false do
+      param :admin_id, Integer, desc: 'Id of admins who will have access the startup (required only if current_user is SuperAdmin want to update startup)', required: true
+    end
+  end
+
+  description <<-DESC
+
+  === Request headers
+    SuperAdmin or Admin or StartupAdmin or Member can perform this action
+      SuperAdmin   - can update name and add new admins to the startup;
+      Admin        - can update name;
+      StartupAdmin - can update name;
+      Authentication - string - required
+        Example of Authentication header : "Bearer TOKEN_FETCHED_FROM_SERVER_DURING_REGISTRATION"
+      Accelerator-Id - integer - required
+        Example of Accelerator-Id header : 1
+
+  === Success response body(admins_for_startup shows only for SuperAdmin or Admin)
+  {
+    "id": 1,
+    "name": "New name",
+    "accelerator_id": 1,
+    "created_at": "2021-04-09T19:04:59.356Z",
+    "updated_at": "2021-05-24T12:59:11.745Z",
+    "admins_for_startup": [
+      {
+        "id": 1,
+        "email": "admin@gmail.com",
+        "created_at": "2021-04-09T18:49:05.376Z",
+        "updated_at": "2021-04-09T18:49:05.376Z",
+        "first_name": "Admin",
+        "last_name": "Adm",
+        "accelerator_id": 1,
+        "startup_id": null
+      }
+    ]
+  }
+
+  DESC
+
+  def update
+    if @startup.update(startup_admins_params)
+      if current_user.super_admin? || current_user.admin?
+        render json: @startup.as_json(methods: :admins_for_startup)
+      else
+        render json: @startup
+      end
+
+    else
+      render json: @startup.errors, status: :unprocessable_entity
+    end
+  end
+
   private
 
   def set_startup
@@ -211,19 +269,22 @@ class StartupsController < ApplicationController
   def startup_admins_params
     if startup_params[:admins_startups_attributes]
       admins_ids_for_startup = startup_params[:admins_startups_attributes].map { |admin| admin[:admin_id] }
+      if !@startup
+        @admins = current_user.super_admin? ? policy_scope(User).where({id: admins_ids_for_startup || 0, type: "Admin", accelerator_id: user_accelerator_id}) : [current_user]
+      else
+        @admins = current_user.super_admin? ? policy_scope(User).where({id: admins_ids_for_startup, type: "Admin", accelerator_id: user_accelerator_id}).where.not(id: @startup.admin_ids) : nil
+      end
+      
+      validated_admins_ids_hash = []
+
+      @admins&.each do |admin|
+        validated_admins_ids_hash.push({admin_id: admin&.id})
+      end
+      startup_params_hash = startup_params.to_h
+      startup_params_hash[:admins_startups_attributes] = validated_admins_ids_hash
+      return startup_params_hash
     end
-
-    @admins = current_user.super_admin? ? policy_scope(User).where({id: admins_ids_for_startup, type: "Admin"}) : [current_user]
-    raise Pundit::NotAuthorizedError if @admins.empty? || @admins.nil?
-
-    validated_admins_ids_hash = []
-
-    @admins.each do |admin|
-      validated_admins_ids_hash.push({admin_id: admin.id})
-    end
-    startup_params_hash = startup_params.to_h
-    startup_params_hash[:admins_startups_attributes] = validated_admins_ids_hash
-    return startup_params_hash
+    return startup_params
   end
 
   def startup_params

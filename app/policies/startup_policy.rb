@@ -22,6 +22,10 @@ class StartupPolicy < ApplicationPolicy
     end
   end
 
+  def update?
+    super_admin? || can_admin_do_show? || can_startup_admin_do_it?
+  end
+
   def show?
     super_admin? || can_admin_do_show? || can_startup_admin_do_it? || can_member_do_it?
   end
