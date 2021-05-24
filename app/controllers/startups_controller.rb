@@ -1,4 +1,5 @@
 class StartupsController < ApplicationController
+  before_action :set_startup, only: :show
 
   api :GET, 'api/startups', "List of startups"
   param :page, Integer, desc: "Page for startups iteration (10 items per page)"
@@ -131,7 +132,77 @@ class StartupsController < ApplicationController
     end
   end
 
+  api :GET, 'api/startups/:id', "Request for a certain startup"
+  param :id, Integer, desc: "id of startup",  required: true
+
+  description <<-DESC
+
+  === Request headers
+    SuperAdmin or Admin or StartupAdmin or Member can perform this action
+      SuperAdmin   - can request any startup of any accelerator;
+      Admin        - can request startups that were created by the admin;
+      StartupAdmin - can see only a startup of the StartupAdmin;
+      Member       - can see only a startup of the Member
+    Authentication - string - required
+      Example of Authentication header : "Bearer TOKEN_FETCHED_FROM_SERVER_DURING_REGISTRATION"
+    Accelerator-Id - integer - required
+      Example of Accelerator-Id header : 1
+
+  === Success response body
+  {
+    "id": 2,
+    "name": "Xiomi",
+    "accelerator_id": 1,
+    "created_at": "2021-04-09T19:04:59.513Z",
+    "updated_at": "2021-04-09T19:04:59.513Z",
+    "assessments_risk_list": [
+      {
+        "assessment": "CRL (Commercial Readiness Level)",
+        "risk_value": "5.88235294117647"
+      },
+      ...
+    ],
+    "members": [
+      {
+        "id": 4,
+        "email": "member@gmail.com",
+        "created_at": "2021-04-09T18:52:30.042Z",
+        "updated_at": "2021-04-09T19:04:59.546Z",
+        "first_name": "Emily",
+        "last_name": "Pack",
+        "accelerator_id": 1,
+        "startup_id": 2
+      },
+      ...
+    ],
+    "startup_admins": [
+      {
+        "id": 9,
+        "email": "startup_admin_juli@gmail.com",
+        "created_at": "2021-04-12T08:56:22.550Z",
+        "updated_at": "2021-04-12T08:56:22.550Z",
+        "first_name": "Juli",
+        "last_name": "Lee",
+        "accelerator_id": 1,
+        "startup_id": 2
+      },
+      ...
+    ]
+  }
+
+  DESC
+
+  def show
+    render json: @startup.as_json(methods: [:assessments_risk_list, :members, :startup_admins])
+  end
+
   private
+
+  def set_startup
+    raise Pundit::NotAuthorizedError unless @startup = (policy_scope(Startup).where(id: params[:id], accelerator_id: user_accelerator_id)).first
+
+    authorize @startup
+  end
 
   def page_params
     params[:page]

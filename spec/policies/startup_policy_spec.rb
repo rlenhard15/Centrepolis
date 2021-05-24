@@ -25,7 +25,7 @@ RSpec.describe StartupPolicy, type: :policy do
       expect(policy_scope).to eq(Startup.all)
     end
 
-    it { is_expected.to permit_actions(%i[index]) }
+    it { is_expected.to permit_actions(%i[index show]) }
   end
 
   describe "user's type: Admin" do
@@ -36,7 +36,7 @@ RSpec.describe StartupPolicy, type: :policy do
       expect(policy_scope).to eq(user.startups)
     end
 
-    it { is_expected.to permit_actions(%i[index]) }
+    it { is_expected.to permit_actions(%i[index show]) }
   end
 
   describe "user's type: StartupAdmin" do
@@ -47,6 +47,7 @@ RSpec.describe StartupPolicy, type: :policy do
       expect(policy_scope).to eq(Startup.where(id: user.startup_id))
     end
 
+    it { is_expected.to permit_actions(%i[show]) }
     it { is_expected.to forbid_actions(%i[index]) }
   end
 
@@ -58,6 +59,7 @@ RSpec.describe StartupPolicy, type: :policy do
       expect(policy_scope).to eq(Startup.where(id: user.startup_id))
     end
 
+    it { is_expected.to permit_actions(%i[show]) }
     it { is_expected.to forbid_actions(%i[index]) }
   end
 end

@@ -22,6 +22,10 @@ class StartupPolicy < ApplicationPolicy
     end
   end
 
+  def show?
+    super_admin? || can_admin_do_show? || can_startup_admin_do_it? || can_member_do_it?
+  end
+
   def index?
     super_admin? || admin?
   end
@@ -30,7 +34,19 @@ class StartupPolicy < ApplicationPolicy
     super_admin? || can_admin_do_it?
   end
 
+  def can_admin_do_show?
+    admin? && user.startup_ids.include?(record.id)
+  end
+
   def can_admin_do_it?
     admin? && user.accelerator_id == record.accelerator_id
+  end
+
+  def can_startup_admin_do_it?
+    startup_admin? && user.startup_id == record.id
+  end
+
+  def can_member_do_it?
+    member? && user.startup_id == record.id
   end
 end

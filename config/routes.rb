@@ -15,7 +15,7 @@ Rails.application.routes.draw do
     resources :tasks do
       put :mark_task_as_completed, on: :member
     end
-    resources :startups, only: %i[index create]
+    resources :startups, only: %i[index create show]
     resources :members, only: :index, module: 'admins'
     resources :admins, only: :index, module: 'admins'
     resources :startup_admins, only: :index, module: 'admins'
