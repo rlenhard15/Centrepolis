@@ -121,11 +121,13 @@ class StartupsController < ApplicationController
   DESC
 
   def create
-    @startup = Startup.new(startup_admins_params.merge({accelerator_id: user_accelerator_id}))
+    startup_params_create = startup_admins_params
+    @startup = Startup.new(startup_params_create.merge({accelerator_id: user_accelerator_id}))
 
     authorize @startup
 
     if @startup.save
+      StartupsService::SendEmailToAssignedAdmins.call(startup_params_create, @startup, current_user) if startup_params_create[:admins_startups_attributes]
       render json: @startup.as_json(methods: :admins_for_startup), status: :created
     else
       render json: @startup.errors, status: :unprocessable_entity
@@ -242,8 +244,11 @@ class StartupsController < ApplicationController
   DESC
 
   def update
-    if @startup.update(startup_admins_params)
+    startup_params_update = startup_admins_params
+
+    if @startup.update(startup_params_update)
       if current_user.super_admin? || current_user.admin?
+        StartupsService::SendEmailToAssignedAdmins.call(startup_params_update, @startup, current_user) if startup_params_update[:admins_startups_attributes]
         render json: @startup.as_json(methods: :admins_for_startup)
       else
         render json: @startup
@@ -274,7 +279,7 @@ class StartupsController < ApplicationController
       else
         @admins = current_user.super_admin? ? policy_scope(User).where({id: admins_ids_for_startup, type: "Admin", accelerator_id: user_accelerator_id}).where.not(id: @startup.admin_ids) : nil
       end
-      
+
       validated_admins_ids_hash = []
 
       @admins&.each do |admin|
