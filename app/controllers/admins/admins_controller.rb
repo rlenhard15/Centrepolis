@@ -71,6 +71,7 @@ module Admins
 
     def destroy
       if @admin.destroy
+        UsersService::UsersEmailNotification.call(@admin, current_user)
         render json: {
           message: 'Successfully destroyed'
         }, status: :ok

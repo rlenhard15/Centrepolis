@@ -1,7 +1,17 @@
+<% if @deleted_admin && !@super_admin %>
+  <p>
+    Hi, <%= @deleted_admin&.full_name %>
+  </p>
+  <p>
+    You received this letter because your admin account has been deleted on <%= @deleted_admin&.accelerator&.name&.capitalize() %> Accelerator
+    on RAMP Client Business Planning support tool.
+  </p>
+<% elsif @deleted_admin && @super_admin %>
 <p>
-  Hi, <%= @deleted_admin&.full_name %>
+  Hi, <%= @super_admin&.full_name %>
 </p>
 <p>
-  You received this letter because your admin account has been deleted on <%= @deleted_admin&.accelerator&.name&.capitalize() %> Accelerator
+  You received this letter because you deleted admin account of the user <%= @deleted_admin&.full_name %> at <%= @deleted_admin&.accelerator&.name&.capitalize() %> Accelerator
   on RAMP Client Business Planning support tool.
 </p>
+<% end %>
