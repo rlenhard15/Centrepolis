@@ -4,4 +4,13 @@ class Admin < User
   belongs_to :accelerator, foreign_key: "accelerator_id"
 
   after_create :send_email
+  after_destroy :send_email_about_delete_account
+
+  private
+
+    def send_email_about_delete_account
+      UsersMailer.with(
+        deleted_admin: self
+      ).email_after_delete_admin.deliver_later
+    end
 end

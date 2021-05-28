@@ -17,7 +17,7 @@ Rails.application.routes.draw do
     end
     resources :startups, only: %i[index create show update]
     resources :members, only: :index, module: 'admins'
-    resources :admins, only: :index, module: 'admins'
+    resources :admins, only: %i[index destroy], module: 'admins'
     resources :startup_admins, only: :index, module: 'admins'
     resources :users, only: :create, module: 'admins'
     resources :assessments, only: %i[index show] do
