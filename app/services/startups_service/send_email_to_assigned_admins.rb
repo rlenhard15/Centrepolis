@@ -18,6 +18,12 @@ class StartupsService::SendEmailToAssignedAdmins < ApplicationService
       admin_ids: admin_ids,
       startup_id: startup.id
     ).email_for_assigned_admins.deliver_later
+
+    StartupsMailer.with(
+      admin_ids: admin_ids,
+      startup_id: startup.id,
+      super_admin_id: current_user.id
+    ).email_for_assigned_admins.deliver_later
   end
 
   def admin_ids
