@@ -150,41 +150,54 @@ class StartupsController < ApplicationController
 
   === Success response body
   {
-    "id": 2,
-    "name": "Xiomi",
+    "id": 1,
+    "name": "MSI",
     "accelerator_id": 1,
-    "created_at": "2021-04-09T19:04:59.513Z",
-    "updated_at": "2021-04-09T19:04:59.513Z",
+    "created_at": "2021-04-09T19:04:59.356Z",
+    "updated_at": "2021-05-24T14:08:22.089Z",
     "assessments_risk_list": [
-      {
-        "assessment": "CRL (Commercial Readiness Level)",
-        "risk_value": "5.88235294117647"
-      },
-      ...
+        {
+            "assessment": "CRL (Commercial Readiness Level)",
+            "risk_value": "3.92156862745098"
+        },
+        {
+            "assessment": "MRL",
+            "risk_value": "5.12820512820513"
+        },
+        {
+            "assessment": "TRL",
+            "risk_value": "100.0"
+        }
     ],
     "members": [
       {
-        "id": 4,
+        "id": 12,
         "email": "member@gmail.com",
-        "created_at": "2021-04-09T18:52:30.042Z",
-        "updated_at": "2021-04-09T19:04:59.546Z",
-        "first_name": "Emily",
-        "last_name": "Pack",
+        "created_at": "2021-04-12T09:26:34.286Z",
+        "updated_at": "2021-04-12T09:26:45.599Z",
+        "first_name": "Nicole",
+        "last_name": "Smith",
         "accelerator_id": 1,
-        "startup_id": 2
+        "startup_id": 1,
+        "tasks_number": 5,
+        "last_visit": "2021-05-31T11:26:34.768Z",
+        "user_type": "Member"
       },
       ...
     ],
     "startup_admins": [
       {
-        "id": 9,
-        "email": "startup_admin_juli@gmail.com",
-        "created_at": "2021-04-12T08:56:22.550Z",
-        "updated_at": "2021-04-12T08:56:22.550Z",
-        "first_name": "Juli",
+        "id": 20,
+        "email": "startup_admin@gmail.com",
+        "created_at": "2021-05-03T09:09:11.536Z",
+        "updated_at": "2021-05-03T09:10:44.003Z",
+        "first_name": "Maria",
         "last_name": "Lee",
         "accelerator_id": 1,
-        "startup_id": 2
+        "startup_id": 1,
+        "tasks_number": 3,
+        "last_visit": "2021-05-31T11:26:34.768Z",
+        "user_type": "StartupAdmin"
       },
       ...
     ]
@@ -193,7 +206,10 @@ class StartupsController < ApplicationController
   DESC
 
   def show
-    render json: @startup.as_json(methods: [:assessments_risk_list, :members, :startup_admins])
+    render json: @startup.as_json(methods: :assessments_risk_list, include: {
+      members: {methods: [:tasks_number, :last_visit, :user_type]},
+      startup_admins: {methods: [:tasks_number, :last_visit, :user_type]}
+    })
   end
 
   api :PUT, 'api/startups/:id', "Update info of a certain startup and assign admins to the startups"
@@ -274,7 +290,7 @@ class StartupsController < ApplicationController
       else
         @admins = current_user.super_admin? ? policy_scope(User).where({id: admins_ids_for_startup, type: "Admin", accelerator_id: user_accelerator_id}).where.not(id: @startup.admin_ids) : nil
       end
-      
+
       validated_admins_ids_hash = []
 
       @admins&.each do |admin|
