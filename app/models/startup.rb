@@ -23,8 +23,4 @@ class Startup < ApplicationRecord
       }
     end
   end
-
-  def users
-    members.merge(startup_admins)
-  end
 end

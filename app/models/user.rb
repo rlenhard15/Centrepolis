@@ -30,10 +30,6 @@ class User < ApplicationRecord
     type
   end
 
-  scope :with_tasks, -> {
-    joins(:tasks).select("users.*, COUNT(tasks.id) AS tasks_number").group("users.id")
-  }
-
   def payload
     {
       auth_token: JwtWrapper.encode(user_id: id),
