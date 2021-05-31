@@ -244,6 +244,7 @@ class TasksController < ApplicationController
 
   def mark_task_as_completed
     if @task.update(status: 'completed')
+      TasksService::EmailTaskCompleted.call(@task, current_user)
       render json: { new_task_status: @task.status }
     else
       render json: @task.errors, status: :unprocessable_entity
