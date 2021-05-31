@@ -294,22 +294,25 @@ class TasksController < ApplicationController
     end
 
     def task_members_params
-      user_ids_for_task = tasks_params[:task_users_attributes].map { |user| user[:user_id] }
-      raise Pundit::NotAuthorizedError unless @users = policy_scope(User).where(id: user_ids_for_task)
-      validated_users_ids_hash = []
+      if tasks_params[:task_users_attributes]
+        user_ids_for_task = tasks_params[:task_users_attributes].map { |user| user[:user_id] }
+        raise Pundit::NotAuthorizedError unless @users = policy_scope(User).where(id: user_ids_for_task)
+        validated_users_ids_hash = []
 
-      @users.each do |user|
-        if @task
-          validated_users_ids_hash.push({user_id: user.id}) if !user.task_ids.include?(@task.id)
-        else
-          validated_users_ids_hash.push({user_id: user.id})
+        @users.each do |user|
+          if @task
+            validated_users_ids_hash.push({user_id: user.id}) if !user.task_ids.include?(@task.id)
+          else
+            validated_users_ids_hash.push({user_id: user.id})
+          end
         end
+
+        tasks_params_hash = tasks_params.to_h
+        tasks_params_hash[:task_users_attributes] = validated_users_ids_hash
+        return tasks_params_hash
       end
 
-      tasks_params_hash = tasks_params.to_h
-      tasks_params_hash[:task_users_attributes] = validated_users_ids_hash
-
-      return tasks_params_hash
+      return tasks_params
     end
 
     def task_members_params_create
