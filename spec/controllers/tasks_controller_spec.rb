@@ -153,38 +153,44 @@ RSpec.describe TasksController, type: :controller do
   end
 
   describe 'POST create action' do
-    let!(:params)   { ActionController::Parameters.new({ task: {title: "Task", stage_id: stage.id, priority: "low", due_date: DateTime.now, task_users_attributes: [{user_id: member.id}, {user_id: member_3.id}, {user_id: member_4.id}] }}) }
+    let!(:params)   { ActionController::Parameters.new({ task: {title: "Task", stage_id: stage.id, priority: "low", due_date: DateTime.now, task_users_attributes: [{user_id: member.id}, {user_id: startup_admin.id}] }}) }
 
     before { params.permit! }
 
-    it 'return new task with users who assigned to the task in json format with status success if startup_admin authenticated' do
+    it 'return new task with users who assigned to the task in json format with status success if super_admin authenticated' do
       request.headers.merge!({ "Accelerator-Id": "#{accelerator.id}"})
-      sign_in startup_admin
+      sign_in super_admin
       post :create, params: params
       expect(parse_json(response.body)).to eq(parse_json(Task.last.as_json(methods: :members_for_task).to_json))
-      expect(Task.last.users.count).to eq(2)
+      expect(Task.last.users.count).to eq(3)
       expect(Task.last.users.where(type: "Member").first).to eq(Member.find(member.id))
       expect(Task.last.users.where(type: "StartupAdmin").first).to eq(StartupAdmin.find(startup_admin.id))
       expect(response.content_type).to eq('application/json; charset=utf-8')
       expect(response).to have_http_status(:created)
     end
 
-    it 'return error with status 403 if super_admin authenticated' do
-      request.headers.merge!({ "Accelerator-Id": "#{accelerator.id}"})
-      sign_in super_admin
-      post :create, params: params
-      expect(response.body).to eq({'notice': 'You do not have permission to perform this action'}.to_json)
-      expect(response.content_type).to eq('application/json; charset=utf-8')
-      expect(response).to have_http_status(:forbidden)
-    end
-
-    it 'return error with status 403 if admin authenticated' do
+    it 'return new task with users who assigned to the task in json format with status success if admin authenticated' do
       request.headers.merge!({ "Accelerator-Id": "#{accelerator.id}"})
       sign_in admin
       post :create, params: params
-      expect(response.body).to eq({'notice': 'You do not have permission to perform this action'}.to_json)
+      expect(parse_json(response.body)).to eq(parse_json(Task.last.as_json(methods: :members_for_task).to_json))
+      expect(Task.last.users.count).to eq(3)
+      expect(Task.last.users.where(type: "Member").first).to eq(Member.find(member.id))
+      expect(Task.last.users.where(type: "StartupAdmin").first).to eq(StartupAdmin.find(startup_admin.id))
       expect(response.content_type).to eq('application/json; charset=utf-8')
-      expect(response).to have_http_status(:forbidden)
+      expect(response).to have_http_status(:created)
+    end
+
+    it 'return new task with users who assigned to the task in json format with status success if startup_admin authenticated' do
+      request.headers.merge!({ "Accelerator-Id": "#{accelerator.id}"})
+      sign_in startup_admin_4
+      post :create, params: params
+      expect(parse_json(response.body)).to eq(parse_json(Task.last.as_json(methods: :members_for_task).to_json))
+      expect(Task.last.users.count).to eq(3)
+      expect(Task.last.users.where(type: "Member").first).to eq(Member.find(member.id))
+      expect(Task.last.users.where(type: "StartupAdmin").first).to eq(StartupAdmin.find(startup_admin.id))
+      expect(response.content_type).to eq('application/json; charset=utf-8')
+      expect(response).to have_http_status(:created)
     end
 
     it 'return error with status 403 if member authenticated' do
@@ -199,13 +205,48 @@ RSpec.describe TasksController, type: :controller do
 
   describe 'PUT update action' do
     let!(:task_2)   { create(:task, stage_id: stage.id, task_users_attributes: [{user_id: member.id}, {user_id: startup_admin.id}]) }
-    let!(:params)   { ActionController::Parameters.new({ task: { title: "New Task", stage_id: stage.id, priority: "high", due_date: DateTime.now, task_users_attributes: [{user_id: member_2.id}, {user_id: member_4.id}] }}) }
+    let!(:params)   { ActionController::Parameters.new({ task: { title: "New Task", stage_id: stage.id, priority: "high", due_date: DateTime.now, task_users_attributes: [{user_id: member_2.id}] }}) }
     let!(:params_2) { ActionController::Parameters.new({ 'id': task_2.id}) }
     let!(:params_3) { ActionController::Parameters.new({ 'id': tasks_2.first.id}) }
 
     before { params.permit! }
     before { params_2.permit! }
     before { params_3.permit! }
+
+    it 'return updated task and assigned new users to the task in json format with status success if super_admin authenticated' do
+      request.headers.merge!({ "Accelerator-Id": "#{accelerator.id}"})
+      expect(task_2.users.count).to eq(2)
+      sign_in super_admin
+      put :update, params: params.merge(params_2)
+      task_2.reload
+      expect(parse_json(response.body)).to eq(parse_json(task_2.as_json(methods: :members_for_task).to_json))
+      expect(task_2.title).to eq('New Task')
+      expect(task_2.users.count).to eq(3)
+      expect(response.content_type).to eq('application/json; charset=utf-8')
+      expect(response).to have_http_status(:success)
+    end
+
+    it 'return updated task and assigned new users to the task in json format with status success if admin authenticated' do
+      request.headers.merge!({ "Accelerator-Id": "#{accelerator.id}"})
+      expect(task_2.users.count).to eq(2)
+      sign_in admin
+      put :update, params: params.merge(params_2)
+      task_2.reload
+      expect(parse_json(response.body)).to eq(parse_json(task_2.as_json(methods: :members_for_task).to_json))
+      expect(task_2.title).to eq('New Task')
+      expect(task_2.users.count).to eq(3)
+      expect(response.content_type).to eq('application/json; charset=utf-8')
+      expect(response).to have_http_status(:success)
+    end
+
+    it 'return error with status 403 if task doesnt belong to admin' do
+      request.headers.merge!({ "Accelerator-Id": "#{accelerator.id}"})
+      sign_in admin
+      put :update, params: params.merge(params_3)
+      expect(response.body).to eq({'notice': 'You do not have permission to perform this action'}.to_json)
+      expect(response.content_type).to eq('application/json; charset=utf-8')
+      expect(response).to have_http_status(:forbidden)
+    end
 
     it 'return updated task and assigned new users to the task in json format with status success if startup_admin authenticated' do
       request.headers.merge!({ "Accelerator-Id": "#{accelerator.id}"})
@@ -223,24 +264,6 @@ RSpec.describe TasksController, type: :controller do
     it 'return error with status 403 if task doesnt belong to startup_admin' do
       request.headers.merge!({ "Accelerator-Id": "#{accelerator.id}"})
       sign_in startup_admin
-      put :update, params: params.merge(params_3)
-      expect(response.body).to eq({'notice': 'You do not have permission to perform this action'}.to_json)
-      expect(response.content_type).to eq('application/json; charset=utf-8')
-      expect(response).to have_http_status(:forbidden)
-    end
-
-    it 'return error with status 403 if super_admin authenticated' do
-      request.headers.merge!({ "Accelerator-Id": "#{accelerator.id}"})
-      sign_in super_admin
-      put :update, params: params.merge(params_3)
-      expect(response.body).to eq({'notice': 'You do not have permission to perform this action'}.to_json)
-      expect(response.content_type).to eq('application/json; charset=utf-8')
-      expect(response).to have_http_status(:forbidden)
-    end
-
-    it 'return error with status 403 if admin authenticated' do
-      request.headers.merge!({ "Accelerator-Id": "#{accelerator.id}"})
-      sign_in admin
       put :update, params: params.merge(params_3)
       expect(response.body).to eq({'notice': 'You do not have permission to perform this action'}.to_json)
       expect(response.content_type).to eq('application/json; charset=utf-8')
@@ -349,6 +372,35 @@ RSpec.describe TasksController, type: :controller do
     before { params.permit! }
     before { params_2.permit! }
 
+    it 'return successfully message in json if super_admin authenticated' do
+      request.headers.merge!({ "Accelerator-Id": "#{accelerator.id}"})
+      sign_in super_admin
+      delete :destroy, params: params
+      expect(Task.find_by_id(task_3.id)).to eq(nil)
+      expect(response.body).to eq({message: 'Successfully destroyed'}.to_json)
+      expect(response.content_type).to eq("application/json; charset=utf-8")
+      expect(response).to have_http_status(:success)
+    end
+
+    it 'return successfully message in json if admin authenticated' do
+      request.headers.merge!({ "Accelerator-Id": "#{accelerator.id}"})
+      sign_in admin
+      delete :destroy, params: params
+      expect(Task.find_by_id(task_3.id)).to eq(nil)
+      expect(response.body).to eq({message: 'Successfully destroyed'}.to_json)
+      expect(response.content_type).to eq("application/json; charset=utf-8")
+      expect(response).to have_http_status(:success)
+    end
+
+    it 'return error with status 403 if task doesnt belong to admin' do
+      request.headers.merge!({ "Accelerator-Id": "#{accelerator.id}"})
+      sign_in admin
+      delete :destroy, params: params_2
+      expect(response.body).to eq({'notice': 'You do not have permission to perform this action'}.to_json)
+      expect(response.content_type).to eq('application/json; charset=utf-8')
+      expect(response).to have_http_status(:forbidden)
+    end
+
     it 'return successfully message in json if startup_admin authenticated' do
       request.headers.merge!({ "Accelerator-Id": "#{accelerator.id}"})
       sign_in startup_admin
@@ -363,24 +415,6 @@ RSpec.describe TasksController, type: :controller do
       request.headers.merge!({ "Accelerator-Id": "#{accelerator.id}"})
       sign_in startup_admin
       delete :destroy, params: params_2
-      expect(response.body).to eq({'notice': 'You do not have permission to perform this action'}.to_json)
-      expect(response.content_type).to eq('application/json; charset=utf-8')
-      expect(response).to have_http_status(:forbidden)
-    end
-
-    it 'return error with status 403 if super_admin authenticated' do
-      request.headers.merge!({ "Accelerator-Id": "#{accelerator.id}"})
-      sign_in super_admin
-      post :create, params: params
-      expect(response.body).to eq({'notice': 'You do not have permission to perform this action'}.to_json)
-      expect(response.content_type).to eq('application/json; charset=utf-8')
-      expect(response).to have_http_status(:forbidden)
-    end
-
-    it 'return error with status 403 if admin authenticated' do
-      request.headers.merge!({ "Accelerator-Id": "#{accelerator.id}"})
-      sign_in admin
-      post :create, params: params
       expect(response.body).to eq({'notice': 'You do not have permission to perform this action'}.to_json)
       expect(response.content_type).to eq('application/json; charset=utf-8')
       expect(response).to have_http_status(:forbidden)
