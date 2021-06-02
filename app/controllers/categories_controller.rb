@@ -84,16 +84,6 @@ class CategoriesController < ApplicationController
     raise Pundit::NotAuthorizedError unless @startup_id = startup_id_for_current_user
   end
 
-  def startup_id_for_current_user
-    if current_user.admin?
-      (policy_scope(Startup)&.ids & [params[:startup_id].to_i]).first
-    elsif current_user.super_admin?
-      (policy_scope(Startup)&.for_accelerator(user_accelerator_id)&.ids & [params[:startup_id].to_i]).first
-    else
-      current_user.startup_id
-    end
-  end
-
   def set_category
     @category = policy_scope(Category).for_assessment(params[:assessment_id]).find(params[:id])
   end
