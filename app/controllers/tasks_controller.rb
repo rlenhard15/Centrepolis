@@ -123,11 +123,14 @@ class TasksController < ApplicationController
   description <<-DESC
 
   === Request headers
-    Only StartupAdmin can perform this action
-      Authentication - string - required
-        Example of Authentication header : "Bearer TOKEN_FETCHED_FROM_SERVER_DURING_REGISTRATION"
-      Accelerator-Id - integer - required
-        Example of Accelerator-Id header : 1
+    Only SuperAdmin, Admin and StartupAdmin can perform this action
+      SuperAdmin   - any tasks of any accelerator;
+      Admin        - any tasks of the startups that were created by the admin;
+      StartupAdmin - only tasks were created by StartupAdmin;
+    Authentication - string - required
+      Example of Authentication header : "Bearer TOKEN_FETCHED_FROM_SERVER_DURING_REGISTRATION"
+    Accelerator-Id - integer - required
+      Example of Accelerator-Id header : 1
 
   === Success response body
   {
@@ -158,9 +161,11 @@ class TasksController < ApplicationController
 
   def create
     authorize current_user, policy_class: TaskPolicy
+    task_params_for_create = task_members_params_create
 
-    @task = Task.new(task_members_params_create)
+    @task = Task.new(task_params_for_create)
     if @task.save
+      TasksService::EmailUsersAssignedToTask.call(@task, task_params_for_create, current_user)
       render json: @task.as_json(methods: :members_for_task), status: :created
     else
       render json: @task.errors, status: :unprocessable_entity
@@ -183,11 +188,14 @@ class TasksController < ApplicationController
   description <<-DESC
 
   === Request headers
-    Only StartupAdmin who assign to the task can perform this action
-      Authentication - string - required
-        Example of Authentication header : "Bearer TOKEN_FETCHED_FROM_SERVER_DURING_REGISTRATION"
-      Accelerator-Id - integer - required
-        Example of Accelerator-Id header : 1
+  Only SuperAdmin, Admin and StartupAdmin can perform this action
+    SuperAdmin   - any tasks of any accelerator;
+    Admin        - any tasks of the startups that were created by the admin;
+    StartupAdmin - only tasks were created by StartupAdmin;
+  Authentication - string - required
+    Example of Authentication header : "Bearer TOKEN_FETCHED_FROM_SERVER_DURING_REGISTRATION"
+  Accelerator-Id - integer - required
+    Example of Accelerator-Id header : 1
 
   === Success response body
   {
@@ -216,7 +224,10 @@ class TasksController < ApplicationController
 
   DESC
   def update
-    if @task.update(task_members_params)
+    task_members_params_update = task_members_params
+
+    if @task.update(task_members_params_update)
+      TasksService::EmailUsersAssignedToTask.call(@task, task_members_params_update, current_user) if task_members_params_update[:task_users_attributes]
       render json: @task.as_json(methods: :members_for_task)
     else
       render json: @task.errors, status: :unprocessable_entity
@@ -257,11 +268,14 @@ class TasksController < ApplicationController
   description <<-DESC
 
   === Request headers
-    Only StartupAdmin who assign to the task can perform this action
-      Authentication - string - required
-        Example of Authentication header : "Bearer TOKEN_FETCHED_FROM_SERVER_DURING_REGISTRATION"
-      Accelerator-Id - integer - required
-        Example of Accelerator-Id header : 1
+  Only SuperAdmin, Admin and StartupAdmin can perform this action
+    SuperAdmin   - any tasks of any accelerator;
+    Admin        - any tasks of the startups that were created by the admin;
+    StartupAdmin - only tasks were created by StartupAdmin;
+  Authentication - string - required
+    Example of Authentication header : "Bearer TOKEN_FETCHED_FROM_SERVER_DURING_REGISTRATION"
+  Accelerator-Id - integer - required
+    Example of Accelerator-Id header : 1
 
   === Success response body
   {
@@ -295,22 +309,25 @@ class TasksController < ApplicationController
     end
 
     def task_members_params
-      user_ids_for_task = tasks_params[:task_users_attributes].map { |user| user[:user_id] }
-      raise Pundit::NotAuthorizedError unless @users = policy_scope(User).where(id: user_ids_for_task)
-      validated_users_ids_hash = []
+      if tasks_params[:task_users_attributes]
+        user_ids_for_task = tasks_params[:task_users_attributes].map { |user| user[:user_id] }
+        raise Pundit::NotAuthorizedError unless @users = policy_scope(User).where(id: user_ids_for_task)
+        validated_users_ids_hash = []
 
-      @users.each do |user|
-        if @task
-          validated_users_ids_hash.push({user_id: user.id}) if !user.task_ids.include?(@task.id)
-        else
-          validated_users_ids_hash.push({user_id: user.id})
+        @users.each do |user|
+          if @task
+            validated_users_ids_hash.push({user_id: user.id}) if !user.task_ids.include?(@task.id)
+          else
+            validated_users_ids_hash.push({user_id: user.id})
+          end
         end
+
+        tasks_params_hash = tasks_params.to_h
+        tasks_params_hash[:task_users_attributes] = validated_users_ids_hash
+        return tasks_params_hash
       end
 
-      tasks_params_hash = tasks_params.to_h
-      tasks_params_hash[:task_users_attributes] = validated_users_ids_hash
-
-      return tasks_params_hash
+      return tasks_params
     end
 
     def task_members_params_create
