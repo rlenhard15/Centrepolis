@@ -35,7 +35,6 @@ class User < ApplicationRecord
       user: as_json
     }
   end
-  
 
   def super_admin?
     type == SUPER_ADMIN
