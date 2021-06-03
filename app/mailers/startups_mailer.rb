@@ -14,10 +14,10 @@ class StartupsMailer < ApplicationMailer
   default from: -> { ENV['SENDER_EMAIL'] }
 
   def email_for_assigned_admins
-    if @admins && !@super_admin
+    if !@admins.empty? && !@super_admin
       admins_emails = @admins.map(&:email)
       mail(to: admins_emails, subject: "You have been assigned to startup on RAMP Client Business Planning Support")
-    elsif @admins && @super_admin
+    elsif !@admins.empty? && @super_admin
       mail(to: @super_admin.email, subject: "You assigned admin(s) to a startup on RAMP Client Business Planning Support")
     end
   end
