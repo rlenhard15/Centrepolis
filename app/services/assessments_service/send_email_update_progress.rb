@@ -15,9 +15,8 @@ class AssessmentsService::SendEmailUpdateProgress < ApplicationService
   private
 
   def send_email
-    byebug
     to_admins
-    to_startups_users
+    to_startup_users
     to_current_user
   end
 
@@ -27,10 +26,10 @@ class AssessmentsService::SendEmailUpdateProgress < ApplicationService
       assessment_progress_id: assessment_progress.id,
       current_user_id: current_user.id,
       startup_id: startup.id
-    ).email_progress_updated.deliver_later
+    ).email_progress_updated_to_admins.deliver_later
   end
 
-  def to_startups_users
+  def to_startup_users
     AssessmentsMailer.with(
       sub_category_progress_id: sub_category_progress.id,
       assessment_progress_id: assessment_progress.id,

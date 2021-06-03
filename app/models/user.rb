@@ -19,7 +19,7 @@ class User < ApplicationRecord
     STARTUP_ADMIN = 'StartupAdmin',
     MEMBER = 'Member'
   ].freeze
-  
+
   def tasks_number
     tasks.count
   end
@@ -41,7 +41,7 @@ class User < ApplicationRecord
   scope :for_startup, ->(startup_id) { where(startup_id: startup_id ) }
   scope :search_by, ->(params) { where('LOWER(first_name) like ? or LOWER(last_name) like ?', "%#{params}%", "%#{params}%") }
 
-  scope :not_current_user, ->(current_user_id) { where.not("users.id != ?", current_user_id) }
+  scope :not_current_user, ->(current_user_id) { where.not("users.id = ?", current_user_id) }
 
   def payload
     {

@@ -5,8 +5,8 @@
   The stage progress of your <b><%= @startup&.name %></b> startup, which located on <%= @startup.accelerator.name.capitalize() %> Accelerator, has been updated by <i><%= @current_user.email%></i>.
 </p>
 <p>
-  Current assessment progress of the assessment: <b><%= @assessment_progress.risk_value.round(1) %>%</b><br>
-  Current stage progress: <%= @current_stage.title %>, which included in the sub category <i><%= @assessment_progress.sub_category.title%></i>
+  Current assessment progress: <b><%= @assessment_progress.risk_value.round(1) %>%</b><br>
+  Current stage progress: <%= @current_stage.title %>, which included in the sub category <i><%= @sub_category_progress.sub_category.title%></i>
 </p>
 <p>
   Stay tuned,

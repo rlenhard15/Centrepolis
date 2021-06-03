@@ -1,8 +1,8 @@
 <p>
-  Hi!
+  Hi, <%= @current_user.full_name %>
 <p>
 <p>
-  The stage progress for <%= @assessment_progress.assessment.name %> assessment of <b><%= @startup&.name %></b> startup has been updated by <i><%= @current_user.email%></i>.
+  You updated progress of <%= @assessment_progress.assessment.name %> assessment for the <b><%= @startup&.name %></b>.
 </p>
 <p>
   Current assessment progress: <b><%= @assessment_progress.risk_value.round(1) %>%</b><br>
