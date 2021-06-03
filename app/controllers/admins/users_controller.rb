@@ -175,7 +175,7 @@ module Admins
       end
     end
 
-    api :PUT, 'api/users/update_password'
+    api :PUT, 'api/users/change_password'
     param :user, Hash, required: true do
       param :current_password, String, desc: 'Current password of user', required: true
       param :password, String, desc: 'New password', required: true
