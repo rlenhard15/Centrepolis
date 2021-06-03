@@ -21,4 +21,12 @@ class UserPolicy < ApplicationPolicy
       end
     end
   end
+
+  def create?
+    super_admin? || admin? || startup_admin?
+  end
+
+  def index?
+    super_admin? || admin? || startup_admin?
+  end
 end
