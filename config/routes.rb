@@ -19,7 +19,7 @@ Rails.application.routes.draw do
     resources :members, only: :index, module: 'admins'
     resources :admins, only: :index, module: 'admins'
     resources :startup_admins, only: :index, module: 'admins'
-    resources :users, only: %i[create], module: 'admins' do
+    resources :users, only: %i[create index], module: 'admins' do
       get :profile, on: :collection
     end
     resources :assessments, only: %i[index show] do

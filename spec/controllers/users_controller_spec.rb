@@ -10,6 +10,7 @@ RSpec.describe Admins::UsersController, type: :controller do
   let!(:admins)               { create_list(:admin, 3, accelerator_id: accelerator.id) }
   let!(:admin)                { create(:admin, accelerator_id: accelerator_2.id) }
   let!(:startups)             { create_list(:startup, 2, accelerator_id: accelerator.id, admins_startups_attributes: [{admin_id: admins.first.id}]) }
+  let!(:startups_2)           { create_list(:startup, 2, accelerator_id: accelerator.id, admins_startups_attributes: [{admin_id: admins.last.id}]) }
   let!(:startup_admin)        { create(:startup_admin, accelerator_id: accelerator.id, startup_id: startups.first.id) }
   let!(:member)               { create(:member, startup_id: startups.first.id, accelerator_id: accelerator.id) }
 
@@ -19,8 +20,6 @@ RSpec.describe Admins::UsersController, type: :controller do
       sign_in super_admin
       get :profile
       expect(parse_json(response.body)).to eq(parse_json(SuperAdmin.find(super_admin.id).to_json))
-      expect(response.content_type).to eq('application/json; charset=utf-8')
-      expect(response).to have_http_status(:success)
     end
 
     it "return info in json format about current Admin with startups if admin is authenticated" do
@@ -51,6 +50,86 @@ RSpec.describe Admins::UsersController, type: :controller do
     end
   end
 
+  describe 'GET index action' do
+    let!(:params)      { ActionController::Parameters.new({'startup_id': startups.first.id}) }
+    let!(:params_1)    { ActionController::Parameters.new({'startup_id': startups_2.last.id}) }
+    let!(:params_2)    { ActionController::Parameters.new({'search': 'Jonson'}) }
+
+    let!(:member_1)    { create(:member, first_name: "Boris", last_name: "Jonson", startup_id: startups.first.id, accelerator_id: accelerator.id) }
+    let!(:member_2)    { create(:member, first_name: "Ann", last_name: "Jonson", startup_id: startups.first.id, accelerator_id: accelerator.id) }
+    let!(:members_1)   { create_list(:member, 3, startup_id: startups.last.id, accelerator_id: accelerator.id) }
+    let!(:members_2)   { create_list(:member, 3, startup_id: startups.first.id, accelerator_id: accelerator.id) }
+
+    before do
+       params.permit!
+       params_1.permit!
+       params_2.permit!
+    end
+
+    it 'return all users are searched of the startup for super_admin in json format with status success if super_admin authenticated' do
+      request.headers.merge!({ "Accelerator-Id": "#{accelerator.id}"})
+      sign_in super_admin
+      get :index, params: params.merge(params_2)
+      expect(parse_json(response.body)[0]).to eq(["current_page", 1])
+      expect(parse_json(response.body)[1]).to eq(["total_pages", 1])
+      expect(parse_json(response.body)[2][1].count).to eq(2)
+      expect([parse_json(response.body)[2][1][0]['first_name'], parse_json(response.body)[2][1][1]['first_name']]).to eq([member_1.first_name, member_2.first_name])
+      expect(response.content_type).to eq('application/json; charset=utf-8')
+      expect(response).to have_http_status(:success)
+    end
+
+    it "return error in json with status forbidden if super_admin request a startup isnt belonged to the current accelerator" do
+      request.headers.merge!({ "Accelerator-Id": "#{accelerator_2.id}"})
+      sign_in super_admin
+      get :index, params: params_1.merge(params_2)
+      expect(response.body).to eq({'notice': 'You do not have permission to perform this action'}.to_json)
+      expect(response.content_type).to eq('application/json; charset=utf-8')
+      expect(response).to have_http_status(:forbidden)
+    end
+
+    it 'return all users are searched of the startup for admin in json format with status success if admin authenticated' do
+      request.headers.merge!({ "Accelerator-Id": "#{accelerator.id}"})
+      sign_in admins.first
+      get :index, params: params.merge(params_2)
+      expect(parse_json(response.body)[0]).to eq(["current_page", 1])
+      expect(parse_json(response.body)[1]).to eq(["total_pages", 1])
+      expect(parse_json(response.body)[2][1].count).to eq(2)
+      expect([parse_json(response.body)[2][1][0]['first_name'], parse_json(response.body)[2][1][1]['first_name']]).to eq([member_1.first_name, member_2.first_name])
+      expect(response.content_type).to eq('application/json; charset=utf-8')
+      expect(response).to have_http_status(:success)
+    end
+
+    it "return error in json with status forbidden if admin request a startup isnt belonged to the admin" do
+      request.headers.merge!({ "Accelerator-Id": "#{accelerator.id}"})
+      sign_in admins.first
+      get :index, params: params_1.merge(params_2)
+      expect(response.body).to eq({'notice': 'You do not have permission to perform this action'}.to_json)
+      expect(response.content_type).to eq('application/json; charset=utf-8')
+      expect(response).to have_http_status(:forbidden)
+    end
+
+    it 'return all users are searched of the startup of the current startup_admin in json format with status success if startup_admin authenticated' do
+      request.headers.merge!({ "Accelerator-Id": "#{accelerator.id}"})
+      sign_in startup_admin
+      get :index, params: params.merge(params_2)
+      expect(parse_json(response.body)[0]).to eq(["current_page", 1])
+      expect(parse_json(response.body)[1]).to eq(["total_pages", 1])
+      expect(parse_json(response.body)[2][1].count).to eq(2)
+      expect([parse_json(response.body)[2][1][0]['first_name'], parse_json(response.body)[2][1][1]['first_name']]).to eq([member_1.first_name, member_2.first_name])
+      expect(response.content_type).to eq('application/json; charset=utf-8')
+      expect(response).to have_http_status(:success)
+    end
+
+    it "return error in json with status forbidden if member tries perform this action" do
+      request.headers.merge!({ "Accelerator-Id": "#{accelerator.id}"})
+      sign_in member
+      get :index, params: params.merge(params_2)
+      expect(response.body).to eq({'notice': 'You do not have permission to perform this action'}.to_json)
+      expect(response.content_type).to eq('application/json; charset=utf-8')
+      expect(response).to have_http_status(:forbidden)
+    end
+  end
+  
   describe "POST create action" do
     let!(:params)     {ActionController::Parameters.new({user: {email: 'user@gmail.com', type: "Admin"}})}
     let!(:params_2)   {ActionController::Parameters.new({user: {email: 'user2@gmail.com', type: "StartupAdmin", startup_id: startups.first.id}})}
