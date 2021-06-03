@@ -1,0 +1,16 @@
+<% if !@super_admin %>
+  <p>
+    Hi,
+  </p>
+  <p>
+    You received this letter because you have been assigned to <%= @startup.name %> startup as Admin,
+    which located on <%= @startup.accelerator.name.capitalize() %> accelerator on our RAMP Client Business Planning support tool.
+  </p>
+<% else %>
+  <p>
+    Hi, <%= @super_admin&.full_name%>
+  </p>
+  <p>
+    You assigned admin(s) to <%= @startup.name %> startup, which located on <%= @startup.accelerator.name.capitalize() %> accelerator on our RAMP Client Business Planning support tool.
+  </p>
+<% end %>
