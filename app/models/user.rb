@@ -18,6 +18,10 @@ class User < ApplicationRecord
     MEMBER = 'Member'
   ].freeze
 
+  def full_name
+    "#{first_name} #{last_name}"
+  end
+
   def payload
     {
       auth_token: JwtWrapper.encode(user_id: id),
