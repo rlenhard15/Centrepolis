@@ -2,6 +2,7 @@ require 'rails_helper'
 
 RSpec.describe Admins::UsersController, type: :controller do
   it { should use_before_action(:authenticate_user!) }
+  it { should use_before_action(:set_profile) }
 
   let!(:accelerator)          { create(:accelerator) }
   let!(:accelerator_2)        { create(:accelerator) }
@@ -12,6 +13,42 @@ RSpec.describe Admins::UsersController, type: :controller do
   let!(:startups_2)           { create_list(:startup, 2, accelerator_id: accelerator.id, admins_startups_attributes: [{admin_id: admins.last.id}]) }
   let!(:startup_admin)        { create(:startup_admin, accelerator_id: accelerator.id, startup_id: startups.first.id) }
   let!(:member)               { create(:member, startup_id: startups.first.id, accelerator_id: accelerator.id) }
+
+  describe 'GET profile action' do
+    it "return info in json format about current SuperAdmin if super_admin is authenticated" do
+      request.headers.merge!({ "Accelerator-Id": "#{accelerator.id}"})
+      sign_in super_admin
+      get :profile
+      expect(parse_json(response.body)).to eq(parse_json(SuperAdmin.find(super_admin.id).to_json))
+    end
+
+    it "return info in json format about current Admin with startups if admin is authenticated" do
+      request.headers.merge!({ "Accelerator-Id": "#{accelerator.id}"})
+      sign_in admins.first
+      get :profile
+      expect(parse_json(response.body)).to eq(parse_json(Admin.find(admins.first.id).as_json(methods: :startups).to_json))
+      expect(response.content_type).to eq('application/json; charset=utf-8')
+      expect(response).to have_http_status(:success)
+    end
+
+    it "return info in json format about current StartupAdmin with startup if startup_admin is authenticated" do
+      request.headers.merge!({ "Accelerator-Id": "#{accelerator.id}"})
+      sign_in startup_admin
+      get :profile
+      expect(parse_json(response.body)).to eq(parse_json(StartupAdmin.find(startup_admin.id).as_json(methods: :startup).to_json))
+      expect(response.content_type).to eq('application/json; charset=utf-8')
+      expect(response).to have_http_status(:success)
+    end
+
+    it "return info in json format about current Member with startup if member is authenticated" do
+      request.headers.merge!({ "Accelerator-Id": "#{accelerator.id}"})
+      sign_in member
+      get :profile
+      expect(parse_json(response.body)).to eq(parse_json(Member.find(member.id).as_json(methods: :startup).to_json))
+      expect(response.content_type).to eq('application/json; charset=utf-8')
+      expect(response).to have_http_status(:success)
+    end
+  end
 
   describe 'GET index action' do
     let!(:params)      { ActionController::Parameters.new({'startup_id': startups.first.id}) }
@@ -92,7 +129,7 @@ RSpec.describe Admins::UsersController, type: :controller do
       expect(response).to have_http_status(:forbidden)
     end
   end
-
+  
   describe "POST create action" do
     let!(:params)     {ActionController::Parameters.new({user: {email: 'user@gmail.com', type: "Admin"}})}
     let!(:params_2)   {ActionController::Parameters.new({user: {email: 'user2@gmail.com', type: "StartupAdmin", startup_id: startups.first.id}})}
