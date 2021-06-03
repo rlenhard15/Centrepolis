@@ -21,7 +21,10 @@ Rails.application.routes.draw do
     resources :admins, only: %i[index destroy], module: 'admins'
     resources :startup_admins, only: :index, module: 'admins'
     resources :users, only: %i[create index], module: 'admins' do
-      get :profile, on: :collection
+      collection do
+        get :profile
+        put :change_password
+      end
     end
     resources :assessments, only: %i[index show] do
       resources :categories, only: %i[index show] do

@@ -29,4 +29,8 @@ class UserPolicy < ApplicationPolicy
   def index?
     super_admin? || admin? || startup_admin?
   end
+
+  def change_password?
+    super_admin? || admin? || startup_admin? || member?
+  end
 end
