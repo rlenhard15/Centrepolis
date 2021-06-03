@@ -4,6 +4,7 @@ Rails.application.routes.draw do
   devise_scope :user do
     post '/users/sign_in', to: 'users/sessions#create'
     post '/users/sign_up', to: 'users/registrations#create'
+    post '/users/password', to: 'users/passwords#create'
     put '/users/password', to: 'users/passwords#update'
   end
 
@@ -17,9 +18,11 @@ Rails.application.routes.draw do
     end
     resources :startups, only: %i[index create show update]
     resources :members, only: :index, module: 'admins'
-    resources :admins, only: :index, module: 'admins'
+    resources :admins, only: %i[index destroy], module: 'admins'
     resources :startup_admins, only: :index, module: 'admins'
-    resources :users, only: :create, module: 'admins'
+    resources :users, only: %i[create index], module: 'admins' do
+      get :profile, on: :collection
+    end
     resources :assessments, only: %i[index show] do
       resources :categories, only: %i[index show] do
         resources :sub_categories, only: :index do

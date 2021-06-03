@@ -23,5 +23,4 @@ class Startup < ApplicationRecord
       }
     end
   end
-
 end

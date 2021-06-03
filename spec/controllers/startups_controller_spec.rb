@@ -69,9 +69,11 @@ RSpec.describe StartupsController, type: :controller do
   describe 'POST create action' do
     let!(:params)   { ActionController::Parameters.new({ startup: {name: "New startup", admins_startups_attributes: [{admin_id: admins.first.id}, {admin_id: admins.last.id}] }}) }
     let!(:params_2) { ActionController::Parameters.new({ startup: {name: "New startup", admins_startups_attributes: [{admin_id: admin.id}] }}) }
+    let!(:params_3) { ActionController::Parameters.new({ startup: {name: "New startup"}})}
 
     before { params.permit! }
     before { params_2.permit! }
+    before { params_3.permit! }
 
     it 'return new startup with admins who assigned to the startup in json format with status success if super_admin authenticated' do
       request.headers.merge!({ "Accelerator-Id": "#{accelerator.id}"})
@@ -87,7 +89,7 @@ RSpec.describe StartupsController, type: :controller do
     it 'return new startup with assigned to the startup current admin in json format with status success if super_admin authenticated' do
       request.headers.merge!({ "Accelerator-Id": "#{accelerator.id}"})
       sign_in admins.first
-      post :create, params: params
+      post :create, params: params_3
       expect(parse_json(response.body)).to eq(parse_json(Startup.last.as_json(methods: :admins_for_startup).to_json))
       expect(Startup.last.admins.count).to eq(1)
       expect(Startup.last.admin_ids).to eq([admins.first.id])
@@ -127,7 +129,10 @@ RSpec.describe StartupsController, type: :controller do
       request.headers.merge!({ "Accelerator-Id": "#{accelerator.id}"})
       sign_in super_admin
       get :show, params: params_1
-      expect(parse_json(response.body)).to eq(parse_json(startup.as_json(methods: [:assessments_risk_list, :members, :startup_admins]).to_json))
+      expect(parse_json(response.body)).to eq(parse_json(startup.as_json(methods: :assessments_risk_list, include: {
+        members: {methods: [:tasks_number, :last_visit, :user_type]},
+        startup_admins: {methods: [:tasks_number, :last_visit, :user_type]}
+      }).to_json))
       expect(response.content_type).to eq('application/json; charset=utf-8')
       expect(response).to have_http_status(:success)
     end
@@ -145,7 +150,10 @@ RSpec.describe StartupsController, type: :controller do
       request.headers.merge!({ "Accelerator-Id": "#{accelerator.id}"})
       sign_in admins.first
       get :show, params: params_1
-      expect(parse_json(response.body)).to eq(parse_json(startup.as_json(methods: [:assessments_risk_list, :members, :startup_admins]).to_json))
+      expect(parse_json(response.body)).to eq(parse_json(startup.as_json(methods: :assessments_risk_list, include: {
+        members: {methods: [:tasks_number, :last_visit, :user_type]},
+        startup_admins: {methods: [:tasks_number, :last_visit, :user_type]}
+      }).to_json))
       expect(response.content_type).to eq('application/json; charset=utf-8')
       expect(response).to have_http_status(:success)
     end
@@ -163,7 +171,10 @@ RSpec.describe StartupsController, type: :controller do
       request.headers.merge!({ "Accelerator-Id": "#{accelerator.id}"})
       sign_in startup_admin
       get :show, params: params_1
-      expect(parse_json(response.body)).to eq(parse_json(startup.as_json(methods: [:assessments_risk_list, :members, :startup_admins]).to_json))
+      expect(parse_json(response.body)).to eq(parse_json(startup.as_json(methods: :assessments_risk_list, include: {
+        members: {methods: [:tasks_number, :last_visit, :user_type]},
+        startup_admins: {methods: [:tasks_number, :last_visit, :user_type]}
+      }).to_json))
       expect(response.content_type).to eq('application/json; charset=utf-8')
       expect(response).to have_http_status(:success)
     end
@@ -181,7 +192,10 @@ RSpec.describe StartupsController, type: :controller do
       request.headers.merge!({ "Accelerator-Id": "#{accelerator.id}"})
       sign_in member
       get :show, params: params_1
-      expect(parse_json(response.body)).to eq(parse_json(startup.as_json(methods: [:assessments_risk_list, :members, :startup_admins]).to_json))
+      expect(parse_json(response.body)).to eq(parse_json(startup.as_json(methods: :assessments_risk_list, include: {
+        members: {methods: [:tasks_number, :last_visit, :user_type]},
+        startup_admins: {methods: [:tasks_number, :last_visit, :user_type]}
+      }).to_json))
       expect(response.content_type).to eq('application/json; charset=utf-8')
       expect(response).to have_http_status(:success)
     end
