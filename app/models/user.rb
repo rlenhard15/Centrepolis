@@ -7,6 +7,8 @@ class User < ApplicationRecord
   has_many :task_users, dependent: :destroy
   has_many :tasks, through: :task_users
 
+  paginates_per 5
+
   scope :members, -> { where(type: "Member") }
   scope :admins, -> { where(type: "Admin") }
   scope :startup_admins, -> { where(type: "StartupAdmin") }
@@ -17,6 +19,9 @@ class User < ApplicationRecord
     STARTUP_ADMIN = 'StartupAdmin',
     MEMBER = 'Member'
   ].freeze
+
+  scope :for_startup, ->(startup_id) { where(startup_id: startup_id ) }
+  scope :search_by, ->(params) { where('LOWER(first_name) like ? or LOWER(last_name) like ?', "%#{params}%", "%#{params}%") }
 
   def payload
     {
