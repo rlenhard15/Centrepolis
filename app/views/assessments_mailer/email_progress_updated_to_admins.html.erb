@@ -1,0 +1,14 @@
+<p>
+  Hi!
+<p>
+<p>
+  The stage progress for <%= @assessment_progress.assessment.name %> assessment of <b><%= @startup&.name %></b> startup has been updated by <i><%= @current_user.email%></i>.
+</p>
+<p>
+  Current assessment progress of the assessment: <b><%= @assessment_progress.risk_value.round(1) %>%</b><br>
+  Current stage progress: <%= @current_stage.title %>, which included in the sub category <i><%= @assessment_progress.sub_category.title%></i>
+</p>
+<p>
+  The startup is located on <%= @startup.accelerator.name.capitalize() %> Accelerator
+  on our RAMP Client Business Planning support tool.
+</p>

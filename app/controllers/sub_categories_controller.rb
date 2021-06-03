@@ -28,9 +28,12 @@ class SubCategoriesController < ApplicationController
       "assessment_risk": "7.45098039215686"
     }
   DESC
-  
+
   def update_progress
     if @sub_category_progress.update(current_stage_id: params[:current_stage_id]) && @assessment_progress.update(risk_value: assessment_risk_value)
+
+      AssessmentsService::SendEmailUpdateProgress.call(@sub_category_progress, @assessment_progress, current_user)
+
       render json: {
         message: "Progress updates successfully",
         assessment_risk: assessment_risk_value

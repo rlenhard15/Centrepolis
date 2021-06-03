@@ -18,6 +18,8 @@ class User < ApplicationRecord
     MEMBER = 'Member'
   ].freeze
 
+  scope :not_current_user, ->(current_user_id) { where.not("users.id != ?", current_user_id) }
+
   def payload
     {
       auth_token: JwtWrapper.encode(user_id: id),
