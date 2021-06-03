@@ -19,10 +19,7 @@ class User < ApplicationRecord
     STARTUP_ADMIN = 'StartupAdmin',
     MEMBER = 'Member'
   ].freeze
-
-  scope :for_startup, ->(startup_id) { where(startup_id: startup_id ) }
-  scope :search_by, ->(params) { where('LOWER(first_name) like ? or LOWER(last_name) like ?', "%#{params}%", "%#{params}%") }
-
+  
   def tasks_number
     tasks.count
   end
@@ -34,6 +31,9 @@ class User < ApplicationRecord
   def user_type
     type
   end
+
+  scope :for_startup, ->(startup_id) { where(startup_id: startup_id ) }
+  scope :search_by, ->(params) { where('LOWER(first_name) like ? or LOWER(last_name) like ?', "%#{params}%", "%#{params}%") }
 
   def payload
     {
