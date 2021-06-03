@@ -55,6 +55,7 @@ class User < ApplicationRecord
   def frontend_hostname
     ENV[accelerator.hostname]
   end
+  
 
   def self.set_user_by_password_token(attributes={})
     original_token       = attributes[:reset_password_token]
