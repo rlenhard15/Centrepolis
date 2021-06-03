@@ -3,12 +3,44 @@
 module Users
   class PasswordsController < Devise::PasswordsController
 
+    api :POST, '/users/password'
+    param :user, Hash, required: true do
+      param :email, String, desc: 'Email of user', required: true
+    end
+
+    description <<-DESC
+      NOTE: This message will be received email was successfully sent. In other case there will
+      be error message. In email user will have a link with reset token.
+      === Request headers
+        Accelerator-Id - integer - required
+          Example of Accelerator-Id header : 1
+
+      === Success response body
+      {
+        "message": "Reset instructions sent"
+      }
+
+    DESC
+
+    def create
+      self.resource = resource_class.send_reset_password_instructions(
+        resource_params
+      )
+
+      if successfully_sent?(resource)
+        render json: { message: 'Reset instructions sent' }
+      else
+        render json:
+          bad_request_params(resource.errors), status: :bad_request
+      end
+    end
+
     api :PUT, '/users/password'
     param :reset_password_token, String, desc: 'Reset password token fetched from link in mail', required: true
     param :password, String, desc: 'New password', required: true
     param :password_confirmation, String, desc: 'New password confirmation', required: true
-    param :first_name, String, desc: 'First name of customer', required: true
-    param :last_name, String, desc: 'Last name of customer', required: true
+    param :first_name, String, desc: 'First name of user (is not required for change password endpoint)', required: true
+    param :last_name, String, desc: 'Last name of user (is not required for change password endpoint)', required: true
 
     description <<-DESC
       === Request headers
@@ -17,10 +49,10 @@ module Users
       === Success response body
       {
         "auth_token": "Token",
-        "user_type": "Customer",
+        "user_type": "UserType",
         "user": {
           "id": 49,
-          "email": "customer_example@gmail.com",
+          "email": "user@gmail.com",
           "created_by": 1,
           "created_at": "2020-03-20T10:45:02.522Z",
           "updated_at": "2020-03-20T10:46:25.226Z",
@@ -34,9 +66,9 @@ module Users
 
     def update
       resource = resource_class.set_user_by_password_token(update_password_params)
-      if resource && resource.accelerator_id == accelerator_id
+      if resource && valid_accelerator_id(resource)
         resource = resource.reset_password_by_token(update_password_params)
-        if resource.errors.empty? && resource.update(update_customer_params)
+        if resource.errors.empty? && resource.update(update_user_params)
           resource.unlock_access! if unlockable?(resource)
           if Devise.sign_in_after_reset_password
             resource.after_database_authentication
@@ -53,6 +85,14 @@ module Users
     end
 
     private
+
+    def valid_accelerator_id user
+      if !user&.super_admin?
+        user&.accelerator_id == accelerator_id
+      else
+        Accelerator.ids.include?(accelerator_id)
+      end
+    end
 
     def bad_request_params(details)
       {
@@ -75,7 +115,7 @@ module Users
                    )
     end
 
-    def update_customer_params
+    def update_user_params
       params.permit(:first_name, :last_name)
     end
 
