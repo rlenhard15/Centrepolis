@@ -2,7 +2,7 @@ class User < ApplicationRecord
   # Include default devise modules. Others available are:
   # :confirmable, :lockable, :timeoutable, :trackable and :omniauthable
   devise :database_authenticatable, :registerable,
-         :recoverable, :rememberable, :validatable
+         :recoverable, :rememberable, :validatable, :trackable
 
   has_many :task_users, dependent: :destroy
   has_many :tasks, through: :task_users
@@ -19,6 +19,18 @@ class User < ApplicationRecord
     STARTUP_ADMIN = 'StartupAdmin',
     MEMBER = 'Member'
   ].freeze
+  
+  def tasks_number
+    tasks.count
+  end
+
+  def last_visit
+    last_sign_in_at
+  end
+
+  def user_type
+    type
+  end
 
   def full_name
 
