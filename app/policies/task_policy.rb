@@ -27,15 +27,15 @@ class TaskPolicy < ApplicationPolicy
   end
 
   def create?
-    startup_admin?
+    super_admin? || admin? || startup_admin?
   end
 
   def destroy?
-    can_startup_admin_do_it?
+    can_super_admin_do_it? || can_admin_do_it? || can_startup_admin_do_it?
   end
 
   def update?
-    can_startup_admin_do_it?
+    can_super_admin_do_it? || can_admin_do_it? || can_startup_admin_do_it?
   end
 
   def mark_task_as_completed?
