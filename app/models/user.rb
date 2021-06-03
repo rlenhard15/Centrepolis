@@ -20,6 +20,12 @@ class User < ApplicationRecord
     MEMBER = 'Member'
   ].freeze
 
+  def full_name
+
+    ("#{first_name} #{last_name}").gsub(/[A-Za-z']+/,&:capitalize)
+
+  end
+
   scope :for_startup, ->(startup_id) { where(startup_id: startup_id ) }
   scope :search_by, ->(params) { where('LOWER(first_name) like ? or LOWER(last_name) like ?', "%#{params}%", "%#{params}%") }
 

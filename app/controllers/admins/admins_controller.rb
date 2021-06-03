@@ -1,16 +1,17 @@
 module Admins
   class AdminsController < ApplicationController
+    before_action :set_admin, only: :destroy
+
     api :GET, 'api/admins', "Only SuperAdmin can see list of the admins and their startups"
     description <<-DESC
 
     === Request headers
       Only SuperAdmin can perform this action
         SuperAdmin   - all admins of any accelerator;
-
-        Authentication - string - required
-          Example of Authentication header : "Bearer TOKEN_FETCHED_FROM_SERVER_DURING_REGISTRATION"
-        Accelerator-Id - integer - required
-            Example of Accelerator-Id header : 1
+      Authentication - string - required
+        Example of Authentication header : "Bearer TOKEN_FETCHED_FROM_SERVER_DURING_REGISTRATION"
+      Accelerator-Id - integer - required
+        Example of Accelerator-Id header : 1
 
     === Params
       Params are absent
@@ -42,11 +43,48 @@ module Admins
 
 
     DESC
-    
+
     def index
       authorize current_user, policy_class: AdminPolicy
 
       render json: policy_scope(User).admins.for_accelerator(user_accelerator_id).as_json(methods: :startups)
     end
+
+    api :DELETE, 'api/admins/:id', 'SuperAdmin deletes Admin (admin receives email that his/her account was deleted)'
+    param :id, Integer, desc: "id of admin", required: true
+
+    description <<-DESC
+
+    === Request headers
+      Only SuperAdmin can perform this action
+        Authentication - string - required
+          Example of Authentication header : "Bearer TOKEN_FETCHED_FROM_SERVER_DURING_REGISTRATION"
+        Accelerator-Id - integer - required
+          Example of Accelerator-Id header : 1
+
+    === Success response body
+    {
+      "message": "Successfully destroyed"
+    }
+
+    DESC
+
+    def destroy
+      if @admin.destroy
+        UsersService::UsersEmailNotification.call(@admin, current_user)
+        render json: {
+          message: 'Successfully destroyed'
+        }, status: :ok
+      else
+        render json: @admin.errors, status: :unprocessable_entity
+      end
+    end
+
+    private
+
+      def set_admin
+        @admin = Admin.find_by_id(params[:id])
+        authorize @admin
+      end
   end
 end
