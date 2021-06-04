@@ -228,6 +228,7 @@ module Admins
     description <<-DESC
 
     === Request headers
+      SuperAdmin, Admin, StartupAdmin or Member can perform this action
       Authentication - string - required
         Example of Authentication header : "Bearer TOKEN_FETCHED_FROM_SERVER_DURING_REGISTRATION"
       Accelerator-Id - integer - required
