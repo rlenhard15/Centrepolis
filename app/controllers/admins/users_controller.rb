@@ -175,7 +175,47 @@ module Admins
       end
     end
 
+    api :PUT, 'api/users/change_password'
+    param :user, Hash, required: true do
+      param :current_password, String, desc: 'Current password of user', required: true
+      param :password, String, desc: 'New password', required: true
+    end
+
+    description <<-DESC
+      === Request headers
+        SuperAdmin, Admin, StartupAdmin or Member can perform this action
+          Authentication - string - required
+            Example of Authentication header : "Bearer TOKEN_FETCHED_FROM_SERVER_DURING_REGISTRATION"
+          Accelerator-Id - integer - required
+            Example of Accelerator-Id header : 1
+
+      === Success response body
+      {
+        "id": 14,
+        "email": "member@gmail.com",
+        "created_at": "2021-04-12T12:04:39.943Z",
+        "updated_at": "2021-06-03T18:49:02.471Z",
+        "first_name": "Samuel",
+        "last_name": "Ramirez",
+        "accelerator_id": 1,
+        "startup_id": 1
+      }
+
+    DESC
+
+    def change_password
+      if current_user.update_with_password(update_password_params)
+        render json: current_user
+      else
+        render json: current_user.errors, status: :bad_request
+      end
+    end
+
     private
+
+    def update_password_params
+      params.require(:user).permit(:current_password, :password)
+    end
 
     def search_params
       params[:search]&.downcase  || ''

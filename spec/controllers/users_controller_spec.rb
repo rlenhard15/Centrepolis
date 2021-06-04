@@ -129,7 +129,7 @@ RSpec.describe Admins::UsersController, type: :controller do
       expect(response).to have_http_status(:forbidden)
     end
   end
-  
+
   describe "POST create action" do
     let!(:params)     {ActionController::Parameters.new({user: {email: 'user@gmail.com', type: "Admin"}})}
     let!(:params_2)   {ActionController::Parameters.new({user: {email: 'user2@gmail.com', type: "StartupAdmin", startup_id: startups.first.id}})}
@@ -211,6 +211,49 @@ RSpec.describe Admins::UsersController, type: :controller do
       expect(response.body).to eq({'notice': 'You do not have permission to perform this action'}.to_json)
       expect(response.content_type).to eq('application/json; charset=utf-8')
       expect(response).to have_http_status(:forbidden)
+    end
+  end
+
+  describe 'PUT change_password action' do
+    let!(:member_2) { create(:member, startup_id: startups.first.id, accelerator_id: accelerator.id, password: "123456") }
+
+    let!(:params) { ActionController::Parameters.new(
+      user: {
+        current_password: "123456",
+        password: "qwerty",
+      }
+    )}
+
+    before { params.permit! }
+
+    it 'return updated password of current user in json format with status success' do
+      request.headers.merge!({ "Accelerator-Id": "#{accelerator.id}"})
+      sign_in member_2
+      expect(member_2.valid_password?('qwerty')).to eq(false)
+      put :change_password, params: params
+      expect(parse_json(response.body)).to eq(parse_json(member_2.to_json))
+      expect(response.content_type).to eq('application/json; charset=utf-8')
+      expect(response).to have_http_status(:success)
+      member_2.reload
+      expect(member_2.valid_password?('qwerty')).to eq(true)
+    end
+
+    let!(:params_2) { ActionController::Parameters.new(
+      user: {
+        current_password: "123456_2",
+        password: "qwerty"
+      }
+    )}
+
+    before { params_2.permit! }
+
+    it 'return error if current_password was not provide or was incorrect' do
+      request.headers.merge!({ "Accelerator-Id": "#{accelerator.id}"})
+      sign_in member_2
+      put :change_password, params: params_2
+      expect(parse_json(response.body)).to eq([["current_password", ["is invalid"]]])
+      expect(response.content_type).to eq('application/json; charset=utf-8')
+      expect(response).to have_http_status(:bad_request)
     end
   end
 end
