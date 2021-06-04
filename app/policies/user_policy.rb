@@ -33,4 +33,8 @@ class UserPolicy < ApplicationPolicy
   def change_password?
     super_admin? || admin? || startup_admin? || member?
   end
+
+  def update_profile?
+    super_admin? || admin? || startup_admin? || member?
+  end
 end

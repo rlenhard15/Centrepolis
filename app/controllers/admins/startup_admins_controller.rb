@@ -27,6 +27,7 @@ module Admins
         "last_name": "Lee",
         "accelerator_id": 1,
         "startup_id": 1,
+        "phone_number": "(186)285-7925",
         "startup": {
           "id": 1,
           "name": "MSI",

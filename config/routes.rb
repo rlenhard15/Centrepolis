@@ -3,7 +3,7 @@ Rails.application.routes.draw do
   devise_for :users, skip: %i[sessions registrations passwords]
   devise_scope :user do
     post '/users/sign_in', to: 'users/sessions#create'
-    post '/users/sign_up', to: 'users/registrations#create'
+    # post '/users/sign_up', to: 'users/registrations#create'
     post '/users/password', to: 'users/passwords#create'
     put '/users/password', to: 'users/passwords#update'
   end
@@ -24,6 +24,7 @@ Rails.application.routes.draw do
       collection do
         get :profile
         put :change_password
+        put :update_profile
       end
     end
     resources :assessments, only: %i[index show] do
