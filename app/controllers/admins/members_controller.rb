@@ -30,6 +30,7 @@ module Admins
         "startup_id": 1,
         "accelerator_id": 1,
         "phone_number": "(186)285-7925",
+        "email_notification": true,
         "startup": {
           "id": 1,
           "name": "Example",
