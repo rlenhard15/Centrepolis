@@ -10,8 +10,8 @@ class AssessmentsMailer < ApplicationMailer
   default from: -> { ENV['SENDER_EMAIL'] }
 
   def email_progress_updated_to_admins
-    @super_admins = SuperAdmin.not_current_user(@current_user.id)
-    @admins = Admin.joins(:startups).where("startups.id = ?", @startup.id).not_current_user(@current_user.id)
+    @super_admins = SuperAdmin.not_current_user(@current_user.id).with_allowed_email_notifications
+    @admins = Admin.joins(:startups).where("startups.id = ?", @startup.id).not_current_user(@current_user.id).with_allowed_email_notifications
 
     if !@super_admins.empty? || !@admins.empty?
       if @sub_category_progress && @assessment_progress && @startup
@@ -25,7 +25,7 @@ class AssessmentsMailer < ApplicationMailer
   end
 
   def email_progress_updated_to_startup_users
-    @startup_users = User.where(startup_id: @startup.id).not_current_user(@current_user.id)
+    @startup_users = User.where(startup_id: @startup.id).not_current_user(@current_user.id).with_allowed_email_notifications
 
     if !@startup_users.empty?
       if @sub_category_progress && @assessment_progress && @startup
@@ -37,7 +37,7 @@ class AssessmentsMailer < ApplicationMailer
   end
 
   def email_progress_updated_to_current_user
-    if @sub_category_progress && @assessment_progress && @startup
+    if @sub_category_progress && @assessment_progress && @startup && @current_user.email_notification
       mail(to: @current_user.email, subject: "You updated the stage progress of your startup on RAMP Client Business Planning Support")
     end
   end

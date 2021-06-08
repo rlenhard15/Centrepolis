@@ -29,6 +29,7 @@ module Admins
       "accelerator_id": 1,
       "startup_id": 1,
       "phone_number": "(186)285-7925",
+      "email_notification": true,
       "startup": {
         "id": 1,
         "name": "MSI",
@@ -49,6 +50,7 @@ module Admins
       "accelerator_id": 1,
       "startup_id": null,
       "phone_number": "(186)285-7925",
+      "email_notification": true,
       "startups": [
         {
           "id": 1,
@@ -71,7 +73,8 @@ module Admins
       "last_name": "Ramirez",
       "accelerator_id": null,
       "startup_id": null,
-      "phone_number": "(186)285-7925"
+      "phone_number": "(186)285-7925",
+      "email_notification": true
     }
 
 
@@ -115,7 +118,8 @@ module Admins
           "last_name": "Pack",
           "accelerator_id": 1,
           "startup_id": 8,
-          "phone_number": "(186)285-7925"
+          "phone_number": "(186)285-7925",
+          "email_notification": true
         },
         ...
       ]
@@ -163,7 +167,8 @@ module Admins
         "last_name": null,
         "accelerator_id": 1,
         "startup_id": null,
-        "phone_number": "(186)285-7925"
+        "phone_number": "(186)285-7925",
+        "email_notification": true
       }
 
     DESC
@@ -204,7 +209,8 @@ module Admins
         "last_name": "Ramirez",
         "accelerator_id": 1,
         "startup_id": 1,
-        "phone_number": "(186)285-7925"
+        "phone_number": "(186)285-7925",
+        "email_notification": true
       }
 
     DESC
@@ -244,7 +250,8 @@ module Admins
       "first_name": "Bill",
       "last_name": "Jonson",
       "startup_id": 1,
-      "phone_number": "123456789"
+      "phone_number": "123456789",
+      "email_notification": true
     }
 
     DESC
@@ -257,7 +264,51 @@ module Admins
       end
     end
 
+    api :PUT, 'api/users/update_email_notification', "Update email notification of current_user"
+      param :email_notification, String, desc: 'Email notification status for current_user, can be only "true" or "false"', required: true
+
+    description <<-DESC
+
+    === Request headers
+      SuperAdmin, Admin, StartupAdmin or Member can perform this action
+      Authentication - string - required
+        Example of Authentication header : "Bearer TOKEN_FETCHED_FROM_SERVER_DURING_REGISTRATION"
+      Accelerator-Id - integer - required
+        Example of Accelerator-Id header : 1
+
+    === Success response body
+    {
+      "accelerator_id": 1,
+      "id": 3,
+      "email": "user@gmail.com",
+      "created_at": "2021-04-09T18:51:32.967Z",
+      "updated_at": "2021-06-04T17:06:55.344Z",
+      "first_name": "Bill",
+      "last_name": "Jonson",
+      "startup_id": 1,
+      "phone_number": "123456789",
+      "email_notification": true
+    }
+
+    DESC
+
+    def update_email_notification
+      if !email_notification_params.nil?
+        if current_user.update(email_notification: email_notification_params)
+          render json: current_user
+        else
+          render json: current_user.errors, status: :unprocessable_entity
+        end
+      else
+        render json: current_user
+      end
+    end
+
     private
+
+    def email_notification_params
+      return params[:email_notification].downcase == 'true' if params[:email_notification]
+    end
 
     def user_params_update
       params.require(:user).permit(:email, :first_name, :last_name, :phone_number)

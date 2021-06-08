@@ -34,6 +34,10 @@ class UserPolicy < ApplicationPolicy
     super_admin? || admin? || startup_admin? || member?
   end
 
+  def update_email_notification?
+    super_admin? || admin? || startup_admin? || member?
+  end
+
   def update_profile?
     super_admin? || admin? || startup_admin? || member?
   end
