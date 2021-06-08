@@ -359,17 +359,9 @@ RSpec.describe Admins::UsersController, type: :controller do
   end
 
   describe 'PUT update_email_notification action' do
-    let!(:params) { ActionController::Parameters.new(
-      user: {
-        email_notification: "false"
-      }
-    )}
+    let!(:params) { ActionController::Parameters.new(email_notification: "false")}
 
-    let!(:params_2) { ActionController::Parameters.new(
-      user: {
-        email_notification: "false_123"
-      }
-    )}
+    let!(:params_2) { ActionController::Parameters.new()}
 
     before { params.permit! }
     before { params_2.permit! }
@@ -422,7 +414,7 @@ RSpec.describe Admins::UsersController, type: :controller do
       expect(response).to have_http_status(:success)
     end
 
-    it 'return did not update info about current user in json format with status success if user set isnt valid value of the param email_notification' do
+    it 'return did not update info about current user in json format with status success if user dont provide email_notification param' do
       request.headers.merge!({ "Accelerator-Id": "#{accelerator.id}"})
       sign_in member
       expect(member.email_notification).to eq(true)

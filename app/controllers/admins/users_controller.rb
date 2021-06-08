@@ -265,9 +265,7 @@ module Admins
     end
 
     api :PUT, 'api/users/update_email_notification', "Update email notification of current_user"
-    param :user, Hash, required: true do
       param :email_notification, String, desc: 'Email notification status for current_user, can be only "true" or "false"', required: true
-    end
 
     description <<-DESC
 
@@ -295,7 +293,7 @@ module Admins
     DESC
 
     def update_email_notification
-      if email_notification_params == true || email_notification_params == false
+      if !email_notification_params.nil?
         if current_user.update(email_notification: email_notification_params)
           render json: current_user
         else
@@ -309,11 +307,7 @@ module Admins
     private
 
     def email_notification_params
-      if params[:user][:email_notification]&.downcase == 'false'
-        false
-      elsif params[:user][:email_notification]&.downcase == 'true'
-        true
-      end
+      return params[:email_notification]&.downcase == 'true' if params[:email_notification]
     end
 
     def user_params_update
