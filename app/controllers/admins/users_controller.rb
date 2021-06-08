@@ -5,6 +5,7 @@ module Admins
     before_action :set_user, only: :destroy
 
     api :GET, 'api/users/profile', "Request for current_user profile"
+    
 
     description <<-DESC
 
