@@ -305,6 +305,7 @@ module Admins
     end
 
     private
+    
 
     def email_notification_params
       return params[:email_notification].downcase == 'true' if params[:email_notification]
