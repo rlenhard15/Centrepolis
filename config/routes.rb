@@ -25,6 +25,7 @@ Rails.application.routes.draw do
         get :profile
         put :change_password
         put :update_profile
+        put :update_email_notification
       end
     end
     resources :assessments, only: %i[index show] do

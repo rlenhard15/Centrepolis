@@ -20,6 +20,8 @@ class User < ApplicationRecord
     MEMBER = 'Member'
   ].freeze
 
+  scope :with_allowed_email_notifications, ->{ where(email_notification: true)}
+
   def tasks_number
     tasks.count
   end

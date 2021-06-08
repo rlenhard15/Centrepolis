@@ -424,4 +424,73 @@ RSpec.describe Admins::UsersController, type: :controller do
       expect(response).to have_http_status(:forbidden)
     end
   end
+
+  describe 'PUT update_email_notification action' do
+    let!(:params) { ActionController::Parameters.new(email_notification: "false")}
+
+    let!(:params_2) { ActionController::Parameters.new()}
+
+    before { params.permit! }
+    before { params_2.permit! }
+
+    it 'return updated info about current user in json format with status success if super_admin authenticated' do
+      request.headers.merge!({ "Accelerator-Id": "#{accelerator.id}"})
+      sign_in super_admin
+      expect(super_admin.email_notification).to eq(true)
+      put :update_email_notification, params: params
+      super_admin.reload
+      expect(parse_json(response.body)).to eq(parse_json(super_admin.to_json))
+      expect(super_admin.email_notification).to eq(false)
+      expect(response.content_type).to eq('application/json; charset=utf-8')
+      expect(response).to have_http_status(:success)
+    end
+
+    it 'return updated info about current user in json format with status success if admin authenticated' do
+      request.headers.merge!({ "Accelerator-Id": "#{accelerator.id}"})
+      sign_in admins.first
+      expect(admins.first.email_notification).to eq(true)
+      put :update_email_notification, params: params
+      admins.first.reload
+      expect(parse_json(response.body)).to eq(parse_json(admins.first.to_json))
+      expect(admins.first.email_notification).to eq(false)
+      expect(response.content_type).to eq('application/json; charset=utf-8')
+      expect(response).to have_http_status(:success)
+    end
+
+    it 'return updated info about current user in json format with status success if startup_admin authenticated' do
+      request.headers.merge!({ "Accelerator-Id": "#{accelerator.id}"})
+      sign_in startup_admin
+      expect(startup_admin.email_notification).to eq(true)
+      put :update_email_notification, params: params
+      startup_admin.reload
+      expect(parse_json(response.body)).to eq(parse_json(startup_admin.to_json))
+      expect(startup_admin.email_notification).to eq(false)
+      expect(response.content_type).to eq('application/json; charset=utf-8')
+      expect(response).to have_http_status(:success)
+    end
+
+    it 'return updated info about current user in json format with status success if startup_admin authenticated' do
+      request.headers.merge!({ "Accelerator-Id": "#{accelerator.id}"})
+      sign_in member
+      expect(member.email_notification).to eq(true)
+      put :update_email_notification, params: params
+      member.reload
+      expect(parse_json(response.body)).to eq(parse_json(member.to_json))
+      expect(member.email_notification).to eq(false)
+      expect(response.content_type).to eq('application/json; charset=utf-8')
+      expect(response).to have_http_status(:success)
+    end
+
+    it 'return did not update info about current user in json format with status success if user dont provide email_notification param' do
+      request.headers.merge!({ "Accelerator-Id": "#{accelerator.id}"})
+      sign_in member
+      expect(member.email_notification).to eq(true)
+      put :update_email_notification, params: params_2
+      member.reload
+      expect(parse_json(response.body)).to eq(parse_json(member.to_json))
+      expect(member.email_notification).to eq(true)
+      expect(response.content_type).to eq('application/json; charset=utf-8')
+      expect(response).to have_http_status(:success)
+    end
+  end
 end
