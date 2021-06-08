@@ -32,7 +32,22 @@ class StartupsController < ApplicationController
             "risk_value": "3.92156862745098"
           },
           ...
-        ]
+        ],
+        "admins": [
+          {
+            "id": 1,
+            "email": "admin@gmail.com",
+            "created_at": "2021-05-24T13:23:02.316Z",
+            "updated_at": "2021-06-07T17:28:49.503Z",
+            "first_name": "Mark",
+            "last_name": "Snider",
+            "accelerator_id": 1,
+            "startup_id": null,
+            "phone_number": null,
+            "email_notification": true
+          },
+          ...
+        ],
         "members": [
           {
             "id": 3,
@@ -42,7 +57,8 @@ class StartupsController < ApplicationController
             "first_name": "Eva",
             "last_name": "Evans",
             "accelerator_id": 1,
-            "startup_id": 1
+            "startup_id": 1,
+            "email_notification": true
           },
           ...
         ],
@@ -55,7 +71,8 @@ class StartupsController < ApplicationController
             "first_name": "Nikole",
             "last_name": "Smith",
             "accelerator_id": 1,
-            "startup_id": 1
+            "startup_id": 1,
+            "email_notification": true
           },
           ...
         ]
@@ -74,7 +91,7 @@ class StartupsController < ApplicationController
     render json: {
       current_page: @startups.current_page,
       total_pages: @startups.total_pages,
-      startups: @startups.as_json(methods: [:assessments_risk_list, :members, :startup_admins])
+      startups: @startups.as_json(methods: [:assessments_risk_list, :members, :startup_admins, :admins])
     }
   end
 
@@ -103,14 +120,14 @@ class StartupsController < ApplicationController
     "accelerator_id": 1,
     "created_at": "2021-04-16T09:53:05.871Z",
     "updated_at": "2021-04-16T09:53:05.871Z",
-    "admins_for_startup": [
+    "admins": [
       {
         "id": 2,
         "email": "admin@gmail.com",
         "created_at": "2021-04-09T18:49:34.985Z",
         "updated_at": "2021-04-09T18:49:34.985Z",
-        "first_name": "Admin2",
-        "last_name": "Adm2",
+        "first_name": "Admin",
+        "last_name": "Adm",
         "accelerator_id": 1,
         "startup_id": null
       },
@@ -130,7 +147,7 @@ class StartupsController < ApplicationController
       StartupsService::SendEmailStartupCreated.call(@startup, current_user)
       StartupsService::SendEmailToAssignedAdmins.call(startup_params_create, @startup, current_user) if startup_params_create[:admins_startups_attributes]
 
-      render json: @startup.as_json(methods: :admins_for_startup), status: :created
+      render json: @startup.as_json(methods: :admins), status: :created
     else
       render json: @startup.errors, status: :unprocessable_entity
     end
@@ -152,7 +169,7 @@ class StartupsController < ApplicationController
     Accelerator-Id - integer - required
       Example of Accelerator-Id header : 1
 
-  === Success response body
+  === Success response body for StartupAdmin or Member
   {
     "id": 1,
     "name": "MSI",
@@ -185,7 +202,8 @@ class StartupsController < ApplicationController
         "startup_id": 1,
         "tasks_number": 5,
         "last_visit": "2021-05-31T11:26:34.768Z",
-        "user_type": "Member"
+        "user_type": "Member",
+        "email_notification": true
       },
       ...
     ],
@@ -201,19 +219,99 @@ class StartupsController < ApplicationController
         "startup_id": 1,
         "tasks_number": 3,
         "last_visit": "2021-05-31T11:26:34.768Z",
-        "user_type": "StartupAdmin"
+        "user_type": "StartupAdmin",
+        "email_notification": true
       },
       ...
     ]
   }
 
+  === Success response body for StartupAdmin or Member
+  {
+    "id": 1,
+    "name": "MSI",
+    "accelerator_id": 1,
+    "created_at": "2021-04-09T19:04:59.356Z",
+    "updated_at": "2021-05-24T14:08:22.089Z",
+    "assessments_risk_list": [
+        {
+            "assessment": "CRL (Commercial Readiness Level)",
+            "risk_value": "3.92156862745098"
+        },
+        {
+            "assessment": "MRL",
+            "risk_value": "5.12820512820513"
+        },
+        {
+            "assessment": "TRL",
+            "risk_value": "100.0"
+        }
+    ],
+    "admins": [
+      {
+        "id": 1,
+        "email": "admin@gmail.com",
+        "created_at": "2021-05-24T13:23:02.316Z",
+        "updated_at": "2021-06-07T17:28:49.503Z",
+        "first_name": null,
+        "last_name": null,
+        "accelerator_id": 1,
+        "startup_id": null,
+        "phone_number": null,
+        "email_notification": true
+        }
+    ],
+    "members": [
+      {
+        "id": 12,
+        "email": "member@gmail.com",
+        "created_at": "2021-04-12T09:26:34.286Z",
+        "updated_at": "2021-04-12T09:26:45.599Z",
+        "first_name": "Nicole",
+        "last_name": "Smith",
+        "accelerator_id": 1,
+        "startup_id": 1,
+        "tasks_number": 5,
+        "last_visit": "2021-05-31T11:26:34.768Z",
+        "user_type": "Member",
+        "email_notification": true
+      },
+      ...
+    ],
+    "startup_admins": [
+      {
+        "id": 20,
+        "email": "startup_admin@gmail.com",
+        "created_at": "2021-05-03T09:09:11.536Z",
+        "updated_at": "2021-05-03T09:10:44.003Z",
+        "first_name": "Maria",
+        "last_name": "Lee",
+        "accelerator_id": 1,
+        "startup_id": 1,
+        "tasks_number": 3,
+        "last_visit": "2021-05-31T11:26:34.768Z",
+        "user_type": "StartupAdmin",
+        "email_notification": true
+      },
+      ...
+    ]
+  }
+
+
   DESC
 
   def show
-    render json: @startup.as_json(methods: :assessments_risk_list, include: {
-      members: {methods: [:tasks_number, :last_visit, :user_type]},
-      startup_admins: {methods: [:tasks_number, :last_visit, :user_type]}
-    })
+    if current_user.super_admin? || current_user.admin?
+      render json: @startup.as_json(methods: [:assessments_risk_list, :admins], include: {
+        members: {methods: [:tasks_number, :last_visit, :user_type]},
+        startup_admins: {methods: [:tasks_number, :last_visit, :user_type]}
+      })
+    else
+      render json: @startup.as_json(methods: :assessments_risk_list, include: {
+        members: {methods: [:tasks_number, :last_visit, :user_type]},
+        startup_admins: {methods: [:tasks_number, :last_visit, :user_type]}
+      })
+    end
   end
 
   api :PUT, 'api/startups/:id', "Update info of a certain startup and assign admins to the startups"
@@ -238,14 +336,14 @@ class StartupsController < ApplicationController
       Accelerator-Id - integer - required
         Example of Accelerator-Id header : 1
 
-  === Success response body(admins_for_startup shows only for SuperAdmin or Admin)
+  === Success response body(admins shows only for SuperAdmin or Admin)
   {
     "id": 1,
     "name": "New name",
     "accelerator_id": 1,
     "created_at": "2021-04-09T19:04:59.356Z",
     "updated_at": "2021-05-24T12:59:11.745Z",
-    "admins_for_startup": [
+    "admins": [
       {
         "id": 1,
         "email": "admin@gmail.com",
@@ -254,7 +352,8 @@ class StartupsController < ApplicationController
         "first_name": "Admin",
         "last_name": "Adm",
         "accelerator_id": 1,
-        "startup_id": null
+        "startup_id": null,
+        "email_notification": true
       }
     ]
   }
@@ -267,7 +366,7 @@ class StartupsController < ApplicationController
     if @startup.update(startup_params_update)
       if current_user.super_admin? || current_user.admin?
         StartupsService::SendEmailToAssignedAdmins.call(startup_params_update, @startup, current_user) if startup_params_update[:admins_startups_attributes]
-        render json: @startup.as_json(methods: :admins_for_startup)
+        render json: @startup.as_json(methods: :admins)
       else
         render json: @startup
       end

@@ -218,7 +218,7 @@ RSpec.describe User, type: :model do
       )
     end
 
-    it "Scope 'admins' return all members" do
+    it "Scope 'admins' return all admins" do
       admins_info = User.admins.order(created_at: :asc).as_json
 
       recursively_delete_timestamps(admins_info)
@@ -236,7 +236,7 @@ RSpec.describe User, type: :model do
       )
     end
 
-    it "Scope 'startup_admins' return all members" do
+    it "Scope 'startup_admins' return all startup_admins" do
       startup_admins_info = User.startup_admins.order(created_at: :asc).as_json
 
       recursively_delete_timestamps(startup_admins_info)
