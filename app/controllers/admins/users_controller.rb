@@ -2,6 +2,7 @@ module Admins
   class UsersController < ApplicationController
     before_action :set_profile, only: :profile
     before_action :set_startup, only: :index
+    before_action :set_user, only: :destroy
 
     api :GET, 'api/users/profile', "Request for current_user profile"
 
@@ -234,11 +235,11 @@ module Admins
     description <<-DESC
 
     === Request headers
-      SuperAdmin, Admin, StartupAdmin or Member can perform this action
-      Authentication - string - required
-        Example of Authentication header : "Bearer TOKEN_FETCHED_FROM_SERVER_DURING_REGISTRATION"
-      Accelerator-Id - integer - required
-        Example of Accelerator-Id header : 1
+    SuperAdmin, Admin, StartupAdmin or Member can perform this action
+    Authentication - string - required
+      Example of Authentication header : "Bearer TOKEN_FETCHED_FROM_SERVER_DURING_REGISTRATION"
+    Accelerator-Id - integer - required
+      Example of Accelerator-Id header : 1
 
     === Success response body
     {
@@ -265,16 +266,16 @@ module Admins
     end
 
     api :PUT, 'api/users/update_email_notification', "Update email notification of current_user"
-      param :email_notification, String, desc: 'Email notification status for current_user, can be only "true" or "false"', required: true
+    param :email_notification, String, desc: 'Email notification status for current_user, can be only "true" or "false"', required: true
 
     description <<-DESC
 
     === Request headers
-      SuperAdmin, Admin, StartupAdmin or Member can perform this action
-      Authentication - string - required
-        Example of Authentication header : "Bearer TOKEN_FETCHED_FROM_SERVER_DURING_REGISTRATION"
-      Accelerator-Id - integer - required
-        Example of Accelerator-Id header : 1
+    SuperAdmin, Admin, StartupAdmin or Member can perform this action
+    Authentication - string - required
+      Example of Authentication header : "Bearer TOKEN_FETCHED_FROM_SERVER_DURING_REGISTRATION"
+    Accelerator-Id - integer - required
+      Example of Accelerator-Id header : 1
 
     === Success response body
     {
@@ -304,7 +305,41 @@ module Admins
       end
     end
 
-    private
+    api :DELETE, 'api/users/:id', 'Delete users'
+    param :id, Integer, desc: "id of an user", required: true
+
+    description <<-DESC
+
+    === Request headers
+    Only SuperAdmin and Admin can perform this action
+      SuperAdmin can delete all users
+      Admin can delete StartupAdmin and Member of the admin startups
+
+      === Success response body
+      {
+        "message": "Successfully destroyed"
+      }
+
+      DESC
+
+      def destroy
+        if @user.destroy
+          UsersService::UsersEmailNotification.call(@user, current_user)
+          render json: {
+            message: 'Successfully destroyed'
+          }, status: :ok
+        else
+          render json: @user.errors, status: :unprocessable_entity
+        end
+      end
+
+  private
+
+    def set_user
+      raise Pundit::NotAuthorizedError unless @user = User.where(id: params[:id], accelerator_id: user_accelerator_id).first
+
+      authorize @user, policy_class: UserPolicy
+    end
 
     def email_notification_params
       return params[:email_notification].downcase == 'true' if params[:email_notification]

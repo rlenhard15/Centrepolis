@@ -13,6 +13,7 @@ RSpec.describe Admins::UsersController, type: :controller do
   let!(:startups_2)           { create_list(:startup, 2, accelerator_id: accelerator.id, admins_startups_attributes: [{admin_id: admins.last.id}]) }
   let!(:startup_admin)        { create(:startup_admin, accelerator_id: accelerator.id, startup_id: startups.first.id) }
   let!(:member)               { create(:member, startup_id: startups.first.id, accelerator_id: accelerator.id) }
+  let!(:member_2)             { create(:member, startup_id: startups_2.first.id, accelerator_id: accelerator_2.id) }
   let!(:member_3)             { create(:member, startup_id: startups.first.id, accelerator_id: accelerator.id) }
 
   describe 'GET profile action' do
@@ -74,7 +75,7 @@ RSpec.describe Admins::UsersController, type: :controller do
       expect(parse_json(response.body)[0]).to eq(["current_page", 1])
       expect(parse_json(response.body)[1]).to eq(["total_pages", 1])
       expect(parse_json(response.body)[2][1].count).to eq(2)
-      expect([parse_json(response.body)[2][1][0]['first_name'], parse_json(response.body)[2][1][1]['first_name']]).to eq([member_1.first_name, member_2.first_name])
+      expect([parse_json(response.body)[2][1][0]['first_name'], parse_json(response.body)[2][1][1]['first_name']]).to eq(Member.where(id: [member_1.id, member_2.id]).order(first_name: :asc).map(&:first_name))
       expect(response.content_type).to eq('application/json; charset=utf-8')
       expect(response).to have_http_status(:success)
     end
@@ -95,7 +96,7 @@ RSpec.describe Admins::UsersController, type: :controller do
       expect(parse_json(response.body)[0]).to eq(["current_page", 1])
       expect(parse_json(response.body)[1]).to eq(["total_pages", 1])
       expect(parse_json(response.body)[2][1].count).to eq(2)
-      expect([parse_json(response.body)[2][1][0]['first_name'], parse_json(response.body)[2][1][1]['first_name']]).to eq([member_1.first_name, member_2.first_name])
+      expect([parse_json(response.body)[2][1][0]['first_name'], parse_json(response.body)[2][1][1]['first_name']]).to eq(Member.where(id: [member_1.id, member_2.id]).order(first_name: :asc).map(&:first_name))
       expect(response.content_type).to eq('application/json; charset=utf-8')
       expect(response).to have_http_status(:success)
     end
@@ -116,7 +117,7 @@ RSpec.describe Admins::UsersController, type: :controller do
       expect(parse_json(response.body)[0]).to eq(["current_page", 1])
       expect(parse_json(response.body)[1]).to eq(["total_pages", 1])
       expect(parse_json(response.body)[2][1].count).to eq(2)
-      expect([parse_json(response.body)[2][1][0]['first_name'], parse_json(response.body)[2][1][1]['first_name']]).to eq([member_1.first_name, member_2.first_name])
+      expect([parse_json(response.body)[2][1][0]['first_name'], parse_json(response.body)[2][1][1]['first_name']]).to eq(Member.where(id: [member_1.id, member_2.id]).order(first_name: :asc).map(&:first_name))
       expect(response.content_type).to eq('application/json; charset=utf-8')
       expect(response).to have_http_status(:success)
     end
@@ -355,6 +356,72 @@ RSpec.describe Admins::UsersController, type: :controller do
       expect(response.body).to eq({"email":["has already been taken"]}.to_json)
       expect(response.content_type).to eq('application/json; charset=utf-8')
       expect(response).to have_http_status(:unprocessable_entity)
+    end
+  end
+
+  describe 'DELETE destroy action' do
+    let!(:params)   { ActionController::Parameters.new({'id': member.id}) }
+    let!(:params_2) { ActionController::Parameters.new({'id': member_2.id}) }
+    let!(:params_3) { ActionController::Parameters.new({'id': startup_admin.id}) }
+
+    before { params.permit! }
+    before { params_2.permit! }
+    before { params_3.permit! }
+
+    it 'return successfully message about destroy user in json if super_admin authenticated' do
+      request.headers.merge!({ "Accelerator-Id": "#{accelerator.id}"})
+      sign_in super_admin
+      delete :destroy, params: params
+      expect(Member.find_by_id(member.id)).to eq(nil)
+      expect(response.body).to eq({message: 'Successfully destroyed'}.to_json)
+      expect(response.content_type).to eq("application/json; charset=utf-8")
+      expect(response).to have_http_status(:success)
+    end
+
+    it "return error in json with status forbidden if super_admin try delete user that dosnt belong to the current accelerator" do
+      request.headers.merge!({ "Accelerator-Id": "#{accelerator.id}"})
+      sign_in super_admin
+      delete :destroy, params: params_2
+      expect(response.body).to eq({'notice': 'You do not have permission to perform this action'}.to_json)
+      expect(response.content_type).to eq('application/json; charset=utf-8')
+      expect(response).to have_http_status(:forbidden)
+    end
+
+    it 'return successfully message about destroy user in json if admin authenticated' do
+      request.headers.merge!({ "Accelerator-Id": "#{accelerator.id}"})
+      sign_in admins.first
+      delete :destroy, params: params
+      expect(Member.find_by_id(member.id)).to eq(nil)
+      expect(response.body).to eq({message: 'Successfully destroyed'}.to_json)
+      expect(response.content_type).to eq("application/json; charset=utf-8")
+      expect(response).to have_http_status(:success)
+    end
+
+    it "return error in json with status forbidden if admin try delete user that dosnt belong to the startups were created by the admin" do
+      request.headers.merge!({ "Accelerator-Id": "#{accelerator.id}"})
+      sign_in admins.first
+      delete :destroy, params: params_2
+      expect(response.body).to eq({'notice': 'You do not have permission to perform this action'}.to_json)
+      expect(response.content_type).to eq('application/json; charset=utf-8')
+      expect(response).to have_http_status(:forbidden)
+    end
+
+    it "return error in json with status forbidden if startup_admin tries perform this action" do
+      request.headers.merge!({ "Accelerator-Id": "#{accelerator.id}"})
+      sign_in startup_admin
+      delete :destroy, params: params
+      expect(response.body).to eq({'notice': 'You do not have permission to perform this action'}.to_json)
+      expect(response.content_type).to eq('application/json; charset=utf-8')
+      expect(response).to have_http_status(:forbidden)
+    end
+
+    it "return error in json with status forbidden if member tries perform this action" do
+      request.headers.merge!({ "Accelerator-Id": "#{accelerator.id}"})
+      sign_in member
+      delete :destroy, params: params_3
+      expect(response.body).to eq({'notice': 'You do not have permission to perform this action'}.to_json)
+      expect(response.content_type).to eq('application/json; charset=utf-8')
+      expect(response).to have_http_status(:forbidden)
     end
   end
 

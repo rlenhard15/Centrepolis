@@ -18,9 +18,9 @@ Rails.application.routes.draw do
     end
     resources :startups, only: %i[index create show update]
     resources :members, only: :index, module: 'admins'
-    resources :admins, only: %i[index destroy], module: 'admins'
+    resources :admins, only: %i[index], module: 'admins'
     resources :startup_admins, only: :index, module: 'admins'
-    resources :users, only: %i[create index], module: 'admins' do
+    resources :users, only: %i[create index destroy], module: 'admins' do
       collection do
         get :profile
         put :change_password

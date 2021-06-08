@@ -14,5 +14,6 @@ RSpec.describe Member, type: :model do
       let!(:member)          { create(:member, startup_id: startup.id, accelerator_id: accelerator.id) }
 
     it { expect(member).to callback(:send_email).after(:create) }
+    it { expect(member).to callback(:send_email_about_delete_account).after(:destroy) }
   end
 end

@@ -1,15 +1,15 @@
 class UsersMailer < ApplicationMailer
   before_action do
-    if params[:deleted_admin] && !params[:super_admin_id]
-      @deleted_admin = params[:deleted_admin]
-      @super_admin = nil
-    elsif params[:super_admin_id] && params[:deleted_admin]
-      @deleted_admin = params[:deleted_admin]
-      @super_admin = SuperAdmin.find_by_id(params[:super_admin_id])
-    elsif params[:user_id] && (!params[:super_admin_id] && !params[:deleted_admin])
+    if params[:deleted_user] && !params[:current_user_id]
+      @deleted_user = params[:deleted_user]
+      @current_user = nil
+    elsif params[:current_user_id] && params[:deleted_user]
+      @deleted_user = params[:deleted_user]
+      @current_user = User.find_by_id(params[:current_user_id])
+    elsif params[:user_id] && (!params[:current_user_id] && !params[:deleted_user])
       @user = User.find_by_id(params[:user_id])
-      @deleted_admin = nil
-      @super_admin = nil
+      @deleted_user = nil
+      @current_user = nil
     end
   end
 
@@ -22,11 +22,11 @@ class UsersMailer < ApplicationMailer
     end
   end
 
-  def email_after_delete_admin
-    if @deleted_admin && @deleted_admin.admin? && !@super_admin
-      mail(to: @deleted_admin.email, subject: "Your account has been deleted on RAMP Client Business Planning Support")
-    elsif @deleted_admin && @deleted_admin.admin? && @super_admin
-      mail(to: @super_admin.email, subject: "You deleted admin account on RAMP Client Business Planning Support")
+  def email_after_delete_user
+    if @deleted_user && !@current_user
+      mail(to: @deleted_user.email, subject: "Your account has been deleted on RAMP Client Business Planning Support")
+    elsif @deleted_user && @current_user
+      mail(to: @current_user.email, subject: "You deleted user account on RAMP Client Business Planning Support")
     end
   end
 end

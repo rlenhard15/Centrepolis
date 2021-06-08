@@ -26,6 +26,10 @@ class UserPolicy < ApplicationPolicy
     super_admin? || admin? || startup_admin?
   end
 
+  def destroy?
+    super_admin? || can_admin_do_it?
+  end
+
   def index?
     super_admin? || admin? || startup_admin?
   end
@@ -40,5 +44,9 @@ class UserPolicy < ApplicationPolicy
 
   def update_profile?
     super_admin? || admin? || startup_admin? || member?
+  end
+
+  def can_admin_do_it?
+    admin? && user.startup_ids.include?(record.startup_id)
   end
 end
