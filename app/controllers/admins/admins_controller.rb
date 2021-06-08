@@ -27,6 +27,7 @@ module Admins
         "last_name": "Adm",
         "accelerator_id": 1,
         "startup_id": null,
+        "phone_number": "(186)285-7925",
         "startups": [
           {
             "id": 1,
