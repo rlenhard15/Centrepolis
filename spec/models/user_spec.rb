@@ -15,6 +15,7 @@ RSpec.describe User, type: :model do
       payload = user.payload
       payload[:user].delete('created_at')
       payload[:user].delete('updated_at')
+      
 
       expect(payload).to eq(
         { auth_token: auth_token,
