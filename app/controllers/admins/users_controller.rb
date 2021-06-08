@@ -213,7 +213,7 @@ module Admins
     end
 
     api :DELETE, 'api/users/:id', 'Delete users'
-    param :id, Integer, desc: "id of admin", required: true
+    param :id, Integer, desc: "id of an user", required: true
 
     description <<-DESC
 
