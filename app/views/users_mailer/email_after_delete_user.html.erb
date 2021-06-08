@@ -1,0 +1,17 @@
+<% if @deleted_user && !@current_user %>
+  <p>
+    Hi, <%= @deleted_user&.full_name %>
+  </p>
+  <p>
+    You received this letter because your <%= @deleted_user.user_type.underscore.titleize %> account has been deleted on <%= @deleted_user&.accelerator&.name&.capitalize() %> Accelerator
+    on RAMP Client Business Planning support tool.
+  </p>
+<% elsif @deleted_user && @current_user %>
+<p>
+  Hi, <%= @current_user&.full_name %>
+</p>
+<p>
+  You received this letter because you deleted <%= @deleted_user.user_type.underscore.titleize %> account of the user <%= @deleted_user&.email %> at <%= @deleted_user&.accelerator&.name&.capitalize() %> Accelerator
+  on RAMP Client Business Planning support tool.
+</p>
+<% end %>

@@ -29,7 +29,7 @@ RSpec.describe UserPolicy, type: :policy do
       expect(policy_scope).to eq(User.all)
     end
 
-    it { is_expected.to permit_actions(%i[index create change_password]) }
+    it { is_expected.to permit_actions(%i[index create change_password destroy]) }
   end
 
   describe "user's type: Admin" do
@@ -39,7 +39,7 @@ RSpec.describe UserPolicy, type: :policy do
       expect(policy_scope).to eq(User.where(startup_id: user.startup_ids))
     end
 
-    it { is_expected.to permit_actions(%i[index create change_password]) }
+    it { is_expected.to permit_actions(%i[index create change_password destroy]) }
   end
 
   describe "user's type: StartupAdmin" do
@@ -50,6 +50,7 @@ RSpec.describe UserPolicy, type: :policy do
     end
 
     it { is_expected.to permit_actions(%i[index create change_password]) }
+    it { is_expected.to forbid_actions(%i[destroy]) }
   end
 
   describe "user's type: Member" do
@@ -59,7 +60,7 @@ RSpec.describe UserPolicy, type: :policy do
       expect(policy_scope).to eq([])
     end
 
-    it { is_expected.to forbid_actions(%i[index create]) }
+    it { is_expected.to forbid_actions(%i[index create destroy]) }
     it { is_expected.to permit_actions(%i[change_password]) }
   end
 end

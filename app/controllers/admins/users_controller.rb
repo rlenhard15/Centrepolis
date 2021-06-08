@@ -2,6 +2,7 @@ module Admins
   class UsersController < ApplicationController
     before_action :set_profile, only: :profile
     before_action :set_startup, only: :index
+    before_action :set_user, only: :destroy
 
     api :GET, 'api/users/profile', "Request for current_user profile"
 
@@ -211,7 +212,45 @@ module Admins
       end
     end
 
+    api :DELETE, 'api/users/:id', 'Delete users'
+    param :id, Integer, desc: "id of admin", required: true
+
+    description <<-DESC
+
+    === Request headers
+      Only SuperAdmin and Admin can perform this action
+        SuperAdmin can delete all users
+        Admin can delete StartupAdmin and Member of the admin startups
+      Authentication - string - required
+        Example of Authentication header : "Bearer TOKEN_FETCHED_FROM_SERVER_DURING_REGISTRATION"
+      Accelerator-Id - integer - required
+        Example of Accelerator-Id header : 1
+
+    === Success response body
+    {
+      "message": "Successfully destroyed"
+    }
+
+    DESC
+
+    def destroy
+      if @user.destroy
+        UsersService::UsersEmailNotification.call(@user, current_user)
+        render json: {
+          message: 'Successfully destroyed'
+        }, status: :ok
+      else
+        render json: @user.errors, status: :unprocessable_entity
+      end
+    end
+
     private
+
+    def set_user
+      raise Pundit::NotAuthorizedError unless @user = User.where(id: params[:id], accelerator_id: user_accelerator_id).first
+
+      authorize @user, policy_class: UserPolicy
+    end
 
     def update_password_params
       params.require(:user).permit(:current_password, :password)

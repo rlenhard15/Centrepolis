@@ -99,4 +99,10 @@ class User < ApplicationRecord
         user_id: self.id
       ).email_for_restore_password.deliver_later
     end
+
+    def send_email_about_delete_account
+      UsersMailer.with(
+        deleted_user: self
+      ).email_after_delete_user.deliver_now
+    end
 end
