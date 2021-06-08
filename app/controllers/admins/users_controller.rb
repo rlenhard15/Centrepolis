@@ -29,6 +29,8 @@ module Admins
       "last_name": "Evans",
       "accelerator_id": 1,
       "startup_id": 1,
+      "phone_number": "(186)285-7925",
+      "email_notification": true,
       "startup": {
         "id": 1,
         "name": "MSI",
@@ -48,6 +50,8 @@ module Admins
       "last_name": "Klochko",
       "accelerator_id": 1,
       "startup_id": null,
+      "phone_number": "(186)285-7925",
+      "email_notification": true,
       "startups": [
         {
           "id": 1,
@@ -69,7 +73,9 @@ module Admins
       "first_name": "Samuel",
       "last_name": "Ramirez",
       "accelerator_id": null,
-      "startup_id": null
+      "startup_id": null,
+      "phone_number": "(186)285-7925",
+      "email_notification": true
     }
 
 
@@ -112,7 +118,9 @@ module Admins
           "first_name": "Michiel",
           "last_name": "Pack",
           "accelerator_id": 1,
-          "startup_id": 8
+          "startup_id": 8,
+          "phone_number": "(186)285-7925",
+          "email_notification": true
         },
         ...
       ]
@@ -159,7 +167,9 @@ module Admins
         "first_name": null,
         "last_name": null,
         "accelerator_id": 1,
-        "startup_id": null
+        "startup_id": null,
+        "phone_number": "(186)285-7925",
+        "email_notification": true
       }
 
     DESC
@@ -199,7 +209,9 @@ module Admins
         "first_name": "Samuel",
         "last_name": "Ramirez",
         "accelerator_id": 1,
-        "startup_id": 1
+        "startup_id": 1,
+        "phone_number": "(186)285-7925",
+        "email_notification": true
       }
 
     DESC
@@ -212,37 +224,74 @@ module Admins
       end
     end
 
+    api :PUT, 'api/users/update_profile', "Update profile info of current_user"
+
+    param :user, Hash, required: true do
+      param :first_name, String, desc: 'First Name', required: true
+      param :last_name, String, desc: 'Last Name', required: true
+      param :phone_number, String, desc: 'Phone number', required: true
+    end
+
+    description <<-DESC
+
+    === Request headers
+    SuperAdmin, Admin, StartupAdmin or Member can perform this action
+    Authentication - string - required
+      Example of Authentication header : "Bearer TOKEN_FETCHED_FROM_SERVER_DURING_REGISTRATION"
+    Accelerator-Id - integer - required
+      Example of Accelerator-Id header : 1
+
+    === Success response body
+    {
+      "accelerator_id": 1,
+      "id": 3,
+      "email": "user@gmail.com",
+      "created_at": "2021-04-09T18:51:32.967Z",
+      "updated_at": "2021-06-04T17:06:55.344Z",
+      "first_name": "Bill",
+      "last_name": "Jonson",
+      "startup_id": 1,
+      "phone_number": "123456789",
+      "email_notification": true
+    }
+
+    DESC
+
+    def update_profile
+      if current_user.update(user_params_update)
+        render json: current_user
+      else
+        render json: current_user.errors, status: :unprocessable_entity
+      end
+    end
+
     api :DELETE, 'api/users/:id', 'Delete users'
     param :id, Integer, desc: "id of an user", required: true
 
     description <<-DESC
 
     === Request headers
-      Only SuperAdmin and Admin can perform this action
-        SuperAdmin can delete all users
-        Admin can delete StartupAdmin and Member of the admin startups
-      Authentication - string - required
-        Example of Authentication header : "Bearer TOKEN_FETCHED_FROM_SERVER_DURING_REGISTRATION"
-      Accelerator-Id - integer - required
-        Example of Accelerator-Id header : 1
+    Only SuperAdmin and Admin can perform this action
+      SuperAdmin can delete all users
+      Admin can delete StartupAdmin and Member of the admin startups
 
-    === Success response body
-    {
-      "message": "Successfully destroyed"
-    }
+      === Success response body
+      {
+        "message": "Successfully destroyed"
+      }
 
-    DESC
+      DESC
 
-    def destroy
-      if @user.destroy
-        UsersService::UsersEmailNotification.call(@user, current_user)
-        render json: {
-          message: 'Successfully destroyed'
-        }, status: :ok
-      else
-        render json: @user.errors, status: :unprocessable_entity
+      def destroy
+        if @user.destroy
+          UsersService::UsersEmailNotification.call(@user, current_user)
+          render json: {
+            message: 'Successfully destroyed'
+          }, status: :ok
+        else
+          render json: @user.errors, status: :unprocessable_entity
+        end
       end
-    end
 
     private
 
@@ -250,6 +299,10 @@ module Admins
       raise Pundit::NotAuthorizedError unless @user = User.where(id: params[:id], accelerator_id: user_accelerator_id).first
 
       authorize @user, policy_class: UserPolicy
+    end
+
+    def user_params_update
+      params.require(:user).permit(:email, :first_name, :last_name, :phone_number)
     end
 
     def update_password_params

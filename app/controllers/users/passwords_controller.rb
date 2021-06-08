@@ -41,6 +41,7 @@ module Users
     param :password_confirmation, String, desc: 'New password confirmation', required: true
     param :first_name, String, desc: 'First name of user (is not required for change password endpoint)', required: true
     param :last_name, String, desc: 'Last name of user (is not required for change password endpoint)', required: true
+    param :phone_number, String, desc: 'Phone number of the user', required: true
 
     description <<-DESC
       === Request headers
@@ -58,8 +59,9 @@ module Users
           "updated_at": "2020-03-20T10:46:25.226Z",
           "first_name": "Xu",
           "last_name": "Xian",
-          "company_name": "MSI",
-          "accelerator_id": 1
+          "startup_id": 1,
+          "accelerator_id": 1,
+          "phone_number": "(186)285-7925"
         }
       }
     DESC
@@ -116,7 +118,7 @@ module Users
     end
 
     def update_user_params
-      params.permit(:first_name, :last_name)
+      params.permit(:first_name, :last_name, :phone_number)
     end
 
     def accelerator_id
