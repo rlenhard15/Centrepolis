@@ -30,7 +30,7 @@ RSpec.describe StartupsController, type: :controller do
       expect(parse_json(response.body)[0][1]).to eq(1)
       expect(parse_json(response.body)[1][1][0]['assessments_risk_list']).to eq(startup.assessments_risk_list.as_json)
       expect(parse_json(response.body)[1][1].count).to eq(10)
-      expect(recursively_delete_timestamps(parse_json(response.body)[1][1][1])).to eq(recursively_delete_timestamps(startups.first.as_json(methods: [:assessments_risk_list, :members, :startup_admins])))
+      expect(recursively_delete_timestamps(parse_json(response.body)[1][1][1])).to eq(recursively_delete_timestamps(startups.first.as_json(methods: [:assessments_risk_list, :admins, :members, :startup_admins])))
       expect(response.content_type).to eq('application/json; charset=utf-8')
       expect(response).to have_http_status(:success)
     end
@@ -42,7 +42,7 @@ RSpec.describe StartupsController, type: :controller do
       expect(parse_json(response.body)[0][1]).to eq(1)
       expect(parse_json(response.body)[1][1].count).to eq(9)
       expect(parse_json(response.body)[1][1][0]['assessments_risk_list']).to eq(startups_2.first.assessments_risk_list.as_json)
-      expect(recursively_delete_timestamps(parse_json(response.body)[1][1][1])).to eq(recursively_delete_timestamps(startups_2.second.as_json(methods: [:assessments_risk_list, :members, :startup_admins])))
+      expect(recursively_delete_timestamps(parse_json(response.body)[1][1][1])).to eq(recursively_delete_timestamps(startups_2.second.as_json(methods: [:assessments_risk_list, :admins, :members, :startup_admins])))
       expect(response.content_type).to eq('application/json; charset=utf-8')
       expect(response).to have_http_status(:success)
     end
@@ -79,7 +79,7 @@ RSpec.describe StartupsController, type: :controller do
       request.headers.merge!({ "Accelerator-Id": "#{accelerator.id}"})
       sign_in super_admin
       post :create, params: params
-      expect(parse_json(response.body)).to eq(parse_json(Startup.last.as_json(methods: :admins_for_startup).to_json))
+      expect(parse_json(response.body)).to eq(parse_json(Startup.last.as_json(methods: :admins).to_json))
       expect(Startup.last.admins.count).to eq(2)
       expect(Startup.last.admin_ids).to eq([admins.first.id, admins.last.id])
       expect(response.content_type).to eq('application/json; charset=utf-8')
@@ -90,7 +90,7 @@ RSpec.describe StartupsController, type: :controller do
       request.headers.merge!({ "Accelerator-Id": "#{accelerator.id}"})
       sign_in admins.first
       post :create, params: params_3
-      expect(parse_json(response.body)).to eq(parse_json(Startup.last.as_json(methods: :admins_for_startup).to_json))
+      expect(parse_json(response.body)).to eq(parse_json(Startup.last.as_json(methods: :admins).to_json))
       expect(Startup.last.admins.count).to eq(1)
       expect(Startup.last.admin_ids).to eq([admins.first.id])
       expect(response.content_type).to eq('application/json; charset=utf-8')
@@ -129,7 +129,7 @@ RSpec.describe StartupsController, type: :controller do
       request.headers.merge!({ "Accelerator-Id": "#{accelerator.id}"})
       sign_in super_admin
       get :show, params: params_1
-      expect(parse_json(response.body)).to eq(parse_json(startup.as_json(methods: :assessments_risk_list, include: {
+      expect(parse_json(response.body)).to eq(parse_json(startup.as_json(methods: [:assessments_risk_list, :admins], include: {
         members: {methods: [:tasks_number, :last_visit, :user_type]},
         startup_admins: {methods: [:tasks_number, :last_visit, :user_type]}
       }).to_json))
@@ -150,7 +150,7 @@ RSpec.describe StartupsController, type: :controller do
       request.headers.merge!({ "Accelerator-Id": "#{accelerator.id}"})
       sign_in admins.first
       get :show, params: params_1
-      expect(parse_json(response.body)).to eq(parse_json(startup.as_json(methods: :assessments_risk_list, include: {
+      expect(parse_json(response.body)).to eq(parse_json(startup.as_json(methods: [:assessments_risk_list, :admins], include: {
         members: {methods: [:tasks_number, :last_visit, :user_type]},
         startup_admins: {methods: [:tasks_number, :last_visit, :user_type]}
       }).to_json))
@@ -226,7 +226,7 @@ RSpec.describe StartupsController, type: :controller do
       sign_in super_admin
       put :update, params: params_1.merge(params)
       startup.reload
-      expect(parse_json(response.body)).to eq(parse_json(Startup.find(startup.id).as_json(methods: :admins_for_startup).to_json))
+      expect(parse_json(response.body)).to eq(parse_json(Startup.find(startup.id).as_json(methods: :admins).to_json))
       expect(Startup.find(startup.id).admins.count).to eq(2)
       expect(Startup.find(startup.id).admin_ids).to eq([admins.first.id, admins.last.id])
       expect(response.content_type).to eq('application/json; charset=utf-8')
@@ -247,7 +247,7 @@ RSpec.describe StartupsController, type: :controller do
       sign_in  admins.first
       put :update, params: params_1.merge(params)
       startup.reload
-      expect(parse_json(response.body)).to eq(parse_json(Startup.find(startup.id).as_json(methods: :admins_for_startup).to_json))
+      expect(parse_json(response.body)).to eq(parse_json(Startup.find(startup.id).as_json(methods: :admins).to_json))
       expect(Startup.find(startup.id).admins.count).to eq(1)
       expect(Startup.find(startup.id).admin_ids).to eq([admins.first.id])
       expect(response.content_type).to eq('application/json; charset=utf-8')
