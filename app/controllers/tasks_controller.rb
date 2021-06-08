@@ -20,14 +20,14 @@ class TasksController < ApplicationController
     Accelerator-Id - integer - required
       Example of Accelerator-Id header : 1
 
-  === Success response body
+  === Success response body for StartupAdmin or Member
   {
     "current_page": 1,
     "total_pages": 3,
     "tasks": [
       {
         "id": 2,
-        "title": "Test task 2",
+        "title": "Test task",
         "status": "completed",
         "priority": "high",
         "due_date": "2020-03-12T00:00:00.000Z",
@@ -53,16 +53,60 @@ class TasksController < ApplicationController
     ]
   }
 
+  === Success response body for SuperAdmin or Admin
+  {
+    "current_page": 1,
+    "total_pages": 2,
+    "tasks": [
+      {
+        "id": 2,
+        "title": "Test task",
+        "status": "completed",
+        "priority": "high",
+        "due_date": "2020-03-12T00:00:00.000Z",
+        "master_assessment": "CRL (Commercial Readiness Level)",
+        "category": "IP Risk",
+        "sub_category": "Development Status",
+        "stage_title": "Basic tests showing potential",
+        "users_for_task": [
+          {
+            "id": 3,
+            "email": "member@gmail.com",
+            "created_at": "2021-04-09T18:51:32.967Z",
+            "updated_at": "2021-06-07T15:45:00.737Z",
+            "first_name": "Nelli",
+            "last_name": "Bilokon",
+            "accelerator_id": 1,
+            "startup_id": 1,
+            "phone_number": "123456789",
+            "email_notification": true,
+            "user_type": "Member"
+          },
+          ...
+        ]
+      },
+      ...
+    ]
+  }
+
   DESC
 
   def index
     @tasks = policy_scope(Task).tasks_for_startup(@startup.id).distinct.page(page_params)
 
-    render json: {
-      current_page: @tasks.current_page,
-      total_pages: @tasks.total_pages,
-      tasks: @tasks.with_all_required_info_for_tasks.as_json(methods: :members_for_task)
-    }
+    if current_user.super_admin? || current_user.admin?
+      render json: {
+        current_page: @tasks.current_page,
+        total_pages: @tasks.total_pages,
+        tasks: @tasks.with_all_required_info_for_tasks.as_json(methods: :users_for_task)
+      }
+    else
+      render json: {
+        current_page: @tasks.current_page,
+        total_pages: @tasks.total_pages,
+        tasks: @tasks.with_all_required_info_for_tasks.as_json(methods: :members_for_task)
+      }
+    end
   end
 
   api :GET, 'api/tasks/:id', "Request for a certain task"
@@ -77,7 +121,7 @@ class TasksController < ApplicationController
     Accelerator-Id - integer - required
       Example of Accelerator-Id header : 1
 
-  === Success response body
+  === Success response body for StartupAdmin or Member
   {
     "id": 1,
     "title": "New task",
@@ -103,9 +147,43 @@ class TasksController < ApplicationController
     ]
   }
 
+  === Success response body for SuperAdmin or Admin
+  {
+    "id": 2,
+    "title": "Test task",
+    "status": "completed",
+    "priority": "high",
+    "due_date": "2020-03-12T00:00:00.000Z",
+    "master_assessment": "CRL (Commercial Readiness Level)",
+    "category": "IP Risk",
+    "sub_category": "Development Status",
+    "stage_title": "Basic tests showing potential",
+    "users_for_task": [
+      {
+        "id": 3,
+        "email": "member@gmail.com",
+        "created_at": "2021-04-09T18:51:32.967Z",
+        "updated_at": "2021-06-07T15:45:00.737Z",
+        "first_name": "Nelli",
+        "last_name": "Bilokon",
+        "accelerator_id": 1,
+        "startup_id": 1,
+        "phone_number": "123456789",
+        "email_notification": true,
+        "user_type": "Member"
+      },
+      ...
+    ]
+  }
+
   DESC
+
   def show
-    render json: @task.as_json(methods: :members_for_task)
+    if current_user.super_admin? || current_user.admin?
+      render json: @task.as_json(methods: :users_for_task)
+    else
+      render json: @task.as_json(methods: :members_for_task)
+    end
   end
 
   api :POST, 'api/tasks', "Create new task and assign its to the specific users of the startup"

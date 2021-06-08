@@ -25,4 +25,8 @@ class Task < ApplicationRecord
   def members_for_task
     users.where("users.type = ?", "Member")
   end
+  
+  def users_for_task
+    users.select("users.*, users.type AS user_type")
+  end
 end
