@@ -55,7 +55,7 @@ class TaskPolicy < ApplicationPolicy
   end
 
   def can_admin_do_it?
-    admin? && user.startup_ids.include?(record.members_for_task.first.startup_id)
+    admin? && user.startup_ids.include?(record&.startup_users_for_task&.first&.startup_id)
   end
 
   def can_startup_admin_do_it?
