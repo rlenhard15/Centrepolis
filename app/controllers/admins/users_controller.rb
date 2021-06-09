@@ -131,7 +131,7 @@ module Admins
     def index
       authorize current_user, policy_class: UserPolicy
 
-      @users = policy_scope(User).for_startup(@startup_id).search_by(search_params).page(page_params)
+      @users = policy_scope(User).for_startup(@startup_id).with_name.search_by(search_params).page(page_params)
 
       render json: {
         current_page: @users.current_page,
@@ -227,6 +227,7 @@ module Admins
     api :PUT, 'api/users/update_profile', "Update profile info of current_user"
 
     param :user, Hash, required: true do
+      param :email, String, desc: 'New email', required: true
       param :first_name, String, desc: 'First Name', required: true
       param :last_name, String, desc: 'Last Name', required: true
       param :phone_number, String, desc: 'Phone number', required: true

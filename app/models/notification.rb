@@ -1,6 +1,8 @@
 class Notification < ApplicationRecord
   belongs_to :task
-  belongs_to :member
+  belongs_to :user
+
+  scope 
 
   scope :with_task_and_admin_info, ->{
     joins(task: :admin).select("tasks.title AS task_title,

@@ -44,7 +44,7 @@ module Admins
     def index
       authorize current_user, policy_class: StartupAdminPolicy
 
-      render json: policy_scope(User).startup_admins.for_accelerator(user_accelerator_id).as_json(include: :startup)
+      render json: policy_scope(User).startup_admins.with_name.for_accelerator(user_accelerator_id).as_json(include: :startup)
     end
   end
 end

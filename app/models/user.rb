@@ -6,6 +6,7 @@ class User < ApplicationRecord
 
   has_many :task_users, dependent: :destroy
   has_many :tasks, through: :task_users
+  has_many :notifications, dependent: :destroy
 
   paginates_per 5
 
@@ -19,6 +20,8 @@ class User < ApplicationRecord
     STARTUP_ADMIN = 'StartupAdmin',
     MEMBER = 'Member'
   ].freeze
+
+  scope :with_name, ->{ where.not(first_name: [nil, ''], last_name: [nil, ''])}
 
   scope :with_allowed_email_notifications, ->{ where(email_notification: true)}
 
