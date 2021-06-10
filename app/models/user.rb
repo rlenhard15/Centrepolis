@@ -21,7 +21,9 @@ class User < ApplicationRecord
     MEMBER = 'Member'
   ].freeze
 
-  scope :with_name, ->{ where.not(first_name: [nil, ''], last_name: [nil, ''])}
+  scope :with_name, ->{
+    where("(users.first_name IS NOT NULL OR users.first_name = '') AND (users.last_name IS NOT NULL OR users.last_name = '')")
+  }
 
   scope :with_allowed_email_notifications, ->{ where(email_notification: true)}
 

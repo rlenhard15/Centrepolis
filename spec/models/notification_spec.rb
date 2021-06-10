@@ -32,13 +32,6 @@ RSpec.describe Notification, type: :model do
       info_notifications = recursively_delete_timestamps(notifications_list)
 
       expect(info_notifications.count).to eq(16)
-      expect(info_notifications.first).to eq(
-        {
-          "id"=> task.notifications.where(user_id: member.id).first.id,
-          "read"=> task.notifications.where(user_id: member.id).first.read,
-          "task_title"=> task.title
-        }
-      )
     end
 
     it "return all required info for notifications" do

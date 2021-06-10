@@ -27,8 +27,7 @@ RSpec.describe TaskPolicy, type: :policy do
       expect(policy_scope).to eq(Task.joins(:users))
     end
 
-    it { is_expected.to forbid_actions(%i[create destroy update]) }
-    it { is_expected.to permit_actions(%i[index show mark_task_as_completed]) }
+    it { is_expected.to permit_actions(%i[create destroy update index show mark_task_as_completed]) }
   end
 
   describe "user's type: Admin" do
@@ -39,7 +38,8 @@ RSpec.describe TaskPolicy, type: :policy do
       expect(policy_scope).to eq(Task.joins(:users).where("users.startup_id IN (?) ", user.startup_ids))
     end
 
-    it { is_expected.to forbid_actions(%i[create destroy update]) }
+    it { is_expected.to permit_actions(%i[create]) }
+    it { is_expected.to forbid_actions(%i[destroy update]) }
   end
 
   describe "user's type: StartupAdmin" do

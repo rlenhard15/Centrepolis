@@ -7,12 +7,12 @@ RSpec.describe UsersMailer, type: :mailer do
   let!(:startup)     {create(:startup, accelerator_id: accelerator.id, admins_startups_attributes: [{admin_id: admin.id}]) }
   let!(:member)      {create(:member, startup_id: startup.id, accelerator_id: accelerator.id)}
   let!(:params)      {ActionController::Parameters.new({user_id: member.id})}
-  let!(:params_2)    {ActionController::Parameters.new({deleted_admin: admin})}
-  let!(:params_3)    {ActionController::Parameters.new({deleted_admin: admin, super_admin_id: super_admin.id})}
+  let!(:params_2)    {ActionController::Parameters.new({deleted_user: admin})}
+  let!(:params_3)    {ActionController::Parameters.new({deleted_user: admin, current_user_id: super_admin.id})}
 
   let!(:mail)   {UsersMailer.with(params).email_for_restore_password}
-  let!(:mail_2) {UsersMailer.with(params_2).email_after_delete_admin}
-  let!(:mail_3) {UsersMailer.with(params_3).email_after_delete_admin}
+  let!(:mail_2) {UsersMailer.with(params_2).email_after_delete_user}
+  let!(:mail_3) {UsersMailer.with(params_3).email_after_delete_user}
 
 
   before do
@@ -53,7 +53,7 @@ RSpec.describe UsersMailer, type: :mailer do
     end
 
     it 'renders the subject to super_admin' do
-      expect(mail_3.subject).to eq("You deleted admin account on RAMP Client Business Planning Support")
+      expect(mail_3.subject).to eq("You deleted user account on RAMP Client Business Planning Support")
     end
 
     it 'renders the receiver email to super_admin' do
