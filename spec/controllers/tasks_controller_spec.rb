@@ -163,6 +163,7 @@ RSpec.describe TasksController, type: :controller do
       post :create, params: params
       expect(parse_json(response.body)).to eq(parse_json(Task.last.as_json(methods: :members_for_task).to_json))
       expect(Task.last.users.count).to eq(3)
+      expect(Task.last.notifications.count).to eq(3)
       expect(Task.last.users.where(type: "Member").first).to eq(Member.find(member.id))
       expect(Task.last.users.where(type: "StartupAdmin").first).to eq(StartupAdmin.find(startup_admin.id))
       expect(response.content_type).to eq('application/json; charset=utf-8')
@@ -175,6 +176,7 @@ RSpec.describe TasksController, type: :controller do
       post :create, params: params
       expect(parse_json(response.body)).to eq(parse_json(Task.last.as_json(methods: :members_for_task).to_json))
       expect(Task.last.users.count).to eq(3)
+      expect(Task.last.notifications.count).to eq(3)
       expect(Task.last.users.where(type: "Member").first).to eq(Member.find(member.id))
       expect(Task.last.users.where(type: "StartupAdmin").first).to eq(StartupAdmin.find(startup_admin.id))
       expect(response.content_type).to eq('application/json; charset=utf-8')
@@ -187,6 +189,7 @@ RSpec.describe TasksController, type: :controller do
       post :create, params: params
       expect(parse_json(response.body)).to eq(parse_json(Task.last.as_json(methods: :members_for_task).to_json))
       expect(Task.last.users.count).to eq(3)
+      expect(Task.last.notifications.count).to eq(3)
       expect(Task.last.users.where(type: "Member").first).to eq(Member.find(member.id))
       expect(Task.last.users.where(type: "StartupAdmin").first).to eq(StartupAdmin.find(startup_admin.id))
       expect(response.content_type).to eq('application/json; charset=utf-8')
@@ -216,9 +219,11 @@ RSpec.describe TasksController, type: :controller do
     it 'return updated task and assigned new users to the task in json format with status success if super_admin authenticated' do
       request.headers.merge!({ "Accelerator-Id": "#{accelerator.id}"})
       expect(task_2.users.count).to eq(2)
+      expect(task_2.notifications.count).to eq(2)
       sign_in super_admin
       put :update, params: params.merge(params_2)
       task_2.reload
+      expect(task_2.notifications.count).to eq(3)
       expect(parse_json(response.body)).to eq(parse_json(task_2.as_json(methods: :members_for_task).to_json))
       expect(task_2.title).to eq('New Task')
       expect(task_2.users.count).to eq(3)
@@ -229,9 +234,11 @@ RSpec.describe TasksController, type: :controller do
     it 'return updated task and assigned new users to the task in json format with status success if admin authenticated' do
       request.headers.merge!({ "Accelerator-Id": "#{accelerator.id}"})
       expect(task_2.users.count).to eq(2)
+      expect(task_2.notifications.count).to eq(2)
       sign_in admin
       put :update, params: params.merge(params_2)
       task_2.reload
+      expect(task_2.notifications.count).to eq(3)
       expect(parse_json(response.body)).to eq(parse_json(task_2.as_json(methods: :members_for_task).to_json))
       expect(task_2.title).to eq('New Task')
       expect(task_2.users.count).to eq(3)
@@ -251,9 +258,11 @@ RSpec.describe TasksController, type: :controller do
     it 'return updated task and assigned new users to the task in json format with status success if startup_admin authenticated' do
       request.headers.merge!({ "Accelerator-Id": "#{accelerator.id}"})
       expect(task_2.users.count).to eq(2)
+      expect(task_2.notifications.count).to eq(2)
       sign_in startup_admin
       put :update, params: params.merge(params_2)
       task_2.reload
+      expect(task_2.notifications.count).to eq(3)
       expect(parse_json(response.body)).to eq(parse_json(task_2.as_json(methods: :members_for_task).to_json))
       expect(task_2.title).to eq('New Task')
       expect(task_2.users.count).to eq(3)

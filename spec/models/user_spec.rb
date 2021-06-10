@@ -4,6 +4,7 @@ RSpec.describe User, type: :model do
   describe "Associations" do
     it { should have_many(:task_users).dependent(:destroy) }
     it { should have_many(:tasks).through(:task_users) }
+    it { should have_many(:notifications).dependent(:destroy) }
   end
 
   describe "Method 'payload'" do
@@ -15,7 +16,7 @@ RSpec.describe User, type: :model do
       payload = user.payload
       payload[:user].delete('created_at')
       payload[:user].delete('updated_at')
-      
+
 
       expect(payload).to eq(
         { auth_token: auth_token,

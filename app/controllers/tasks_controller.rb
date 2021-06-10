@@ -243,7 +243,9 @@ class TasksController < ApplicationController
 
     @task = Task.new(task_params_for_create)
     if @task.save
-      TasksService::EmailUsersAssignedToTask.call(@task, task_params_for_create, current_user)
+      if task_params_for_create[:task_users_attributes]
+        TasksService::EmailUsersAssignedToTask.call(@task, task_params_for_create, current_user)
+      end
       render json: @task.as_json(methods: :members_for_task), status: :created
     else
       render json: @task.errors, status: :unprocessable_entity
@@ -305,7 +307,10 @@ class TasksController < ApplicationController
     task_members_params_update = task_members_params
 
     if @task.update(task_members_params_update)
-      TasksService::EmailUsersAssignedToTask.call(@task, task_members_params_update, current_user) if task_members_params_update[:task_users_attributes]
+      if task_members_params_update[:task_users_attributes]
+        @task.notifications.create(task_members_params_update[:task_users_attributes])
+        TasksService::EmailUsersAssignedToTask.call(@task, task_members_params_update, current_user)
+      end
       render json: @task.as_json(methods: :members_for_task)
     else
       render json: @task.errors, status: :unprocessable_entity
