@@ -61,7 +61,7 @@ class NotificationsController < ApplicationController
   def index
     authorize current_user, policy_class: NotificationPolicy
 
-    @notifications = policy_scope(Notification).page(page_params)
+    @notifications = policy_scope(Notification).order(created_at: :desc).page(page_params)
 
     render json: {
       current_page: @notifications.current_page,
