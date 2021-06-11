@@ -10,6 +10,7 @@ RSpec.describe StartupsController, type: :controller do
   let!(:admins)                  { create_list(:admin, 3, accelerator_id: accelerator.id) }
   let!(:admin)                   { create(:admin, accelerator_id: accelerator_2.id) }
   let!(:startup)                 { create(:startup, accelerator_id: accelerator.id, admins_startups_attributes: [{admin_id: admins.first.id}]) }
+  let!(:startup_2)               { create(:startup, accelerator_id: accelerator_2.id, admins_startups_attributes: [{admin_id: admin.id}]) }
   let!(:startups)                { create_list(:startup, 14, accelerator_id: accelerator.id, admins_startups_attributes: [{admin_id: admins.first.id}]) }
   let!(:startups_2)              { create_list(:startup, 9, accelerator_id: accelerator.id, admins_startups_attributes: [{admin_id: admins.last.id}]) }
   let!(:startup_admin)           { create(:startup_admin, accelerator_id: accelerator.id, startup_id: startup.id) }
@@ -288,6 +289,86 @@ RSpec.describe StartupsController, type: :controller do
       request.headers.merge!({ "Accelerator-Id": "#{accelerator.id}"})
       sign_in member
       put :update, params: params_1.merge(params)
+      expect(response.body).to eq({'notice': 'You do not have permission to perform this action'}.to_json)
+      expect(response.content_type).to eq('application/json; charset=utf-8')
+      expect(response).to have_http_status(:forbidden)
+    end
+  end
+
+  describe 'DELETE destroy action' do
+    let!(:params)   { ActionController::Parameters.new({'id': startup_2.id}) }
+    let!(:params_1) { ActionController::Parameters.new({'id': startup.id}) }
+    let!(:params_2) { ActionController::Parameters.new({'id': startups_2.first.id}) }
+
+    before { params.permit! }
+    before { params_1.permit! }
+    before { params_2.permit! }
+
+    it 'return successful message about delete a startup in json format with status success if super_admin authenticated' do
+      request.headers.merge!({ "Accelerator-Id": "#{accelerator.id}"})
+      sign_in super_admin
+      expect(Startup.find_by_id(startup.id).members).to eq(Member.where(id: member.id))
+      expect(Startup.find_by_id(startup.id).startup_admins).to eq(StartupAdmin.where(id: startup_admin.id))
+      expect(Startup.find_by_id(startup.id).assessment_progresses).to eq(AssessmentProgress.where(startup_id: startup.id))
+      delete :destroy, params: params_1
+      expect(Startup.find_by_id(startup.id)).to eq(nil)
+      expect(Member.find_by_id(member.id)).to eq(nil)
+      expect(StartupAdmin.find_by_id(startup_admin.id)).to eq(nil)
+      with_assessment_progresses = AssessmentProgress.where(startup_id: startup.id)
+      expect(with_assessment_progresses.empty?).to eq(true)
+      expect(response.body).to eq({message: 'Successfully destroyed'}.to_json)
+      expect(response.content_type).to eq("application/json; charset=utf-8")
+      expect(response).to have_http_status(:success)
+    end
+
+    it 'return error with status 403 if super_admin try to delete a startup that doesnt belong to the current accelerator' do
+      request.headers.merge!({ "Accelerator-Id": "#{accelerator.id}"})
+      sign_in super_admin
+      delete :destroy, params: params
+      expect(response.body).to eq({'notice': 'You do not have permission to perform this action'}.to_json)
+      expect(response.content_type).to eq('application/json; charset=utf-8')
+      expect(response).to have_http_status(:forbidden)
+    end
+
+    it 'return successful message about delete a startup in json format with status success if admin authenticated' do
+      request.headers.merge!({ "Accelerator-Id": "#{accelerator.id}"})
+      sign_in  admins.first
+      expect(Startup.find_by_id(startup.id).members).to eq(Member.where(id: member.id))
+      expect(Startup.find_by_id(startup.id).startup_admins).to eq(StartupAdmin.where(id: startup_admin.id))
+      expect(Startup.find_by_id(startup.id).assessment_progresses).to eq(AssessmentProgress.where(startup_id: startup.id))
+      delete :destroy, params: params_1
+      expect(Startup.find_by_id(startup.id)).to eq(nil)
+      expect(Member.find_by_id(member.id)).to eq(nil)
+      expect(StartupAdmin.find_by_id(startup_admin.id)).to eq(nil)
+      with_assessment_progresses = AssessmentProgress.where(startup_id: startup.id)
+      expect(with_assessment_progresses.empty?).to eq(true)
+      expect(response.body).to eq({message: 'Successfully destroyed'}.to_json)
+      expect(response.content_type).to eq("application/json; charset=utf-8")
+      expect(response).to have_http_status(:success)
+    end
+
+    it 'return error with status 403 if admin try to delete a startup that doesnt belong to the admin' do
+      request.headers.merge!({ "Accelerator-Id": "#{accelerator.id}"})
+      sign_in admins.first
+      delete :destroy, params: params_2
+      expect(response.body).to eq({'notice': 'You do not have permission to perform this action'}.to_json)
+      expect(response.content_type).to eq('application/json; charset=utf-8')
+      expect(response).to have_http_status(:forbidden)
+    end
+
+    it 'return error with status 403 if startup_admin authenticated' do
+      request.headers.merge!({ "Accelerator-Id": "#{accelerator.id}"})
+      sign_in startup_admin
+      delete :destroy, params: params_1
+      expect(response.body).to eq({'notice': 'You do not have permission to perform this action'}.to_json)
+      expect(response.content_type).to eq('application/json; charset=utf-8')
+      expect(response).to have_http_status(:forbidden)
+    end
+
+    it 'return error with status 403 if member authenticated' do
+      request.headers.merge!({ "Accelerator-Id": "#{accelerator.id}"})
+      sign_in member
+      delete :destroy, params: params_1
       expect(response.body).to eq({'notice': 'You do not have permission to perform this action'}.to_json)
       expect(response.content_type).to eq('application/json; charset=utf-8')
       expect(response).to have_http_status(:forbidden)

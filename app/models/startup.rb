@@ -1,6 +1,6 @@
 class Startup < ApplicationRecord
-  has_many :startup_admins, foreign_key: "startup_id"
-  has_many :members, foreign_key: "startup_id"
+  has_many :startup_admins, foreign_key: "startup_id", dependent: :destroy
+  has_many :members, foreign_key: "startup_id", dependent: :destroy
   has_many :admins_startups, dependent: :destroy
   has_many :admins, through: :admins_startups
   belongs_to :accelerator
@@ -14,6 +14,8 @@ class Startup < ApplicationRecord
   def admins_for_startup
     admins.where("users.type = ?", "Admin")
   end
+
+  scope :for_accelerator, ->(accelerator_id) { where(accelerator_id: accelerator_id)}
 
   def assessments_risk_list
     Assessment.with_assessment_progresses(id).map do |assessment|

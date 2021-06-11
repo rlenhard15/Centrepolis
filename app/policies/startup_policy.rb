@@ -38,6 +38,10 @@ class StartupPolicy < ApplicationPolicy
     super_admin? || can_admin_do_it?
   end
 
+  def destroy?
+    super_admin? || admin?
+  end
+
   def can_admin_do_show?
     admin? && user.startup_ids.include?(record.id)
   end

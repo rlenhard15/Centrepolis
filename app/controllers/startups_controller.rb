@@ -1,5 +1,5 @@
 class StartupsController < ApplicationController
-  before_action :set_startup, only: [:show, :update]
+  before_action :set_startup, only: [:show, :update, :destroy]
 
   api :GET, 'api/startups', "List of startups"
   param :page, Integer, desc: "Page for startups iteration (10 items per page)"
@@ -86,7 +86,7 @@ class StartupsController < ApplicationController
   def index
     authorize current_user, policy_class: StartupPolicy
 
-    @startups = policy_scope(Startup).page(page_params)
+    @startups = policy_scope(Startup).for_accelerator(user_accelerator_id).page(page_params)
 
     render json: {
       current_page: @startups.current_page,
@@ -371,6 +371,44 @@ class StartupsController < ApplicationController
         render json: @startup
       end
 
+    else
+      render json: @startup.errors, status: :unprocessable_entity
+    end
+  end
+
+  api :PUT, 'api/startups/:id', "Update info of a certain startup and assign admins to the startups"
+  param :id, Integer, desc: "id of startup",  required: true
+
+  param :startup, Hash, required: true do
+    param :name, String, desc: "Name of the startup", required: false
+    param :admins_startups_attributes, Array, required: false do
+      param :admin_id, Integer, desc: 'Id of admins who will have access the startup (required only if current_user is SuperAdmin want to update startup)', required: true
+    end
+  end
+
+  description <<-DESC
+
+  === Request headers
+    SuperAdmin or Admin perform this action
+      SuperAdmin   - can delete all startups of the current accelerator;
+      Admin        - can delete only th startups were created by the admin;
+      Authentication - string - required
+        Example of Authentication header : "Bearer TOKEN_FETCHED_FROM_SERVER_DURING_REGISTRATION"
+      Accelerator-Id - integer - required
+        Example of Accelerator-Id header : 1
+
+  === Success response body
+  {
+    "message": "Successfully destroyed"
+  }
+
+  DESC
+
+  def destroy
+    if @startup.destroy
+      render json: {
+        message: 'Successfully destroyed'
+      }, status: :ok
     else
       render json: @startup.errors, status: :unprocessable_entity
     end
