@@ -29,7 +29,9 @@ RSpec.describe Startup, type: :model do
             "first_name"=> admins.first.first_name,
             "last_name"=> admins.first.last_name,
             "accelerator_id"=> admins.first.accelerator_id,
-            "startup_id"=> admins.first.startup_id
+            "startup_id"=> admins.first.startup_id,
+            "email_notification"=> admins.first.email_notification,
+            "phone_number"=> admins.first.phone_number
           },
           {
             "id"=> admins.last.id,
@@ -37,7 +39,9 @@ RSpec.describe Startup, type: :model do
             "first_name"=> admins.last.first_name,
             "last_name"=> admins.last.last_name,
             "accelerator_id"=> admins.last.accelerator_id,
-            "startup_id"=> admins.last.startup_id
+            "startup_id"=> admins.last.startup_id,
+            "email_notification"=> admins.last.email_notification,
+            "phone_number"=> admins.last.phone_number
           },
         ]
       )

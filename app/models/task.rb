@@ -2,6 +2,9 @@ class Task < ApplicationRecord
   belongs_to :stage
   has_many :task_users, dependent: :destroy
   has_many :users, through: :task_users
+  has_many :notifications, dependent: :destroy
+
+  after_create :create_notifications
 
   paginates_per 10
 
@@ -33,4 +36,16 @@ class Task < ApplicationRecord
   def users_for_task
     users.select("users.*, users.type AS user_type")
   end
+
+  private
+
+    def create_notifications
+      users_for_notifications = user_ids_for_notifications users
+
+      notifications.create(users_for_notifications)
+    end
+
+    def user_ids_for_notifications users
+      users.map{ |u| {user_id: u.id}}
+    end
 end

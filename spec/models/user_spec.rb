@@ -4,6 +4,7 @@ RSpec.describe User, type: :model do
   describe "Associations" do
     it { should have_many(:task_users).dependent(:destroy) }
     it { should have_many(:tasks).through(:task_users) }
+    it { should have_many(:notifications).dependent(:destroy) }
   end
 
   describe "Method 'payload'" do
@@ -15,7 +16,7 @@ RSpec.describe User, type: :model do
       payload = user.payload
       payload[:user].delete('created_at')
       payload[:user].delete('updated_at')
-      
+
 
       expect(payload).to eq(
         { auth_token: auth_token,
@@ -25,7 +26,9 @@ RSpec.describe User, type: :model do
             "first_name"=> user.first_name,
             "last_name"=> user.last_name,
             "accelerator_id"=> accelerator.id,
-            "startup_id"=> user.startup_id
+            "startup_id"=> user.startup_id,
+            "email_notification"=> user.email_notification,
+            "phone_number"=> user.phone_number
           },
           :user_type => "Admin"
         }
@@ -50,7 +53,9 @@ RSpec.describe User, type: :model do
             "first_name"=> user.first_name,
             "last_name"=> user.last_name,
             "accelerator_id"=> accelerator.id,
-            "startup_id"=> user.startup_id
+            "startup_id"=> user.startup_id,
+            "email_notification"=> user.email_notification,
+            "phone_number"=> user.phone_number
           },
           :user_type => "Admin"
         }
@@ -214,7 +219,9 @@ RSpec.describe User, type: :model do
           "first_name"=> members.first.first_name,
           "last_name"=> members.first.last_name,
           "accelerator_id"=> members.first.accelerator_id,
-          "startup_id"=> members.first.startup_id
+          "startup_id"=> members.first.startup_id,
+          "email_notification"=> members.first.email_notification,
+          "phone_number"=> members.first.phone_number
         }
       )
     end
@@ -232,7 +239,9 @@ RSpec.describe User, type: :model do
           "first_name"=> admins.first.first_name,
           "last_name"=> admins.first.last_name,
           "accelerator_id"=> admins.first.accelerator_id,
-          "startup_id"=> admins.first.startup_id
+          "startup_id"=> admins.first.startup_id,
+          "email_notification"=> admins.first.email_notification,
+          "phone_number"=> admins.first.phone_number
         }
       )
     end
@@ -250,7 +259,9 @@ RSpec.describe User, type: :model do
           "first_name"=> startup_admins.first.first_name,
           "last_name"=> startup_admins.first.last_name,
           "accelerator_id"=> startup_admins.first.accelerator_id,
-          "startup_id"=> startup_admins.first.startup_id
+          "startup_id"=> startup_admins.first.startup_id,
+          "email_notification"=> startup_admins.first.email_notification,
+          "phone_number"=> startup_admins.first.phone_number
         }
       )
     end

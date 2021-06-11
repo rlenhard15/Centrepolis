@@ -10,27 +10,43 @@ class NotificationPolicy < ApplicationPolicy
     def resolve
       return scope.none unless user
 
-      if user.member?
-        scope.where(customer_id: user.id)
+      if user.super_admin?
+        scope.where(user_id: user.id)
       elsif user.admin?
-        scope.none
+        scope.where(user_id: user.id)
+      elsif user.startup_admin?
+        scope.where(user_id: user.id)
+      elsif user.member?
+        scope.where(user_id: user.id)
       end
     end
   end
 
   def mark_as_readed?
-    can_customer_do_it
+    can_super_admin_do_it || can_admin_do_it || can_startup_admin_do_it || can_member_do_it
   end
 
   def mark_as_readed_all?
-    customer?
+    super_admin? || admin? || startup_admin? || member?
   end
 
   def index?
-    !admin?
+    super_admin? || admin? || startup_admin? || member?
   end
 
-  def can_customer_do_it
-    member? && user.id == record.customer_id
+  def can_super_admin_do_it
+    super_admin? && user.id == record.user_id
+  end
+
+  def can_admin_do_it
+    admin? && user.id == record.user_id
+  end
+
+  def can_startup_admin_do_it
+    startup_admin? && user.id == record.user_id
+  end
+
+  def can_member_do_it
+    member? && user.id == record.user_id
   end
 end
