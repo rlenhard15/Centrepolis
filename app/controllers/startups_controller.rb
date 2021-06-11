@@ -376,15 +376,8 @@ class StartupsController < ApplicationController
     end
   end
 
-  api :PUT, 'api/startups/:id', "Update info of a certain startup and assign admins to the startups"
+  api :DELETE, 'api/startups/:id', "Delete a startup the startups"
   param :id, Integer, desc: "id of startup",  required: true
-
-  param :startup, Hash, required: true do
-    param :name, String, desc: "Name of the startup", required: false
-    param :admins_startups_attributes, Array, required: false do
-      param :admin_id, Integer, desc: 'Id of admins who will have access the startup (required only if current_user is SuperAdmin want to update startup)', required: true
-    end
-  end
 
   description <<-DESC
 
