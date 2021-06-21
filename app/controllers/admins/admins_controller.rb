@@ -2,6 +2,8 @@ module Admins
   class AdminsController < ApplicationController
 
     api :GET, 'api/admins', "Only SuperAdmin can see list of the admins and their startups"
+    param :page, Integer, desc: "Page for admins iteration (10 items per page)"
+
     description <<-DESC
 
     === Request headers
@@ -12,43 +14,55 @@ module Admins
       Accelerator-Id - integer - required
         Example of Accelerator-Id header : 1
 
-    === Params
-      Params are absent
-
     === Success response body
-    [
-      {
-        "id": 1,
-        "email": "admin@gmail.com",
-        "created_at": "2021-04-09T18:49:05.376Z",
-        "updated_at": "2021-04-09T18:49:05.376Z",
-        "first_name": "Admin",
-        "last_name": "Adm",
-        "accelerator_id": 1,
-        "startup_id": null,
-        "phone_number": "(186)285-7925",
-        "email_notification": true,
-        "startups": [
-          {
-            "id": 1,
-            "name": "MSI",
-            "accelerator_id": 1,
-            "created_at": "2021-04-09T19:04:59.356Z",
-            "updated_at": "2021-04-09T19:04:59.356Z"
-          },
-          ...
-        ]
-      },
-      ...
-    ]
-
+    {
+      "current_page": 1,
+      "total_pages": 2,
+      "admins": [
+        {
+          "id": 17,
+          "email": "anastasia@gmail.com",
+          "created_at": "2021-04-28T13:56:03.929Z",
+          "updated_at": "2021-04-28T14:04:39.908Z",
+          "first_name": "Nastya",
+          "last_name": "Smith",
+          "accelerator_id": 1,
+          "startup_id": null,
+          "phone_number": null,
+          "email_notification": true,
+          "startups": [
+            {
+              "id": 64,
+              "name": "MSI",
+              "accelerator_id": 1,
+              "created_at": "2021-05-27T22:53:34.054Z",
+              "updated_at": "2021-05-27T22:53:34.054Z"
+            },
+            ...
+          ]
+        },
+        ...
+      ]
+    }
 
     DESC
 
     def index
       authorize current_user, policy_class: AdminPolicy
 
-      render json: policy_scope(User).admins.with_name.for_accelerator(user_accelerator_id).as_json(methods: :startups)
+      @admins = policy_scope(User).admins.with_name.for_accelerator(user_accelerator_id).page(page_params)
+
+      render json: {
+        current_page: @admins.current_page,
+        total_pages: @admins.total_pages,
+        admins: @admins.as_json(methods: :startups)
+      }
     end
+
+    private
+
+      def page_params
+        params[:page] || 1
+      end
   end
 end
