@@ -415,7 +415,7 @@ class TasksController < ApplicationController
 
     def task_members_params_create
       tasks_params_for_create = task_members_params
-      tasks_params_for_create[:task_users_attributes].push({user_id: current_user.id})
+      tasks_params_for_create[:task_users_attributes].push({user_id: current_user.id, creator: true})
 
       tasks_params_for_create
     end
