@@ -2,6 +2,8 @@ module Admins
   class MembersController < ApplicationController
 
     api :GET, 'api/members', "Only super_admin, admin, startup_admin can see list of members that depends on current_user access level"
+    param :page, Integer, desc: "Page for members iteration (10 items per page)"
+
     description <<-DESC
 
     === Request headers
@@ -15,40 +17,52 @@ module Admins
         Accelerator-Id - integer - required
             Example of Accelerator-Id header : 1
 
-    === Params
-      Params are absent
-
     === Success response body
-    [
-      {
-        "id": 5,
-        "email": "user@gmail.com",
-        "created_at": "2021-04-06T10:48:34.453Z",
-        "updated_at": "2021-04-06T10:48:45.909Z",
-        "first_name": "Emily",
-        "last_name": "Smith",
-        "startup_id": 1,
-        "accelerator_id": 1,
-        "phone_number": "(186)285-7925",
-        "email_notification": true,
-        "startup": {
-          "id": 1,
-          "name": "Example",
+    {
+      "current_page": 1,
+      "total_pages": 2,
+      "members": [
+        {
+          "id": 5,
+          "email": "emily@gmail.com",
+          "created_at": "2021-04-09T18:53:43.416Z",
+          "updated_at": "2021-04-09T19:04:59.578Z",
+          "first_name": "Emily",
+          "last_name": "Smith",
           "accelerator_id": 1,
-          "created_at": "2021-04-05T19:58:08.921Z",
-          "updated_at": "2021-04-06T10:55:04.576Z",
-          "created_by": 2
-        }
-      },
-      ...
-    ]
+          "startup_id": 3,
+          "phone_number": "121241241",
+          "email_notification": true,
+          "startup": {
+            "id": 3,
+            "name": "NMH",
+            "accelerator_id": 1,
+            "created_at": "2021-04-09T19:04:59.551Z",
+            "updated_at": "2021-04-09T19:04:59.551Z"
+          }
+        },
+        ...
+      ]
+    }
 
     DESC
 
     def index
       authorize current_user, policy_class: MemberPolicy
 
-      render json: policy_scope(User).members.with_name.for_accelerator(user_accelerator_id).as_json(include: :startup)
+      @members = policy_scope(User).members.with_name.for_accelerator(user_accelerator_id).page(page_params)
+
+      render json: {
+        current_page: @members.current_page,
+        total_pages: @members.total_pages,
+        members: @members.as_json(include: :startup)
+      }
     end
+
+    private
+
+      def page_params
+        params[:page] || 1
+      end
   end
 end

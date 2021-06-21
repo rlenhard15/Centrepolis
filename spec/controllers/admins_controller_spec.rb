@@ -17,8 +17,8 @@ RSpec.describe Admins::AdminsController, type: :controller do
       request.headers.merge!({ "Accelerator-Id": "#{accelerator.id}"})
       sign_in super_admin
       get :index
-      expect(parse_json(response.body).count).to eq(admins.count)
-      expect(recursively_delete_timestamps(parse_json(response.body))).to eq(recursively_delete_timestamps(Admin.for_accelerator(accelerator.id).as_json(methods: :startups)))
+      expect(parse_json(response.body)[1]).to eq(["current_page", 1])
+      expect(recursively_delete_timestamps(parse_json(response.body)[0][1])).to eq(recursively_delete_timestamps(Admin.for_accelerator(accelerator.id).as_json(methods: :startups)))
       expect(response.content_type).to eq('application/json; charset=utf-8')
       expect(response).to have_http_status(:success)
     end

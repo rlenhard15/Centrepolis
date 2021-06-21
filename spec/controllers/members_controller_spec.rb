@@ -22,8 +22,9 @@ RSpec.describe Admins::MembersController, type: :controller do
       request.headers.merge!({ "Accelerator-Id": "#{accelerator.id}"})
       sign_in super_admin
       get :index
-      expect(parse_json(response.body).count).to eq(5)
-      expect(parse_json(response.body)).to eq(recursively_delete_timestamps(Member.for_accelerator(accelerator.id).as_json(include: :startup)))
+      expect(parse_json(response.body)[0]).to eq(["current_page", 1])
+      expect(parse_json(response.body)[1][1].count).to eq(5)
+      expect(recursively_delete_timestamps(parse_json(response.body)[1][1])).to eq(recursively_delete_timestamps(Member.for_accelerator(accelerator.id).as_json(include: :startup)))
       expect(response.content_type).to eq('application/json; charset=utf-8')
       expect(response).to have_http_status(:success)
     end
@@ -32,8 +33,9 @@ RSpec.describe Admins::MembersController, type: :controller do
       request.headers.merge!({ "Accelerator-Id": "#{accelerator.id}"})
       sign_in admins.first
       get :index
-      expect(parse_json(response.body).count).to eq(3)
-      expect(parse_json(response.body)).to eq(recursively_delete_timestamps(Member.where(startup_id: admins.first.startup_ids).for_accelerator(accelerator.id).as_json(include: :startup)))
+      expect(parse_json(response.body)[0]).to eq(["current_page", 1])
+      expect(parse_json(response.body)[1][1].count).to eq(3)
+      expect(recursively_delete_timestamps(parse_json(response.body)[1][1])).to eq(recursively_delete_timestamps(Member.where(startup_id: admins.first.startup_ids).for_accelerator(accelerator.id).as_json(include: :startup)))
       expect(response.content_type).to eq('application/json; charset=utf-8')
       expect(response).to have_http_status(:success)
     end
@@ -42,8 +44,9 @@ RSpec.describe Admins::MembersController, type: :controller do
       request.headers.merge!({ "Accelerator-Id": "#{accelerator.id}"})
       sign_in startup_admin
       get :index
-      expect(parse_json(response.body).count).to eq(3)
-      expect(parse_json(response.body)).to eq(recursively_delete_timestamps(Member.where(startup_id: startup_admin.startup_id).for_accelerator(accelerator.id).as_json(include: :startup)))
+      expect(parse_json(response.body)[0]).to eq(["current_page", 1])
+      expect(parse_json(response.body)[1][1].count).to eq(3)
+      expect(recursively_delete_timestamps(parse_json(response.body)[1][1])).to eq(recursively_delete_timestamps(Member.where(startup_id: startup_admin.startup_id).for_accelerator(accelerator.id).as_json(include: :startup)))
       expect(response.content_type).to eq('application/json; charset=utf-8')
       expect(response).to have_http_status(:success)
     end
