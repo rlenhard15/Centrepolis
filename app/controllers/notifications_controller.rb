@@ -34,23 +34,18 @@ class NotificationsController < ApplicationController
           "status": "completed",
           "priority": "high",
           "due_date": "2020-03-12T00:00:00.000Z",
-          "users": [
-            {
-              "id": 3,
-              "email": "customer@gmail.com",
-              "created_at": "2021-04-09T18:51:32.967Z",
-              "updated_at": "2021-06-10T13:11:51.485Z",
-              "first_name": "Nelli",
-              "last_name": "Bilokon",
-              "accelerator_id": 1,
-              "startup_id": 1,
-              "phone_number": "123456789",
-              "email_notification": true,
-              "last_visit": "2021-06-10T13:11:34.623Z",
-              "user_type": "Member"
-            },
-            ...
-          ]
+          "created_by": {
+            "id": 14,
+            "email": "super_admin@gmail.com",
+            "created_at": "2021-04-12T12:04:39.943Z",
+            "updated_at": "2021-06-21T11:42:29.969Z",
+            "first_name": "Bill",
+            "last_name": "Smith",
+            "accelerator_id": null,
+            "startup_id": null,
+            "phone_number": "123456789",
+            "email_notification": true
+          }
         }
       },
       ...
@@ -66,7 +61,7 @@ class NotificationsController < ApplicationController
     render json: {
       current_page: @notifications.current_page,
       total_pages: @notifications.total_pages,
-      notifications: @notifications.as_json(include: {task: {include: {users: { methods: [:last_visit, :user_type]}}}})
+      notifications: @notifications.as_json(include: {task: {methods: :created_by}})
     }
   end
 

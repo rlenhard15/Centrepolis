@@ -25,6 +25,10 @@ class Task < ApplicationRecord
 
   scope :tasks_for_startup, ->(startup_id) { where("users.startup_id = ?", startup_id) }
 
+  def created_by
+    users.where("task_users.creator IS true").first
+  end
+
   def members_for_task
     users.where("users.type = ?", "Member")
   end

@@ -15,8 +15,8 @@ RSpec.describe NotificationsController, type: :controller do
     let!(:category)           { create(:category, assessment_id: assessment.id) }
       let!(:sub_category)     { create(:sub_category, category_id: category.id) }
         let!(:stage)          { create(:stage, sub_category_id: sub_category.id) }
-          let!(:tasks)        { create_list(:task, 2, stage_id: stage.id, task_users_attributes: [{user_id: member.id}, {user_id: startup_admin.id}, {user_id: super_admin.id}, {user_id: admins.first.id}]) }
-          let!(:tasks_2)      { create_list(:task, 2, stage_id: stage.id, task_users_attributes: [{user_id: member.id}, {user_id: startup_admin.id}]) }
+          let!(:tasks)        { create_list(:task, 2, stage_id: stage.id, task_users_attributes: [{user_id: member.id}, {user_id: startup_admin.id}, {user_id: super_admin.id, creator: true}, {user_id: admins.first.id}]) }
+          let!(:tasks_2)      { create_list(:task, 2, stage_id: stage.id, task_users_attributes: [{user_id: member.id}, {user_id: admins.last.id, creator: true}, {user_id: startup_admin.id}]) }
 
   describe "GET index action" do
     it "return notifications for current super_admin" do
@@ -25,7 +25,7 @@ RSpec.describe NotificationsController, type: :controller do
       get :index
       expect(parse_json(response.body)[0]).to eq(["current_page", 1])
       expect(parse_json(response.body)[1][1].count).to eq(2)
-      expect(parse_json(response.body)[1][1][0]['task']['users'].count).to eq(tasks.first.users.count)
+      expect(parse_json(response.body)[1][1][0]['task']['created_by']['id']).to eq(tasks.first.users.where("task_users.creator IS true").first.id)
       expect(response.content_type).to eq('application/json; charset=utf-8')
       expect(response).to have_http_status(:success)
     end
@@ -36,8 +36,8 @@ RSpec.describe NotificationsController, type: :controller do
       get :index
       expect(parse_json(response.body)[0]).to eq(["current_page", 1])
       expect(parse_json(response.body)[1][1].count).to eq(2)
-      expect(parse_json(response.body)[1][1][0]['task']['users'].count).to eq(tasks.first.users.count)
-      expect([parse_json(response.body)[1][1][0]['task']['id'], parse_json(response.body)[1][1][1]['task']['id']]).to eq([tasks.first.id, tasks.last.id])
+      expect(parse_json(response.body)[1][1][0]['task']['created_by']['id']).to eq(tasks.first.users.where("task_users.creator IS true").first.id)
+      expect([parse_json(response.body)[1][1][0]['task']['id'], parse_json(response.body)[1][1][1]['task']['id']]).to eq([tasks.last.id, tasks.first.id])
       expect(response.content_type).to eq('application/json; charset=utf-8')
       expect(response).to have_http_status(:success)
     end
@@ -47,9 +47,9 @@ RSpec.describe NotificationsController, type: :controller do
       sign_in startup_admin
       get :index
       expect(parse_json(response.body)[0]).to eq(["current_page", 1])
-      expect(parse_json(response.body)[1][1][0]['task']['users'].count).to eq(tasks.first.users.count)
       expect(parse_json(response.body)[1][1].count).to eq(4)
-      expect([parse_json(response.body)[1][1][0]['task']['id'], parse_json(response.body)[1][1][1]['task']['id']]).to eq([tasks.first.id, tasks.last.id])
+      expect(parse_json(response.body)[1][1][0]['task']['created_by']['id']).to eq(tasks_2.first.users.where("task_users.creator IS true").first.id)
+      expect([parse_json(response.body)[1][1][0]['task']['id'], parse_json(response.body)[1][1][1]['task']['id']]).to eq([tasks_2.last.id, tasks_2.first.id])
       expect(response.content_type).to eq('application/json; charset=utf-8')
       expect(response).to have_http_status(:success)
     end
@@ -60,7 +60,8 @@ RSpec.describe NotificationsController, type: :controller do
       get :index
       expect(parse_json(response.body)[0]).to eq(["current_page", 1])
       expect(parse_json(response.body)[1][1].count).to eq(4)
-      expect([parse_json(response.body)[1][1][0]['task']['id'], parse_json(response.body)[1][1][1]['task']['id']]).to eq([tasks.first.id, tasks.last.id])
+      expect(parse_json(response.body)[1][1][0]['task']['created_by']['id']).to eq(tasks_2.first.users.where("task_users.creator IS true").first.id)
+      expect([parse_json(response.body)[1][1][0]['task']['id'], parse_json(response.body)[1][1][1]['task']['id']]).to eq([tasks_2.last.id, tasks_2.first.id])
       expect(response.content_type).to eq('application/json; charset=utf-8')
       expect(response).to have_http_status(:success)
     end
