@@ -12,12 +12,12 @@ class User < ApplicationRecord
 
   scope :members, -> { where(type: "Member") }
   scope :admins, -> { where(type: "Admin") }
-  scope :startup_admins, -> { where(type: "StartupAdmin") }
+  scope :startup_admins, -> { where(type: "TeamLead") }
 
   USER_TYPES = [
     SUPER_ADMIN = 'SuperAdmin',
     ADMIN = 'Admin',
-    STARTUP_ADMIN = 'StartupAdmin',
+    TEAM_LEAD = 'TeamLead',
     MEMBER = 'Member'
   ].freeze
 
@@ -72,7 +72,7 @@ class User < ApplicationRecord
   end
 
   def startup_admin?
-    type == STARTUP_ADMIN
+    type == TEAM_LEAD
   end
 
   def member?

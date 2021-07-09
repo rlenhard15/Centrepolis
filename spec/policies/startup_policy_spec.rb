@@ -14,7 +14,7 @@ RSpec.describe StartupPolicy, type: :policy do
   let!(:admin)            {create(:admin, accelerator_id: accelerator.id)}
   let!(:admin_2)          {create(:admin, accelerator_id: accelerator_2.id)}
   let!(:startup)          { create(:startup, accelerator_id: accelerator.id, admins_startups_attributes: [{admin_id: admin.id}]) }
-    let!(:startup_admin)  { create(:startup_admin, accelerator_id: accelerator.id, startup_id: startup.id) }
+    let!(:team_lead)      { create(:team_lead, accelerator_id: accelerator.id, startup_id: startup.id) }
     let!(:member)         { create(:member, accelerator_id: accelerator.id, startup_id: startup.id) }
 
   describe "user's type: SuperAdmin" do
@@ -41,9 +41,9 @@ RSpec.describe StartupPolicy, type: :policy do
 
   describe "user's type: StartupAdmin" do
     let!(:accelerator) { create(:accelerator) }
-    let!(:user)        { create(:startup_admin, accelerator_id: accelerator.id, startup_id: startup.id) }
+    let!(:user)        { create(:team_lead, accelerator_id: accelerator.id, startup_id: startup.id) }
 
-    it "show startups for current startup_admin" do
+    it "show startups for current team_lead" do
       expect(policy_scope).to eq(Startup.where(id: user.startup_id))
     end
 

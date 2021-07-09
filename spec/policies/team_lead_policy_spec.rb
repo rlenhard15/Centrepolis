@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-RSpec.describe StartupAdminPolicy, type: :policy do
+RSpec.describe TeamLeadPolicy, type: :policy do
   subject { described_class.new(user, admin) }
 
   let!(:accelerator)          { create(:accelerator) }
@@ -13,19 +13,18 @@ RSpec.describe StartupAdminPolicy, type: :policy do
   let!(:startup)              { create(:startup, accelerator_id: accelerator.id, admins_startups_attributes: [{admin_id: admin.id}]) }
   let!(:startup_2)            { create(:startup, accelerator_id: accelerator.id, admins_startups_attributes: [{admin_id: admin_2.id}]) }
   let!(:startup_3)            { create(:startup, accelerator_id: accelerator.id, admins_startups_attributes: [{admin_id: admins_2.first.id}]) }
-  let!(:startup_admin)        { create(:startup_admin, accelerator_id: accelerator.id, startup_id: startup.id) }
-  let!(:startup_admin)        { create(:startup_admin, accelerator_id: accelerator.id, startup_id: startup_2.id) }
-  let!(:startup_admin_2)      { create(:startup_admin, accelerator_id: accelerator_2.id, startup_id: startup_3.id) }
+  let!(:team_lead)            { create(:team_lead, accelerator_id: accelerator.id, startup_id: startup_2.id) }
+  let!(:team_lead_2)          { create(:team_lead, accelerator_id: accelerator_2.id, startup_id: startup_3.id) }
   let!(:member)               { create(:member, startup_id: startup.id, accelerator_id: accelerator.id) }
 
   let(:policy_scope) do
-    described_class::Scope.new(user, StartupAdmin.all).resolve
+    described_class::Scope.new(user, TeamLead.all).resolve
   end
 
   describe "not auth user" do
     let!(:user)  { nil }
 
-    it "doesn't show any startup_admin" do
+    it "doesn't show any team_lead" do
       expect(policy_scope).to eq([])
     end
   end
@@ -33,8 +32,8 @@ RSpec.describe StartupAdminPolicy, type: :policy do
   describe "user's type: SuperAdmin" do
     let!(:user)  { super_admin }
 
-    it "shows startup_admins which belongs to the super_admin accelerator" do
-      expect(policy_scope).to eq(StartupAdmin.all)
+    it "shows team_leads which belongs to the super_admin accelerator" do
+      expect(policy_scope).to eq(TeamLead.all)
     end
 
     it { is_expected.to permit_actions(%i[index]) }
@@ -43,17 +42,17 @@ RSpec.describe StartupAdminPolicy, type: :policy do
   describe "user's type: Admin" do
     let!(:user) { admin }
 
-    it "shows startup_admins which belongs to the admins startups" do
-      expect(policy_scope).to eq(StartupAdmin.where(startup_id: user.startup_ids))
+    it "shows team_leads which belongs to the admins startups" do
+      expect(policy_scope).to eq(TeamLead.where(startup_id: user.startup_ids))
     end
 
     it { is_expected.to permit_actions(%i[index]) }
   end
 
-  describe "user's type: StartupAdmin" do
-    let!(:user) { startup_admin }
+  describe "user's type: TeamLead" do
+    let!(:user) { team_lead }
 
-    it "dont shows list of startup_admins" do
+    it "dont shows list of team_leads" do
       expect(policy_scope).to eq([])
     end
 
@@ -63,7 +62,7 @@ RSpec.describe StartupAdminPolicy, type: :policy do
   describe "user's type: Member" do
     let!(:user) { member }
 
-    it "dont shows list of startup_admins" do
+    it "dont shows list of team_leads" do
       expect(policy_scope).to eq([])
     end
 

@@ -9,7 +9,7 @@ RSpec.describe Admins::AdminsController, type: :controller do
   let!(:admins)               { create_list(:admin, 3, accelerator_id: accelerator.id) }
   let!(:admin)                { create(:admin, accelerator_id: accelerator_2.id) }
   let!(:startups)             { create_list(:startup, 2, accelerator_id: accelerator.id, admins_startups_attributes: [{admin_id: admins.first.id}]) }
-  let!(:startup_admin)        { create(:startup_admin, accelerator_id: accelerator.id, startup_id: startups.first.id) }
+  let!(:team_lead)            { create(:team_lead, accelerator_id: accelerator.id, startup_id: startups.first.id) }
   let!(:member)               { create(:member, startup_id: startups.first.id, accelerator_id: accelerator.id) }
 
   describe "GET index action" do
@@ -32,9 +32,9 @@ RSpec.describe Admins::AdminsController, type: :controller do
       expect(response).to have_http_status(:forbidden)
     end
 
-    it "return error in json with status forbidden if sign in as startup_admin" do
+    it "return error in json with status forbidden if sign in as team_lead" do
       request.headers.merge!({ "Accelerator-Id": "#{accelerator.id}"})
-      sign_in startup_admin
+      sign_in team_lead
       get :index
       expect(response.body).to eq({'notice': 'You do not have permission to perform this action'}.to_json)
       expect(response.content_type).to eq('application/json; charset=utf-8')

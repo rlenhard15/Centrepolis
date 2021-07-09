@@ -26,7 +26,7 @@ RSpec.describe Task, type: :model do
     let!(:super_admin)     { create(:super_admin) }
     let!(:admin)           { create(:admin, accelerator_id: accelerator.id) }
       let!(:startup)       { create(:startup, accelerator_id: accelerator.id, admins_startups_attributes: [{admin_id: admin.id}]) }
-    let!(:startup_admin)   { create(:startup_admin, accelerator_id: accelerator.id, startup_id: startup.id) }
+    let!(:team_lead)       { create(:team_lead, accelerator_id: accelerator.id, startup_id: startup.id) }
     let!(:member)          { create(:member, accelerator_id: accelerator.id, startup_id: startup.id) }
     let!(:member_2)        { create(:member, accelerator_id: accelerator.id, startup_id: startup.id) }
   let!(:assessment)        { create(:assessment) }
@@ -37,8 +37,8 @@ RSpec.describe Task, type: :model do
       let!(:sub_category)  { create(:sub_category, category_id: category_2.id) }
         let!(:stage)       { create(:stage, sub_category_id: sub_categories.first.id) }
         let!(:stage_2)     { create(:stage, sub_category_id: sub_category.id) }
-          let!(:tasks)     { create_list(:task, 2, stage_id: stage.id, task_users_attributes: [{user_id: member.id}, {user_id: startup_admin.id}]) }
-          let!(:tasks_2)   { create_list(:task, 2, stage_id: stage_2.id, task_users_attributes: [{user_id: member_2.id}, {user_id: startup_admin.id}]) }
+          let!(:tasks)     { create_list(:task, 2, stage_id: stage.id, task_users_attributes: [{user_id: member.id}, {user_id: team_lead.id}]) }
+          let!(:tasks_2)   { create_list(:task, 2, stage_id: stage_2.id, task_users_attributes: [{user_id: member_2.id}, {user_id: team_lead.id}]) }
 
   describe "Method 'with_all_required_info_for_tasks'" do
     it "return tasks for current user" do

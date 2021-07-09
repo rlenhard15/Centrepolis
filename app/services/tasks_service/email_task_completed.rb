@@ -21,7 +21,7 @@ class TasksService::EmailTaskCompleted < ApplicationService
   end
 
   def startup_admins_for_task
-    @startup_admins_ids ||= task.users&.where(type: 'StartupAdmin').map(&:id)
+    @startup_admins_ids ||= task.users&.where(type: 'TeamLead').map(&:id)
   end
 
   def task_completed

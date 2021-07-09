@@ -10,7 +10,7 @@ RSpec.describe AdminPolicy, type: :policy do
   let!(:admin)                { create(:admin, accelerator_id: accelerator.id) }
   let!(:admins_2)             { create_list(:admin, 3, accelerator_id: accelerator_2.id) }
   let!(:startup)              { create(:startup, accelerator_id: accelerator.id, admins_startups_attributes: [{admin_id: admin.id}]) }
-  let!(:startup_admin)        { create(:startup_admin, accelerator_id: accelerator.id, startup_id: startup.id) }
+  let!(:team_lead)            { create(:team_lead, accelerator_id: accelerator.id, startup_id: startup.id) }
   let!(:member)               { create(:member, startup_id: startup.id, accelerator_id: accelerator.id) }
 
   let(:policy_scope) do
@@ -46,7 +46,7 @@ RSpec.describe AdminPolicy, type: :policy do
   end
 
   describe "user's type: StartupAdmin" do
-    let!(:user) { startup_admin }
+    let!(:user) { team_lead }
 
     it "dont shows list of admins" do
       expect(policy_scope).to eq([])

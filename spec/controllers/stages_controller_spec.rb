@@ -8,7 +8,7 @@ RSpec.describe StagesController, type: :controller do
   let!(:super_admin)       { create(:super_admin) }
   let!(:admin)             { create(:admin, accelerator_id: accelerator.id) }
     let!(:startup)         { create(:startup, accelerator_id: accelerator.id, admins_startups_attributes: [{admin_id: admin.id}]) }
-      let!(:startup_admin) { create(:startup_admin, accelerator_id: accelerator.id, startup_id: startup.id) }
+      let!(:team_lead)     { create(:team_lead, accelerator_id: accelerator.id, startup_id: startup.id) }
       let!(:member)        { create(:member, startup_id: startup.id, accelerator_id: accelerator.id) }
   let!(:assessment)        { create(:assessment) }
   let!(:category)          { create(:category, assessment_id: assessment.id) }
@@ -41,9 +41,9 @@ RSpec.describe StagesController, type: :controller do
       expect(response).to have_http_status(:success)
     end
 
-    it 'return all stages in json format with status success if startup_admin authenticated' do
+    it 'return all stages in json format with status success if team_lead authenticated' do
       request.headers.merge!({ "Accelerator-Id": "#{accelerator.id}"})
-      sign_in startup_admin
+      sign_in team_lead
       get :index, params: params
       expect(parse_json(response.body).count).to eq(Stage.count)
       expect(parse_json(response.body)).to eq(parse_json([stage_1, stage_2].as_json(include: :tasks).to_json))

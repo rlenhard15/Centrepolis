@@ -8,9 +8,9 @@ RSpec.describe AssessmentsMailer, type: :mailer do
   let!(:startup)                       {create(:startup, accelerator_id: accelerator.id, admins_startups_attributes: [{admin_id: admins.first.id}, {admin_id: admins.second.id}, {admin_id: admins.last.id}, {admin_id: admin_2.id}]) }
   let!(:member)                        {create(:member, startup_id: startup.id, accelerator_id: accelerator.id)}
   let!(:member_2)                      {create(:member, startup_id: startup.id, accelerator_id: accelerator.id, email_notification: false)}
-  let!(:startup_admin)                 {create(:startup_admin, startup_id: startup.id, accelerator_id: accelerator.id)}
-  let!(:startup_admin_2)               {create(:startup_admin, startup_id: startup.id, accelerator_id: accelerator.id)}
-  let!(:startup_admin_3)               {create(:startup_admin, startup_id: startup.id, accelerator_id: accelerator.id, email_notification: false)}
+  let!(:team_lead)                     {create(:team_lead, startup_id: startup.id, accelerator_id: accelerator.id)}
+  let!(:team_lead_2)                   {create(:team_lead, startup_id: startup.id, accelerator_id: accelerator.id)}
+  let!(:team_lead_3)                   {create(:team_lead, startup_id: startup.id, accelerator_id: accelerator.id, email_notification: false)}
   let!(:assessment)                    {create(:assessment)}
     let!(:category)                    {create(:category, assessment_id: assessment.id)}
       let!(:sub_category)              {create(:sub_category, category_id: category.id)}
@@ -22,14 +22,14 @@ RSpec.describe AssessmentsMailer, type: :mailer do
   let!(:params)   {ActionController::Parameters.new({
     sub_category_progress_id: sub_category_progress.id,
     assessment_progress_id: assessment_progress.id,
-    current_user_id: startup_admin.id,
+    current_user_id: team_lead.id,
     startup_id: startup.id
   })}
 
   let!(:params_with_unsubscribe_current_user) {ActionController::Parameters.new({
     sub_category_progress_id: sub_category_progress.id,
     assessment_progress_id: assessment_progress.id,
-    current_user_id: startup_admin_3.id,
+    current_user_id: team_lead_3.id,
     startup_id: startup.id
   })}
 
@@ -82,7 +82,7 @@ RSpec.describe AssessmentsMailer, type: :mailer do
     end
 
     it 'renders the receiver email' do
-      expect(mail_2.to).to eq([member.email, startup_admin_2.email])
+      expect(mail_2.to).to eq([member.email, team_lead_2.email])
     end
 
     it 'renders the sender email' do
@@ -96,7 +96,7 @@ RSpec.describe AssessmentsMailer, type: :mailer do
     end
 
     it 'renders the receiver email' do
-      expect(mail_2_2.to).to eq([member.email, startup_admin.email, startup_admin_2.email])
+      expect(mail_2_2.to).to eq([member.email, team_lead.email, team_lead_2.email])
     end
 
     it 'renders the sender email' do
@@ -110,7 +110,7 @@ RSpec.describe AssessmentsMailer, type: :mailer do
     end
 
     it 'renders the receiver email' do
-      expect(mail_3.to).to eq([startup_admin.email])
+      expect(mail_3.to).to eq([team_lead.email])
     end
 
     it 'renders the sender email' do

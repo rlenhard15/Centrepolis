@@ -11,15 +11,15 @@ RSpec.describe Assessment, type: :model do
     let!(:accelerator)               { create(:accelerator) }
     let!(:admin)                     { create(:admin, accelerator_id: accelerator.id) }
       let!(:startup)                 { create(:startup, accelerator_id: accelerator.id, admins_startups_attributes: [{admin_id: admin.id}]) }
-        let!(:startup_admin)         { create(:startup_admin, accelerator_id: accelerator.id, startup_id: startup.id) }
+        let!(:team_lead)             { create(:team_lead, accelerator_id: accelerator.id, startup_id: startup.id) }
         let!(:member)                { create(:member, startup_id: startup.id, accelerator_id: accelerator.id) }
     let!(:admin_2)                   { create(:admin, accelerator_id: accelerator.id) }
       let!(:startup_2)               { create(:startup, accelerator_id: accelerator.id, admins_startups_attributes: [{admin_id: admin_2.id}]) }
-        let!(:startup_admin_2)       { create(:startup_admin, accelerator_id: accelerator.id, startup_id: startup_2.id) }
+        let!(:team_lead_2)           { create(:team_lead, accelerator_id: accelerator.id, startup_id: startup_2.id) }
         let!(:member_2)              { create(:member, startup_id: startup_2.id, accelerator_id: accelerator.id) }
     let!(:admin_3)                   { create(:admin, accelerator_id: accelerator.id) }
       let!(:startup_3)               { create(:startup, accelerator_id: accelerator.id, admins_startups_attributes: [{admin_id: admin_3.id}]) }
-        let!(:startup_admin_3)       { create(:startup_admin, accelerator_id: accelerator.id, startup_id: startup_3.id) }
+        let!(:team_lead_3)           { create(:team_lead, accelerator_id: accelerator.id, startup_id: startup_3.id) }
         let!(:member_3)              { create(:member, startup_id: startup_3.id, accelerator_id: accelerator.id) }
     let!(:assessments)               { create_list(:assessment, 2) }
       let!(:assessment_progress_1)   { create(:assessment_progress, startup_id: startup.id, assessment_id: assessments.first.id) }
@@ -134,15 +134,15 @@ RSpec.describe Assessment, type: :model do
     let!(:accelerator)                     { create(:accelerator) }
     let!(:admin)                           { create(:admin, accelerator_id: accelerator.id) }
       let!(:startup)                       { create(:startup, accelerator_id: accelerator.id, admins_startups_attributes: [{admin_id: admin.id}]) }
-        let!(:startup_admin)               { create(:startup_admin, accelerator_id: accelerator.id, startup_id: startup.id) }
+        let!(:team_lead)                   { create(:team_lead, accelerator_id: accelerator.id, startup_id: startup.id) }
         let!(:member)                      { create(:member, startup_id: startup.id, accelerator_id: accelerator.id) }
     let!(:admin_2)                         { create(:admin, accelerator_id: accelerator.id) }
       let!(:startup_2)                     { create(:startup, accelerator_id: accelerator.id, admins_startups_attributes: [{admin_id: admin_2.id}]) }
-        let!(:startup_admin_2)             { create(:startup_admin, accelerator_id: accelerator.id, startup_id: startup_2.id) }
+        let!(:team_lead_2)                 { create(:team_lead, accelerator_id: accelerator.id, startup_id: startup_2.id) }
         let!(:member_2)                    { create(:member, startup_id: startup_2.id, accelerator_id: accelerator.id) }
     let!(:admin_3)                         { create(:admin, accelerator_id: accelerator.id) }
       let!(:startup_3)                     { create(:startup, accelerator_id: accelerator.id, admins_startups_attributes: [{admin_id: admin_3.id}]) }
-        let!(:startup_admin_3)             { create(:startup_admin, accelerator_id: accelerator.id, startup_id: startup_3.id) }
+        let!(:team_lead_3)                 { create(:team_lead, accelerator_id: accelerator.id, startup_id: startup_3.id) }
         let!(:member_3)                    { create(:member, startup_id: startup_3.id, accelerator_id: accelerator.id) }
     let!(:assessment)                      { create(:assessment) }
     let!(:assessment_2)                    { create(:assessment) }

@@ -34,7 +34,7 @@ class Task < ApplicationRecord
   end
 
   def startup_users_for_task
-    users.where(type: ["StartupAdmin", "Member"])
+    users.where(type: ["TeamLead", "Member"])
   end
 
   def users_for_task

@@ -12,7 +12,7 @@ RSpec.describe AssessmentsController, type: :controller do
     let!(:startup_1)          { create(:startup, accelerator_id: accelerator.id, admins_startups_attributes: [{admin_id: admin.id}]) }
   let!(:admin_2)              { create(:admin, accelerator_id: accelerator.id) }
     let!(:startup_2)          { create(:startup, accelerator_id: accelerator.id, admins_startups_attributes: [{admin_id: admin_2.id}]) }
-    let!(:startup_admin)      { create(:startup_admin, accelerator_id: accelerator.id, startup_id: startup_1.id) }
+    let!(:team_lead)          { create(:team_lead, accelerator_id: accelerator.id, startup_id: startup_1.id) }
     let!(:member)             { create(:member, startup_id: startup_1.id, accelerator_id: accelerator.id) }
     let!(:member_2)           { create(:member, startup_id: startup_2.id, accelerator_id: accelerator.id) }
   let!(:assessments)          { create_list(:assessment, 2) }
@@ -70,10 +70,10 @@ RSpec.describe AssessmentsController, type: :controller do
 
     it 'return all assessments with risk_value for current admin in json format with status success if admin authenticated' do
       request.headers.merge!({ "Accelerator-Id": "#{accelerator.id}"})
-      sign_in startup_admin
+      sign_in team_lead
       get :index
       expect(parse_json(response.body).count).to eq(Assessment.count)
-      expect(parse_json(response.body)).to eq(parse_json(Assessment.with_assessment_progresses(startup_admin.startup.id).to_json))
+      expect(parse_json(response.body)).to eq(parse_json(Assessment.with_assessment_progresses(team_lead.startup.id).to_json))
       expect(response.content_type).to eq('application/json; charset=utf-8')
       expect(response).to have_http_status(:success)
     end
@@ -108,9 +108,9 @@ RSpec.describe AssessmentsController, type: :controller do
       expect(response).to have_http_status(:success)
     end
 
-    it 'return specific assessment with child models in json format with status success if startup_admin authenticated' do
+    it 'return specific assessment with child models in json format with status success if team_lead authenticated' do
       request.headers.merge!({ "Accelerator-Id": "#{accelerator.id}"})
-      sign_in startup_admin
+      sign_in team_lead
       get :show, params: params
       expect(parse_json(response.body)).to eq(parse_json(assessments.first.as_json(methods: :description_with_child_models).to_json))
       expect(response.content_type).to eq('application/json; charset=utf-8')
