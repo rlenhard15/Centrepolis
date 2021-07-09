@@ -201,25 +201,26 @@ namespace :update_assessments do
   task update_risk_levels_11: :environment do
     # Management Team Risk category stages updates
 
-    management_risk_category = Category.where(title: 'Management Team Risk').first
-    updated_management_risk_category = management_risk_category.update(title: 'Team Risk')
+    # management_risk_category = Category.where(title: 'Management Team Risk').first
+    # management_risk_category.update(title: 'Team Risk')
+    updated_management_risk_category = Category.where(title: 'Team Risk').first
 
-    updated_manag_category_stages_1 = SubCategory.where(title: 'Management Team').first.stages
-
-    st_1 = updated_manag_category_stages_1.where(title: 'No notable experience').first
-    st_1.update(title: 'Limited to no experience in these areas')
-
-    st_2 = updated_manag_category_stages_1.where(title: 'Technology or domain experience only').first
-    st_2.update(title: 'Mgmt team has experience in at least one of these categories')
-
-    st_3 = updated_manag_category_stages_1.where(title: 'Technology / domain expert along with sales / marketing expertise').first
-    st_3.update(title: 'Mgmt team has experience in at least 2 of these categories')
-
-    st_4 = updated_manag_category_stages_1.where(title: 'Team with notable experience, but gaps exists').first
-    st_4.update(title: 'Mgmt team has experience in these categories but gaps exist')
-
-    st_5 = updated_manag_category_stages_1.where(title: 'Solid team with notable experience').first
-    st_5.update(title: 'Mgmt team is complete and has all functions in place')
+    # updated_manag_category_stages_1 = SubCategory.where(title: 'Management Team').first.stages
+    #
+    # st_1 = updated_manag_category_stages_1.where(title: 'No notable experience').first
+    # st_1.update(title: 'Limited to no experience in these areas')
+    #
+    # st_2 = updated_manag_category_stages_1.where(title: 'Technology or domain experience only').first
+    # st_2.update(title: 'Mgmt team has experience in at least one of these categories')
+    #
+    # st_3 = updated_manag_category_stages_1.where(title: 'Technology / domain expert along with sales / marketing expertise').first
+    # st_3.update(title: 'Mgmt team has experience in at least 2 of these categories')
+    #
+    # st_4 = updated_manag_category_stages_1.where(title: 'Team with notable experience, but gaps exists').first
+    # st_4.update(title: 'Mgmt team has experience in these categories but gaps exist')
+    #
+    # st_5 = updated_manag_category_stages_1.where(title: 'Solid team with notable experience').first
+    # st_5.update(title: 'Mgmt team is complete and has all functions in place')
 
     stages_talent_sub_category = ['Not yet addressed', 'Critical talent being evaluated', 'Critical talent identified', 'Critical talent risk of talent flight evaluated', 'Risk mitigation plan in place to avoid talent flight']
 
