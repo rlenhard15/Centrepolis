@@ -68,7 +68,7 @@ RSpec.describe User, type: :model do
     let!(:super_admin)   { create(:user, type:'SuperAdmin') }
     let!(:admin)         { create(:user, type:'Admin', accelerator_id: accelerator.id) }
       let!(:startup)     { create(:startup, accelerator_id: accelerator.id, admins_startups_attributes: [{admin_id: admin.id}]) }
-    let!(:startup_admin) { create(:user, type:'StartupAdmin', accelerator_id: accelerator.id, startup_id: startup.id) }
+    let!(:team_lead)     { create(:user, type:'TeamLead', accelerator_id: accelerator.id, startup_id: startup.id) }
     let!(:member)        { create(:user, type:'Member', accelerator_id: accelerator.id, startup_id: startup.id) }
 
     it "return true if user's type 'SuperAdmin'" do
@@ -80,7 +80,7 @@ RSpec.describe User, type: :model do
     end
 
     it "return false if user's type isn't 'SuperAdmin'" do
-      expect(startup_admin.super_admin?).to eq(false)
+      expect(team_lead.super_admin?).to eq(false)
     end
 
     it "return false if user's type isn't 'SuperAdmin'" do
@@ -93,7 +93,7 @@ RSpec.describe User, type: :model do
     let!(:super_admin)   { create(:user, type:'SuperAdmin') }
     let!(:admin)         { create(:user, type:'Admin', accelerator_id: accelerator.id) }
       let!(:startup)     { create(:startup, accelerator_id: accelerator.id, admins_startups_attributes: [{admin_id: admin.id}]) }
-    let!(:startup_admin) { create(:user, type:'StartupAdmin', accelerator_id: accelerator.id, startup_id: startup.id) }
+    let!(:team_lead)     { create(:user, type:'TeamLead', accelerator_id: accelerator.id, startup_id: startup.id) }
     let!(:member)        { create(:user, type:'Member', accelerator_id: accelerator.id, startup_id: startup.id) }
 
     it "return true if user's type 'Admin'" do
@@ -105,7 +105,7 @@ RSpec.describe User, type: :model do
     end
 
     it "return false if user's type isn't 'Admin'" do
-      expect(startup_admin.admin?).to eq(false)
+      expect(team_lead.admin?).to eq(false)
     end
 
     it "return false if user's type isn't 'Admin'" do
@@ -113,16 +113,16 @@ RSpec.describe User, type: :model do
     end
   end
 
-  describe "Method 'startup_admin?'" do
+  describe "Method 'team_lead?'" do
     let!(:accelerator)   { create(:accelerator) }
     let!(:super_admin)   { create(:user, type:'SuperAdmin') }
     let!(:admin)         { create(:user, type:'Admin', accelerator_id: accelerator.id) }
       let!(:startup)     { create(:startup, accelerator_id: accelerator.id, admins_startups_attributes: [{admin_id: admin.id}]) }
-    let!(:startup_admin) { create(:user, type:'StartupAdmin', accelerator_id: accelerator.id, startup_id: startup.id) }
+    let!(:team_lead)     { create(:user, type:'TeamLead', accelerator_id: accelerator.id, startup_id: startup.id) }
     let!(:member)        { create(:user, type:'Member', accelerator_id: accelerator.id, startup_id: startup.id) }
 
     it "return true if user's type 'StartupAdmin'" do
-      expect(startup_admin.startup_admin?).to eq(true)
+      expect(team_lead.startup_admin?).to eq(true)
     end
 
     it "return false if user's type isn't 'StartupAdmin'" do
@@ -143,7 +143,7 @@ RSpec.describe User, type: :model do
       let!(:super_admin)   { create(:user, type:'SuperAdmin') }
       let!(:admin)         { create(:user, type:'Admin', accelerator_id: accelerator.id) }
         let!(:startup)     { create(:startup, accelerator_id: accelerator.id, admins_startups_attributes: [{admin_id: admin.id}]) }
-      let!(:startup_admin) { create(:user, type:'StartupAdmin', accelerator_id: accelerator.id, startup_id: startup.id) }
+      let!(:team_lead)     { create(:user, type:'TeamLead', accelerator_id: accelerator.id, startup_id: startup.id) }
       let!(:member)        { create(:user, type:'Member', accelerator_id: accelerator.id, startup_id: startup.id) }
 
       it "return true if user's type 'Member'" do
@@ -159,7 +159,7 @@ RSpec.describe User, type: :model do
       end
 
       it "return false if user's type isn't 'Member'" do
-        expect(startup_admin.member?).to eq(false)
+        expect(team_lead.member?).to eq(false)
       end
   end
 
@@ -203,7 +203,7 @@ RSpec.describe User, type: :model do
     let!(:super_admin)   { create(:super_admin) }
     let!(:admins)        { create_list(:admin, 3, accelerator_id: accelerator.id) }
       let!(:startup)     { create(:startup, accelerator_id: accelerator.id, admins_startups_attributes: [{admin_id: admins.first.id}]) }
-    let!(:startup_admins){ create_list(:startup_admin, 4, accelerator_id: accelerator.id, startup_id: startup.id) }
+    let!(:team_leads)    { create_list(:team_lead, 4, accelerator_id: accelerator.id, startup_id: startup.id) }
     let!(:members)       { create_list(:member, 2, accelerator_id: accelerator.id, startup_id: startup.id) }
 
     it "Scope 'members' return all members" do
@@ -246,22 +246,22 @@ RSpec.describe User, type: :model do
       )
     end
 
-    it "Scope 'startup_admins' return all startup_admins" do
-      startup_admins_info = User.startup_admins.order(created_at: :asc).as_json
+    it "Scope 'team_leads' return all team_leads" do
+      team_leads_info = User.startup_admins.order(created_at: :asc).as_json
 
-      recursively_delete_timestamps(startup_admins_info)
+      recursively_delete_timestamps(team_leads_info)
 
-      expect(startup_admins_info.count).to eq(4)
-      expect(startup_admins_info[0]).to eq(
+      expect(team_leads_info.count).to eq(4)
+      expect(team_leads_info[0]).to eq(
         {
-          "id"=> startup_admins.first.id,
-          "email"=> startup_admins.first.email,
-          "first_name"=> startup_admins.first.first_name,
-          "last_name"=> startup_admins.first.last_name,
-          "accelerator_id"=> startup_admins.first.accelerator_id,
-          "startup_id"=> startup_admins.first.startup_id,
-          "email_notification"=> startup_admins.first.email_notification,
-          "phone_number"=> startup_admins.first.phone_number
+          "id"=> team_leads.first.id,
+          "email"=> team_leads.first.email,
+          "first_name"=> team_leads.first.first_name,
+          "last_name"=> team_leads.first.last_name,
+          "accelerator_id"=> team_leads.first.accelerator_id,
+          "startup_id"=> team_leads.first.startup_id,
+          "email_notification"=> team_leads.first.email_notification,
+          "phone_number"=> team_leads.first.phone_number
         }
       )
     end

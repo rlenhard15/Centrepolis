@@ -12,15 +12,15 @@ RSpec.describe SubCategory, type: :model do
     let!(:admin)                           { create(:admin, accelerator_id: accelerator.id) }
     let!(:admin)                           { create(:admin, accelerator_id: accelerator.id) }
       let!(:startup)                       { create(:startup, accelerator_id: accelerator.id, admins_startups_attributes: [{admin_id: admin.id}]) }
-        let!(:startup_admin)               { create(:startup_admin, accelerator_id: accelerator.id, startup_id: startup.id) }
+        let!(:team_lead)                   { create(:team_lead, accelerator_id: accelerator.id, startup_id: startup.id) }
         let!(:member)                      { create(:member, startup_id: startup.id, accelerator_id: accelerator.id) }
     let!(:admin_2)                         { create(:admin, accelerator_id: accelerator.id) }
       let!(:startup_2)                     { create(:startup, accelerator_id: accelerator.id, admins_startups_attributes: [{admin_id: admin_2.id}]) }
-        let!(:startup_admin_2)             { create(:startup_admin, accelerator_id: accelerator.id, startup_id: startup_2.id) }
+        let!(:team_lead_2)                 { create(:team_lead, accelerator_id: accelerator.id, startup_id: startup_2.id) }
         let!(:member_2)                    { create(:member, startup_id: startup_2.id, accelerator_id: accelerator.id) }
     let!(:admin_3)                         { create(:admin, accelerator_id: accelerator.id) }
       let!(:startup_3)                     { create(:startup, accelerator_id: accelerator.id, admins_startups_attributes: [{admin_id: admin_3.id}]) }
-        let!(:startup_admin_3)             { create(:startup_admin, accelerator_id: accelerator.id, startup_id: startup_3.id) }
+        let!(:team_lead_3)                 { create(:team_lead, accelerator_id: accelerator.id, startup_id: startup_3.id) }
         let!(:member_3)                    { create(:member, startup_id: startup_3.id, accelerator_id: accelerator.id) }
     let!(:assessment)                      { create(:assessment) }
       let!(:category)                      { create(:category, assessment_id: assessment.id) }

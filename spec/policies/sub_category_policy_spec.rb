@@ -25,7 +25,7 @@ RSpec.describe SubCategoryPolicy, type: :policy do
     let!(:accelerator) { create(:accelerator) }
     let!(:admin)       { create(:admin, accelerator_id: accelerator.id) }
       let!(:startup)   { create(:startup, accelerator_id: accelerator.id, admins_startups_attributes: [{admin_id: admin.id}]) }
-    let!(:user)        {create(:startup_admin, accelerator_id: accelerator.id, startup_id: startup.id)}
+    let!(:user)        {create(:team_lead, accelerator_id: accelerator.id, startup_id: startup.id)}
 
     it { is_expected.to permit_actions(%i[update_progress]) }
   end

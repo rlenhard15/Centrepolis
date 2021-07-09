@@ -14,10 +14,10 @@ RSpec.describe TasksController, type: :controller do
     let!(:startup_2)          { create(:startup, accelerator_id: accelerator.id, admins_startups_attributes: [{admin_id: admin_2.id}]) }
   let!(:admin_3)              { create(:admin, accelerator_id: accelerator_2.id) }
     let!(:startup_3)          { create(:startup, accelerator_id: accelerator_2.id, admins_startups_attributes: [{admin_id: admin_3.id}]) }
-    let!(:startup_admin)      { create(:startup_admin, accelerator_id: accelerator.id, startup_id: startup.id) }
-    let!(:startup_admin_4)    { create(:startup_admin, accelerator_id: accelerator.id, startup_id: startup.id) }
-    let!(:startup_admin_2)    { create(:startup_admin, accelerator_id: accelerator.id, startup_id: startup_2.id) }
-    let!(:startup_admin_3)    { create(:startup_admin, accelerator_id: accelerator_2.id, startup_id: startup_3.id) }
+    let!(:team_lead)          { create(:team_lead, accelerator_id: accelerator.id, startup_id: startup.id) }
+    let!(:team_lead_4)        { create(:team_lead, accelerator_id: accelerator.id, startup_id: startup.id) }
+    let!(:team_lead_2)        { create(:team_lead, accelerator_id: accelerator.id, startup_id: startup_2.id) }
+    let!(:team_lead_3)        { create(:team_lead, accelerator_id: accelerator_2.id, startup_id: startup_3.id) }
     let!(:member)             { create(:member, startup_id: startup.id, accelerator_id: accelerator.id) }
     let!(:member_2)           { create(:member, startup_id: startup.id, accelerator_id: accelerator.id) }
     let!(:member_3)           { create(:member, startup_id: startup_2.id, accelerator_id: accelerator.id) }
@@ -26,11 +26,11 @@ RSpec.describe TasksController, type: :controller do
     let!(:category)           { create(:category, assessment_id: assessment.id) }
       let!(:sub_category)     { create(:sub_category, category_id: category.id) }
         let!(:stage)          { create(:stage, sub_category_id: sub_category.id) }
-          let!(:tasks)        { create_list(:task, 2, stage_id: stage.id, task_users_attributes: [{user_id: member.id}, {user_id: member_2.id}, {user_id: startup_admin.id}]) }
-          let!(:tasks_3)      { create_list(:task, 2, stage_id: stage.id, task_users_attributes: [{user_id: member.id}, {user_id: startup_admin.id}]) }
-          let!(:tasks_2)      { create_list(:task, 4, stage_id: stage.id, task_users_attributes: [{user_id: member_3.id}, {user_id: startup_admin_2.id}]) }
-          let!(:tasks_4)      { create_list(:task, 4, stage_id: stage.id, task_users_attributes: [{user_id: member_4.id}, {user_id: startup_admin_3.id}]) }
-          let!(:tasks_5)      { create_list(:task, 4, stage_id: stage.id, task_users_attributes: [{user_id: member_2.id}, {user_id: startup_admin_4.id}]) }
+          let!(:tasks)        { create_list(:task, 2, stage_id: stage.id, task_users_attributes: [{user_id: member.id}, {user_id: member_2.id}, {user_id: team_lead.id}]) }
+          let!(:tasks_3)      { create_list(:task, 2, stage_id: stage.id, task_users_attributes: [{user_id: member.id}, {user_id: team_lead.id}]) }
+          let!(:tasks_2)      { create_list(:task, 4, stage_id: stage.id, task_users_attributes: [{user_id: member_3.id}, {user_id: team_lead_2.id}]) }
+          let!(:tasks_4)      { create_list(:task, 4, stage_id: stage.id, task_users_attributes: [{user_id: member_4.id}, {user_id: team_lead_3.id}]) }
+          let!(:tasks_5)      { create_list(:task, 4, stage_id: stage.id, task_users_attributes: [{user_id: member_2.id}, {user_id: team_lead_4.id}]) }
 
 
   describe 'GET index action' do
@@ -58,12 +58,12 @@ RSpec.describe TasksController, type: :controller do
       expect(response).to have_http_status(:success)
     end
 
-    it 'return all tasks of the startup of the current startup_admin in json format with status success if startup_admin authenticated' do
+    it 'return all tasks of the startup of the current team_lead in json format with status success if team_lead authenticated' do
       request.headers.merge!({ "Accelerator-Id": "#{accelerator.id}"})
-      sign_in startup_admin
+      sign_in team_lead
       get :index, params: params
-      expect(parse_json(response.body)[1][1].count).to eq(startup_admin.tasks.count)
-      expect(recursively_delete_timestamps(parse_json(response.body)[1][1])).to eq(parse_json(startup_admin.tasks.with_all_required_info_for_tasks.limit(10).as_json(methods: :members_for_task).to_json))
+      expect(parse_json(response.body)[1][1].count).to eq(team_lead.tasks.count)
+      expect(recursively_delete_timestamps(parse_json(response.body)[1][1])).to eq(parse_json(team_lead.tasks.with_all_required_info_for_tasks.limit(10).as_json(methods: :members_for_task).to_json))
       expect(response.content_type).to eq('application/json; charset=utf-8')
       expect(response).to have_http_status(:success)
     end
@@ -115,18 +115,18 @@ RSpec.describe TasksController, type: :controller do
       expect(response).to have_http_status(:forbidden)
     end
 
-    it 'return specific task in json format with status success if startup_admin authenticated' do
+    it 'return specific task in json format with status success if team_lead authenticated' do
       request.headers.merge!({ "Accelerator-Id": "#{accelerator.id}"})
-      sign_in startup_admin
+      sign_in team_lead
       get :show, params: params_1
       expect(parse_json(response.body)).to eq(parse_json(Task.with_all_required_info_for_tasks.where(id: tasks.first.id).first.as_json(methods: :members_for_task).to_json))
       expect(response.content_type).to eq('application/json; charset=utf-8')
       expect(response).to have_http_status(:success)
     end
 
-    it 'return error with status 403 if task doesnt belong to startup_admin' do
+    it 'return error with status 403 if task doesnt belong to team_lead' do
       request.headers.merge!({ "Accelerator-Id": "#{accelerator.id}"})
-      sign_in startup_admin
+      sign_in team_lead
       get :show, params: params_2
       expect(response.body).to eq({'notice': 'You do not have permission to perform this action'}.to_json)
       expect(response.content_type).to eq('application/json; charset=utf-8')
@@ -153,7 +153,7 @@ RSpec.describe TasksController, type: :controller do
   end
 
   describe 'POST create action' do
-    let!(:params)   { ActionController::Parameters.new({ task: {title: "Task", stage_id: stage.id, priority: "low", due_date: DateTime.now, task_users_attributes: [{user_id: member.id}, {user_id: startup_admin.id}] }}) }
+    let!(:params)   { ActionController::Parameters.new({ task: {title: "Task", stage_id: stage.id, priority: "low", due_date: DateTime.now, task_users_attributes: [{user_id: member.id}, {user_id: team_lead.id}] }}) }
 
     before { params.permit! }
 
@@ -165,7 +165,7 @@ RSpec.describe TasksController, type: :controller do
       expect(Task.last.users.count).to eq(3)
       expect(Task.last.notifications.count).to eq(3)
       expect(Task.last.users.where(type: "Member").first).to eq(Member.find(member.id))
-      expect(Task.last.users.where(type: "StartupAdmin").first).to eq(StartupAdmin.find(startup_admin.id))
+      expect(Task.last.users.where(type: "TeamLead").first).to eq(TeamLead.find(team_lead.id))
       expect(response.content_type).to eq('application/json; charset=utf-8')
       expect(response).to have_http_status(:created)
     end
@@ -178,20 +178,20 @@ RSpec.describe TasksController, type: :controller do
       expect(Task.last.users.count).to eq(3)
       expect(Task.last.notifications.count).to eq(3)
       expect(Task.last.users.where(type: "Member").first).to eq(Member.find(member.id))
-      expect(Task.last.users.where(type: "StartupAdmin").first).to eq(StartupAdmin.find(startup_admin.id))
+      expect(Task.last.users.where(type: "TeamLead").first).to eq(TeamLead.find(team_lead.id))
       expect(response.content_type).to eq('application/json; charset=utf-8')
       expect(response).to have_http_status(:created)
     end
 
-    it 'return new task with users who assigned to the task in json format with status success if startup_admin authenticated' do
+    it 'return new task with users who assigned to the task in json format with status success if team_lead authenticated' do
       request.headers.merge!({ "Accelerator-Id": "#{accelerator.id}"})
-      sign_in startup_admin_4
+      sign_in team_lead_4
       post :create, params: params
       expect(parse_json(response.body)).to eq(parse_json(Task.last.as_json(methods: :members_for_task).to_json))
       expect(Task.last.users.count).to eq(3)
       expect(Task.last.notifications.count).to eq(3)
       expect(Task.last.users.where(type: "Member").first).to eq(Member.find(member.id))
-      expect(Task.last.users.where(type: "StartupAdmin").first).to eq(StartupAdmin.find(startup_admin.id))
+      expect(Task.last.users.where(type: "TeamLead").first).to eq(TeamLead.find(team_lead.id))
       expect(response.content_type).to eq('application/json; charset=utf-8')
       expect(response).to have_http_status(:created)
     end
@@ -207,7 +207,7 @@ RSpec.describe TasksController, type: :controller do
   end
 
   describe 'PUT update action' do
-    let!(:task_2)   { create(:task, stage_id: stage.id, task_users_attributes: [{user_id: member.id}, {user_id: startup_admin.id}]) }
+    let!(:task_2)   { create(:task, stage_id: stage.id, task_users_attributes: [{user_id: member.id}, {user_id: team_lead.id}]) }
     let!(:params)   { ActionController::Parameters.new({ task: { title: "New Task", stage_id: stage.id, priority: "high", due_date: DateTime.now, task_users_attributes: [{user_id: member_2.id}] }}) }
     let!(:params_2) { ActionController::Parameters.new({ 'id': task_2.id}) }
     let!(:params_3) { ActionController::Parameters.new({ 'id': tasks_2.first.id}) }
@@ -255,11 +255,11 @@ RSpec.describe TasksController, type: :controller do
       expect(response).to have_http_status(:forbidden)
     end
 
-    it 'return updated task and assigned new users to the task in json format with status success if startup_admin authenticated' do
+    it 'return updated task and assigned new users to the task in json format with status success if team_lead authenticated' do
       request.headers.merge!({ "Accelerator-Id": "#{accelerator.id}"})
       expect(task_2.users.count).to eq(2)
       expect(task_2.notifications.count).to eq(2)
-      sign_in startup_admin
+      sign_in team_lead
       put :update, params: params.merge(params_2)
       task_2.reload
       expect(task_2.notifications.count).to eq(3)
@@ -270,9 +270,9 @@ RSpec.describe TasksController, type: :controller do
       expect(response).to have_http_status(:success)
     end
 
-    it 'return error with status 403 if task doesnt belong to startup_admin' do
+    it 'return error with status 403 if task doesnt belong to team_lead' do
       request.headers.merge!({ "Accelerator-Id": "#{accelerator.id}"})
-      sign_in startup_admin
+      sign_in team_lead
       put :update, params: params.merge(params_3)
       expect(response.body).to eq({'notice': 'You do not have permission to perform this action'}.to_json)
       expect(response.content_type).to eq('application/json; charset=utf-8')
@@ -290,7 +290,7 @@ RSpec.describe TasksController, type: :controller do
   end
 
   describe 'PUT mark_task_as_completed action' do
-    let!(:task_2)  { create(:task, stage_id: stage.id, status: 0, task_users_attributes: [{user_id: member.id}, {user_id: startup_admin.id}]) }
+    let!(:task_2)  { create(:task, stage_id: stage.id, status: 0, task_users_attributes: [{user_id: member.id}, {user_id: team_lead.id}]) }
     let!(:params)  { ActionController::Parameters.new({'id': task_2.id}) }
     let!(:params_2) { ActionController::Parameters.new({ 'id': tasks_4.first.id}) }
     let!(:params_3) { ActionController::Parameters.new({ 'id': tasks_2.first.id}) }
@@ -332,9 +332,9 @@ RSpec.describe TasksController, type: :controller do
       expect(response).to have_http_status(:forbidden)
     end
 
-    it 'return updated task status to completed in json format with status success if startup_admin authenticated' do
+    it 'return updated task status to completed in json format with status success if team_lead authenticated' do
       request.headers.merge!({ "Accelerator-Id": "#{accelerator.id}"})
-      sign_in startup_admin
+      sign_in team_lead
       put :mark_task_as_completed, params: params
       task_2.reload
       expect(parse_json(response.body)).to eq(parse_json({new_task_status: task_2.status}.to_json))
@@ -343,9 +343,9 @@ RSpec.describe TasksController, type: :controller do
       expect(response).to have_http_status(:success)
     end
 
-    it 'return error with status 403 if task doesnt belong to startup_admin' do
+    it 'return error with status 403 if task doesnt belong to team_lead' do
       request.headers.merge!({ "Accelerator-Id": "#{accelerator.id}"})
-      sign_in startup_admin
+      sign_in team_lead
       put :mark_task_as_completed, params: params_4
       expect(response.body).to eq({'notice': 'You do not have permission to perform this action'}.to_json)
       expect(response.content_type).to eq('application/json; charset=utf-8')
@@ -363,7 +363,7 @@ RSpec.describe TasksController, type: :controller do
       expect(response).to have_http_status(:success)
     end
 
-    it 'return error with status 403 if task doesnt belong to startup_admin' do
+    it 'return error with status 403 if task doesnt belong to team_lead' do
       request.headers.merge!({ "Accelerator-Id": "#{accelerator.id}"})
       sign_in member
       put :mark_task_as_completed, params: params_4
@@ -374,7 +374,7 @@ RSpec.describe TasksController, type: :controller do
   end
 
   describe 'DELETE destroy action' do
-    let!(:task_3)    { create(:task, stage_id: stage.id, task_users_attributes: [{user_id: member.id}, {user_id: startup_admin.id}]) }
+    let!(:task_3)    { create(:task, stage_id: stage.id, task_users_attributes: [{user_id: member.id}, {user_id: team_lead.id}]) }
     let!(:params)  { ActionController::Parameters.new({'id': task_3.id}) }
     let!(:params_2) { ActionController::Parameters.new({ 'id': tasks_2.first.id}) }
 
@@ -410,9 +410,9 @@ RSpec.describe TasksController, type: :controller do
       expect(response).to have_http_status(:forbidden)
     end
 
-    it 'return successfully message in json if startup_admin authenticated' do
+    it 'return successfully message in json if team_lead authenticated' do
       request.headers.merge!({ "Accelerator-Id": "#{accelerator.id}"})
-      sign_in startup_admin
+      sign_in team_lead
       delete :destroy, params: params
       expect(Task.find_by_id(task_3.id)).to eq(nil)
       expect(response.body).to eq({message: 'Successfully destroyed'}.to_json)
@@ -420,9 +420,9 @@ RSpec.describe TasksController, type: :controller do
       expect(response).to have_http_status(:success)
     end
 
-    it 'return error with status 403 if task doesnt belong to startup_admin' do
+    it 'return error with status 403 if task doesnt belong to team_lead' do
       request.headers.merge!({ "Accelerator-Id": "#{accelerator.id}"})
-      sign_in startup_admin
+      sign_in team_lead
       delete :destroy, params: params_2
       expect(response.body).to eq({'notice': 'You do not have permission to perform this action'}.to_json)
       expect(response.content_type).to eq('application/json; charset=utf-8')

@@ -13,7 +13,7 @@ RSpec.describe StartupsController, type: :controller do
   let!(:startup_2)               { create(:startup, accelerator_id: accelerator_2.id, admins_startups_attributes: [{admin_id: admin.id}]) }
   let!(:startups)                { create_list(:startup, 14, accelerator_id: accelerator.id, admins_startups_attributes: [{admin_id: admins.first.id}]) }
   let!(:startups_2)              { create_list(:startup, 9, accelerator_id: accelerator.id, admins_startups_attributes: [{admin_id: admins.last.id}]) }
-  let!(:startup_admin)           { create(:startup_admin, accelerator_id: accelerator.id, startup_id: startup.id) }
+  let!(:team_lead)               { create(:team_lead, accelerator_id: accelerator.id, startup_id: startup.id) }
   let!(:member)                  { create(:member, startup_id: startup.id, accelerator_id: accelerator.id) }
   let!(:assessment)              { create(:assessment) }
     let!(:assessment_progress)   { create(:assessment_progress, startup_id: startup.id, assessment_id: assessment.id) }
@@ -31,7 +31,7 @@ RSpec.describe StartupsController, type: :controller do
       expect(parse_json(response.body)[0][1]).to eq(1)
       expect(parse_json(response.body)[1][1][0]['assessments_risk_list']).to eq(startup.assessments_risk_list.as_json)
       expect(parse_json(response.body)[1][1].count).to eq(10)
-      expect(recursively_delete_timestamps(parse_json(response.body)[1][1][1])).to eq(recursively_delete_timestamps(startups.first.as_json(methods: [:assessments_risk_list, :admins, :members, :startup_admins])))
+      expect(recursively_delete_timestamps(parse_json(response.body)[1][1][1])).to eq(recursively_delete_timestamps(startups.first.as_json(methods: [:assessments_risk_list, :admins, :members, :team_leads])))
       expect(response.content_type).to eq('application/json; charset=utf-8')
       expect(response).to have_http_status(:success)
     end
@@ -43,14 +43,14 @@ RSpec.describe StartupsController, type: :controller do
       expect(parse_json(response.body)[0][1]).to eq(1)
       expect(parse_json(response.body)[1][1].count).to eq(9)
       expect(parse_json(response.body)[1][1][0]['assessments_risk_list']).to eq(startups_2.first.assessments_risk_list.as_json)
-      expect(recursively_delete_timestamps(parse_json(response.body)[1][1][1])).to eq(recursively_delete_timestamps(startups_2.second.as_json(methods: [:assessments_risk_list, :admins, :members, :startup_admins])))
+      expect(recursively_delete_timestamps(parse_json(response.body)[1][1][1])).to eq(recursively_delete_timestamps(startups_2.second.as_json(methods: [:assessments_risk_list, :admins, :members, :team_leads])))
       expect(response.content_type).to eq('application/json; charset=utf-8')
       expect(response).to have_http_status(:success)
     end
 
-    it 'return error with status 403 if startup_admin authenticated' do
+    it 'return error with status 403 if team_lead authenticated' do
       request.headers.merge!({ "Accelerator-Id": "#{accelerator.id}"})
-      sign_in startup_admin
+      sign_in team_lead
       get :index
       expect(response.body).to eq({'notice': 'You do not have permission to perform this action'}.to_json)
       expect(response.content_type).to eq('application/json; charset=utf-8')
@@ -98,9 +98,9 @@ RSpec.describe StartupsController, type: :controller do
       expect(response).to have_http_status(:created)
     end
 
-    it 'return error with status 403 if startup_admin authenticated' do
+    it 'return error with status 403 if team_lead authenticated' do
       request.headers.merge!({ "Accelerator-Id": "#{accelerator.id}"})
-      sign_in startup_admin
+      sign_in team_lead
       post :create, params: params
       expect(response.body).to eq({'notice': 'You do not have permission to perform this action'}.to_json)
       expect(response.content_type).to eq('application/json; charset=utf-8')
@@ -132,7 +132,7 @@ RSpec.describe StartupsController, type: :controller do
       get :show, params: params_1
       expect(parse_json(response.body)).to eq(parse_json(startup.as_json(methods: [:assessments_risk_list, :admins], include: {
         members: {methods: [:tasks_number, :last_visit, :user_type]},
-        startup_admins: {methods: [:tasks_number, :last_visit, :user_type]}
+        team_leads: {methods: [:tasks_number, :last_visit, :user_type]}
       }).to_json))
       expect(response.content_type).to eq('application/json; charset=utf-8')
       expect(response).to have_http_status(:success)
@@ -153,7 +153,7 @@ RSpec.describe StartupsController, type: :controller do
       get :show, params: params_1
       expect(parse_json(response.body)).to eq(parse_json(startup.as_json(methods: [:assessments_risk_list, :admins], include: {
         members: {methods: [:tasks_number, :last_visit, :user_type]},
-        startup_admins: {methods: [:tasks_number, :last_visit, :user_type]}
+        team_leads: {methods: [:tasks_number, :last_visit, :user_type]}
       }).to_json))
       expect(response.content_type).to eq('application/json; charset=utf-8')
       expect(response).to have_http_status(:success)
@@ -168,21 +168,21 @@ RSpec.describe StartupsController, type: :controller do
       expect(response).to have_http_status(:forbidden)
     end
 
-    it 'return specific startup in json format with status success if startup_admin authenticated' do
+    it 'return specific startup in json format with status success if team_lead authenticated' do
       request.headers.merge!({ "Accelerator-Id": "#{accelerator.id}"})
-      sign_in startup_admin
+      sign_in team_lead
       get :show, params: params_1
       expect(parse_json(response.body)).to eq(parse_json(startup.as_json(methods: :assessments_risk_list, include: {
         members: {methods: [:tasks_number, :last_visit, :user_type]},
-        startup_admins: {methods: [:tasks_number, :last_visit, :user_type]}
+        team_leads: {methods: [:tasks_number, :last_visit, :user_type]}
       }).to_json))
       expect(response.content_type).to eq('application/json; charset=utf-8')
       expect(response).to have_http_status(:success)
     end
 
-    it 'return error with status 403 if startup_admin try to request startup that doesnt belong to the startup_admin' do
+    it 'return error with status 403 if team_lead try to request startup that doesnt belong to the team_lead' do
       request.headers.merge!({ "Accelerator-Id": "#{accelerator.id}"})
-      sign_in startup_admin
+      sign_in team_lead
       get :show, params: params_3
       expect(response.body).to eq({'notice': 'You do not have permission to perform this action'}.to_json)
       expect(response.content_type).to eq('application/json; charset=utf-8')
@@ -195,13 +195,13 @@ RSpec.describe StartupsController, type: :controller do
       get :show, params: params_1
       expect(parse_json(response.body)).to eq(parse_json(startup.as_json(methods: :assessments_risk_list, include: {
         members: {methods: [:tasks_number, :last_visit, :user_type]},
-        startup_admins: {methods: [:tasks_number, :last_visit, :user_type]}
+        team_leads: {methods: [:tasks_number, :last_visit, :user_type]}
       }).to_json))
       expect(response.content_type).to eq('application/json; charset=utf-8')
       expect(response).to have_http_status(:success)
     end
 
-    it 'return error with status 403 if startup_admin try to request startup that doesnt belong to the startup_admin' do
+    it 'return error with status 403 if team_lead try to request startup that doesnt belong to the team_lead' do
       request.headers.merge!({ "Accelerator-Id": "#{accelerator.id}"})
       sign_in member
       get :show, params: params_3
@@ -264,9 +264,9 @@ RSpec.describe StartupsController, type: :controller do
       expect(response).to have_http_status(:forbidden)
     end
 
-    it 'return updated startup in json format with status success if startup_admin authenticated' do
+    it 'return updated startup in json format with status success if team_lead authenticated' do
       request.headers.merge!({ "Accelerator-Id": "#{accelerator.id}"})
-      sign_in startup_admin
+      sign_in team_lead
       put :update, params: params_1.merge(params)
       startup.reload
       expect(parse_json(response.body)).to eq(parse_json(Startup.find(startup.id).to_json))
@@ -276,9 +276,9 @@ RSpec.describe StartupsController, type: :controller do
       expect(response).to have_http_status(:success)
     end
 
-    it 'return error with status 403 if startup_admin try to request startup that doesnt belong to the startup_admin' do
+    it 'return error with status 403 if team_lead try to request startup that doesnt belong to the team_lead' do
       request.headers.merge!({ "Accelerator-Id": "#{accelerator.id}"})
-      sign_in startup_admin
+      sign_in team_lead
       put :update, params: params_3.merge(params)
       expect(response.body).to eq({'notice': 'You do not have permission to perform this action'}.to_json)
       expect(response.content_type).to eq('application/json; charset=utf-8')
@@ -308,12 +308,12 @@ RSpec.describe StartupsController, type: :controller do
       request.headers.merge!({ "Accelerator-Id": "#{accelerator.id}"})
       sign_in super_admin
       expect(Startup.find_by_id(startup.id).members).to eq(Member.where(id: member.id))
-      expect(Startup.find_by_id(startup.id).startup_admins).to eq(StartupAdmin.where(id: startup_admin.id))
+      expect(Startup.find_by_id(startup.id).team_leads).to eq(TeamLead.where(id: team_lead.id))
       expect(Startup.find_by_id(startup.id).assessment_progresses).to eq(AssessmentProgress.where(startup_id: startup.id))
       delete :destroy, params: params_1
       expect(Startup.find_by_id(startup.id)).to eq(nil)
       expect(Member.find_by_id(member.id)).to eq(nil)
-      expect(StartupAdmin.find_by_id(startup_admin.id)).to eq(nil)
+      expect(TeamLead.find_by_id(team_lead.id)).to eq(nil)
       with_assessment_progresses = AssessmentProgress.where(startup_id: startup.id)
       expect(with_assessment_progresses.empty?).to eq(true)
       expect(response.body).to eq({message: 'Successfully destroyed'}.to_json)
@@ -334,12 +334,12 @@ RSpec.describe StartupsController, type: :controller do
       request.headers.merge!({ "Accelerator-Id": "#{accelerator.id}"})
       sign_in  admins.first
       expect(Startup.find_by_id(startup.id).members).to eq(Member.where(id: member.id))
-      expect(Startup.find_by_id(startup.id).startup_admins).to eq(StartupAdmin.where(id: startup_admin.id))
+      expect(Startup.find_by_id(startup.id).team_leads).to eq(TeamLead.where(id: team_lead.id))
       expect(Startup.find_by_id(startup.id).assessment_progresses).to eq(AssessmentProgress.where(startup_id: startup.id))
       delete :destroy, params: params_1
       expect(Startup.find_by_id(startup.id)).to eq(nil)
       expect(Member.find_by_id(member.id)).to eq(nil)
-      expect(StartupAdmin.find_by_id(startup_admin.id)).to eq(nil)
+      expect(TeamLead.find_by_id(team_lead.id)).to eq(nil)
       with_assessment_progresses = AssessmentProgress.where(startup_id: startup.id)
       expect(with_assessment_progresses.empty?).to eq(true)
       expect(response.body).to eq({message: 'Successfully destroyed'}.to_json)
@@ -356,9 +356,9 @@ RSpec.describe StartupsController, type: :controller do
       expect(response).to have_http_status(:forbidden)
     end
 
-    it 'return error with status 403 if startup_admin authenticated' do
+    it 'return error with status 403 if team_lead authenticated' do
       request.headers.merge!({ "Accelerator-Id": "#{accelerator.id}"})
-      sign_in startup_admin
+      sign_in team_lead
       delete :destroy, params: params_1
       expect(response.body).to eq({'notice': 'You do not have permission to perform this action'}.to_json)
       expect(response.content_type).to eq('application/json; charset=utf-8')

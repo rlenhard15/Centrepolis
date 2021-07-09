@@ -11,8 +11,8 @@ RSpec.describe Admins::MembersController, type: :controller do
   let!(:startup)               { create(:startup, accelerator_id: accelerator.id, admins_startups_attributes: [{admin_id: admins.first.id}]) }
   let!(:startup_2)             { create(:startup, accelerator_id: accelerator.id, admins_startups_attributes: [{admin_id: admins.last.id}]) }
   let!(:startup_3)             { create(:startup, accelerator_id: accelerator_2.id, admins_startups_attributes: [{admin_id: admin.id}]) }
-  let!(:startup_admin)         { create(:startup_admin, accelerator_id: accelerator.id, startup_id: startup.id) }
-  let!(:startup_admin_2)       { create(:startup_admin, accelerator_id: accelerator.id, startup_id: startup_2.id) }
+  let!(:team_lead)             { create(:team_lead, accelerator_id: accelerator.id, startup_id: startup.id) }
+  let!(:team_lead_2)           { create(:team_lead, accelerator_id: accelerator.id, startup_id: startup_2.id) }
   let!(:members)               { create_list(:member, 3, startup_id: startup.id, accelerator_id: accelerator.id) }
   let!(:members_2)             { create_list(:member, 2, startup_id: startup_2.id, accelerator_id: accelerator.id) }
   let!(:members_3)             { create_list(:member, 4, startup_id: startup_3.id, accelerator_id: accelerator_2.id) }
@@ -42,11 +42,11 @@ RSpec.describe Admins::MembersController, type: :controller do
 
     it "return members for current StartupAdmin with list of assessment_risk if user authenticated" do
       request.headers.merge!({ "Accelerator-Id": "#{accelerator.id}"})
-      sign_in startup_admin
+      sign_in team_lead
       get :index
       expect(parse_json(response.body)[0]).to eq(["current_page", 1])
       expect(parse_json(response.body)[1][1].count).to eq(3)
-      expect(recursively_delete_timestamps(parse_json(response.body)[1][1])).to eq(recursively_delete_timestamps(Member.where(startup_id: startup_admin.startup_id).for_accelerator(accelerator.id).as_json(include: :startup)))
+      expect(recursively_delete_timestamps(parse_json(response.body)[1][1])).to eq(recursively_delete_timestamps(Member.where(startup_id: team_lead.startup_id).for_accelerator(accelerator.id).as_json(include: :startup)))
       expect(response.content_type).to eq('application/json; charset=utf-8')
       expect(response).to have_http_status(:success)
     end

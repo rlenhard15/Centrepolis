@@ -1,14 +1,14 @@
 module Admins
-  class StartupAdminsController < ApplicationController
-    api :GET, 'api/startup_admins', "Only SuperAdmin and Admin can see list of the startup_admins and their startup"
-    param :page, Integer, desc: "Page for startup_admins iteration (10 items per page)"
+  class TeamLeadsController < ApplicationController
+    api :GET, 'api/team_leads', "Only SuperAdmin and Admin can see list of the team_leads and their startup"
+    param :page, Integer, desc: "Page for team_leads iteration (10 items per page)"
 
     description <<-DESC
 
     === Request headers
       Only SuperAdmin, Admin can perform this action
-        SuperAdmin   - all startup_admins of any accelerator;
-        Admin        - all startup_admins of the admins startups;
+        SuperAdmin   - all team_leads of any accelerator;
+        Admin        - all team_leads of the admins startups;
 
         Authentication - string - required
           Example of Authentication header : "Bearer TOKEN_FETCHED_FROM_SERVER_DURING_REGISTRATION"
@@ -19,7 +19,7 @@ module Admins
     {
       "current_page": 1,
       "total_pages": 2,
-      "startup_admins": [
+      "team_leads": [
         {
           "id": 20,
           "email": "startup_admin@gmail.com",
@@ -45,14 +45,14 @@ module Admins
 
     DESC
     def index
-      authorize current_user, policy_class: StartupAdminPolicy
+      authorize current_user, policy_class: TeamLeadPolicy
 
       @startup_admins = policy_scope(User).startup_admins.with_name.for_accelerator(user_accelerator_id).page(page_params)
 
       render json: {
         current_page: @startup_admins.current_page,
         total_pages: @startup_admins.total_pages,
-        startup_admins: @startup_admins.as_json(include: :startup)
+        team_leads: @startup_admins.as_json(include: :startup)
       }
     end
 

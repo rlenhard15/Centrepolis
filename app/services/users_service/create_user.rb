@@ -17,7 +17,7 @@ class UsersService::CreateUser < ApplicationService
   def create_user
     if user_type == 'Admin'
       create_admin
-    elsif user_type == 'StartupAdmin' || user_type == 'Member'
+    elsif user_type == 'TeamLead' || user_type == 'Member'
       create_user_for_startup
     else
       return nil

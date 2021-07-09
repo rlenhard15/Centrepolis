@@ -11,7 +11,7 @@ RSpec.describe Admins::UsersController, type: :controller do
   let!(:admin)                { create(:admin, accelerator_id: accelerator_2.id) }
   let!(:startups)             { create_list(:startup, 2, accelerator_id: accelerator.id, admins_startups_attributes: [{admin_id: admins.first.id}]) }
   let!(:startups_2)           { create_list(:startup, 2, accelerator_id: accelerator.id, admins_startups_attributes: [{admin_id: admins.last.id}]) }
-  let!(:startup_admin)        { create(:startup_admin, accelerator_id: accelerator.id, startup_id: startups.first.id) }
+  let!(:team_lead)            { create(:team_lead, accelerator_id: accelerator.id, startup_id: startups.first.id) }
   let!(:member)               { create(:member, startup_id: startups.first.id, accelerator_id: accelerator.id) }
   let!(:member_2)             { create(:member, startup_id: startups_2.first.id, accelerator_id: accelerator_2.id) }
   let!(:member_3)             { create(:member, startup_id: startups.first.id, accelerator_id: accelerator.id) }
@@ -33,11 +33,11 @@ RSpec.describe Admins::UsersController, type: :controller do
       expect(response).to have_http_status(:success)
     end
 
-    it "return info in json format about current StartupAdmin with startup if startup_admin is authenticated" do
+    it "return info in json format about current TeamLead with startup if team_lead is authenticated" do
       request.headers.merge!({ "Accelerator-Id": "#{accelerator.id}"})
-      sign_in startup_admin
+      sign_in team_lead
       get :profile
-      expect(parse_json(response.body)).to eq(parse_json(StartupAdmin.find(startup_admin.id).as_json(methods: :startup).to_json))
+      expect(parse_json(response.body)).to eq(parse_json(TeamLead.find(team_lead.id).as_json(methods: :startup).to_json))
       expect(response.content_type).to eq('application/json; charset=utf-8')
       expect(response).to have_http_status(:success)
     end
@@ -110,9 +110,9 @@ RSpec.describe Admins::UsersController, type: :controller do
       expect(response).to have_http_status(:forbidden)
     end
 
-    it 'return all users are searched of the startup of the current startup_admin in json format with status success if startup_admin authenticated' do
+    it 'return all users are searched of the startup of the current team_lead in json format with status success if team_lead authenticated' do
       request.headers.merge!({ "Accelerator-Id": "#{accelerator.id}"})
-      sign_in startup_admin
+      sign_in team_lead
       get :index, params: params.merge(params_2)
       expect(parse_json(response.body)[0]).to eq(["current_page", 1])
       expect(parse_json(response.body)[1]).to eq(["total_pages", 1])
@@ -134,7 +134,7 @@ RSpec.describe Admins::UsersController, type: :controller do
 
   describe "POST create action" do
     let!(:params)     {ActionController::Parameters.new({user: {email: 'user@gmail.com', type: "Admin"}})}
-    let!(:params_2)   {ActionController::Parameters.new({user: {email: 'user2@gmail.com', type: "StartupAdmin", startup_id: startups.first.id}})}
+    let!(:params_2)   {ActionController::Parameters.new({user: {email: 'user2@gmail.com', type: "TeamLead", startup_id: startups.first.id}})}
     let!(:params_3)   {ActionController::Parameters.new({user: {email: 'user3@gmail.com', type: "Member"}})}
     let!(:params_4)   {ActionController::Parameters.new({user: {email: 'user4@gmail.com', type: "Member", startup_id: startups.first.id}})}
 
@@ -161,7 +161,7 @@ RSpec.describe Admins::UsersController, type: :controller do
       expect(response).to have_http_status(:created)
     end
 
-    it "return error in json with status forbidden if super_admin try create startup_admin" do
+    it "return error in json with status forbidden if super_admin try create team_lead" do
       request.headers.merge!({ "Accelerator-Id": "#{accelerator.id}"})
       sign_in super_admin
       post :create, params: params_2
@@ -170,11 +170,11 @@ RSpec.describe Admins::UsersController, type: :controller do
       expect(response).to have_http_status(:forbidden)
     end
 
-    it "return startup_admin who was created by current admin" do
+    it "return team_lead who was created by current admin" do
       request.headers.merge!({ "Accelerator-Id": "#{accelerator.id}"})
       sign_in admins.first
       post :create, params: params_2
-      expect(parse_json(response.body)).to eq(parse_json(StartupAdmin.last.to_json))
+      expect(parse_json(response.body)).to eq(parse_json(TeamLead.last.to_json))
       expect(response.content_type).to eq('application/json; charset=utf-8')
       expect(response).to have_http_status(:created)
     end
@@ -188,18 +188,18 @@ RSpec.describe Admins::UsersController, type: :controller do
       expect(response).to have_http_status(:forbidden)
     end
 
-    it "return member who was created by current startup_admin" do
+    it "return member who was created by current team_lead" do
       request.headers.merge!({ "Accelerator-Id": "#{accelerator.id}"})
-      sign_in startup_admin
+      sign_in team_lead
       post :create, params: params_3
       expect(parse_json(response.body)).to eq(parse_json(Member.last.to_json))
       expect(response.content_type).to eq('application/json; charset=utf-8')
       expect(response).to have_http_status(:created)
     end
 
-    it "return error in json with status forbidden if startup_admin try create admin" do
+    it "return error in json with status forbidden if team_lead try create admin" do
       request.headers.merge!({ "Accelerator-Id": "#{accelerator.id}"})
-      sign_in startup_admin
+      sign_in team_lead
       post :create, params: params
       expect(response.body).to eq({'notice': 'You do not have permission to perform this action'}.to_json)
       expect(response.content_type).to eq('application/json; charset=utf-8')
@@ -318,27 +318,27 @@ RSpec.describe Admins::UsersController, type: :controller do
       expect(response).to have_http_status(:unprocessable_entity)
     end
 
-    it 'return updated info about current user in json format with status success if startup_admin authenticated' do
+    it 'return updated info about current user in json format with status success if team_lead authenticated' do
       request.headers.merge!({ "Accelerator-Id": "#{accelerator.id}"})
-      sign_in startup_admin
+      sign_in team_lead
       put :update_profile, params: params
-      startup_admin.reload
-      expect(parse_json(response.body)).to eq(parse_json(startup_admin.to_json))
-      expect([startup_admin.first_name, startup_admin.last_name]).to eq([ params[:user][:first_name], params[:user][:last_name] ])
+      team_lead.reload
+      expect(parse_json(response.body)).to eq(parse_json(team_lead.to_json))
+      expect([team_lead.first_name, team_lead.last_name]).to eq([ params[:user][:first_name], params[:user][:last_name] ])
       expect(response.content_type).to eq('application/json; charset=utf-8')
       expect(response).to have_http_status(:success)
     end
 
     it 'return error with status 422 if super_admin user try to update email and select already existed email' do
       request.headers.merge!({ "Accelerator-Id": "#{accelerator.id}"})
-      sign_in startup_admin
+      sign_in team_lead
       put :update_profile, params: params_2
       expect(response.body).to eq({"email":["has already been taken"]}.to_json)
       expect(response.content_type).to eq('application/json; charset=utf-8')
       expect(response).to have_http_status(:unprocessable_entity)
     end
 
-    it 'return updated info about current user in json format with status success if startup_admin authenticated' do
+    it 'return updated info about current user in json format with status success if team_lead authenticated' do
       request.headers.merge!({ "Accelerator-Id": "#{accelerator.id}"})
       sign_in member
       put :update_profile, params: params
@@ -362,7 +362,7 @@ RSpec.describe Admins::UsersController, type: :controller do
   describe 'DELETE destroy action' do
     let!(:params)   { ActionController::Parameters.new({'id': member.id}) }
     let!(:params_2) { ActionController::Parameters.new({'id': member_2.id}) }
-    let!(:params_3) { ActionController::Parameters.new({'id': startup_admin.id}) }
+    let!(:params_3) { ActionController::Parameters.new({'id': team_lead.id}) }
 
     before { params.permit! }
     before { params_2.permit! }
@@ -406,9 +406,9 @@ RSpec.describe Admins::UsersController, type: :controller do
       expect(response).to have_http_status(:forbidden)
     end
 
-    it "return error in json with status forbidden if startup_admin tries perform this action" do
+    it "return error in json with status forbidden if team_lead tries perform this action" do
       request.headers.merge!({ "Accelerator-Id": "#{accelerator.id}"})
-      sign_in startup_admin
+      sign_in team_lead
       delete :destroy, params: params
       expect(response.body).to eq({'notice': 'You do not have permission to perform this action'}.to_json)
       expect(response.content_type).to eq('application/json; charset=utf-8')
@@ -457,19 +457,19 @@ RSpec.describe Admins::UsersController, type: :controller do
       expect(response).to have_http_status(:success)
     end
 
-    it 'return updated info about current user in json format with status success if startup_admin authenticated' do
+    it 'return updated info about current user in json format with status success if team_lead authenticated' do
       request.headers.merge!({ "Accelerator-Id": "#{accelerator.id}"})
-      sign_in startup_admin
-      expect(startup_admin.email_notification).to eq(true)
+      sign_in team_lead
+      expect(team_lead.email_notification).to eq(true)
       put :update_email_notification, params: params
-      startup_admin.reload
-      expect(parse_json(response.body)).to eq(parse_json(startup_admin.to_json))
-      expect(startup_admin.email_notification).to eq(false)
+      team_lead.reload
+      expect(parse_json(response.body)).to eq(parse_json(team_lead.to_json))
+      expect(team_lead.email_notification).to eq(false)
       expect(response.content_type).to eq('application/json; charset=utf-8')
       expect(response).to have_http_status(:success)
     end
 
-    it 'return updated info about current user in json format with status success if startup_admin authenticated' do
+    it 'return updated info about current user in json format with status success if team_lead authenticated' do
       request.headers.merge!({ "Accelerator-Id": "#{accelerator.id}"})
       sign_in member
       expect(member.email_notification).to eq(true)

@@ -43,7 +43,7 @@ RSpec.describe AssessmentPolicy, type: :policy do
     let!(:accelerator) { create(:accelerator) }
     let!(:admin)       { create(:admin, accelerator_id: accelerator.id) }
       let!(:startup)   { create(:startup, accelerator_id: accelerator.id, admins_startups_attributes: [{admin_id: admin.id}]) }
-        let!(:user)    { create(:startup_admin, startup_id: startup.id, accelerator_id: accelerator.id) }
+        let!(:user)    { create(:team_lead, startup_id: startup.id, accelerator_id: accelerator.id) }
 
     it "shows all assessments" do
       expect(policy_scope).to eq(assessments)

@@ -62,7 +62,7 @@ class StartupsController < ApplicationController
           },
           ...
         ],
-        "startup_admins": [
+        "team_leads": [
           {
             "id": 8,
             "email": "startup_admin@gmail.com",
@@ -91,7 +91,7 @@ class StartupsController < ApplicationController
     render json: {
       current_page: @startups.current_page,
       total_pages: @startups.total_pages,
-      startups: @startups.as_json(methods: [:assessments_risk_list, :members, :startup_admins, :admins])
+      startups: @startups.as_json(methods: [:assessments_risk_list, :members, :team_leads, :admins])
     }
   end
 
@@ -207,7 +207,7 @@ class StartupsController < ApplicationController
       },
       ...
     ],
-    "startup_admins": [
+    "team_leads": [
       {
         "id": 20,
         "email": "startup_admin@gmail.com",
@@ -278,7 +278,7 @@ class StartupsController < ApplicationController
       },
       ...
     ],
-    "startup_admins": [
+    "team_leads": [
       {
         "id": 20,
         "email": "startup_admin@gmail.com",
@@ -304,12 +304,12 @@ class StartupsController < ApplicationController
     if current_user.super_admin? || current_user.admin?
       render json: @startup.as_json(methods: [:assessments_risk_list, :admins], include: {
         members: {methods: [:tasks_number, :last_visit, :user_type]},
-        startup_admins: {methods: [:tasks_number, :last_visit, :user_type]}
+        team_leads: {methods: [:tasks_number, :last_visit, :user_type]}
       })
     else
       render json: @startup.as_json(methods: :assessments_risk_list, include: {
         members: {methods: [:tasks_number, :last_visit, :user_type]},
-        startup_admins: {methods: [:tasks_number, :last_visit, :user_type]}
+        team_leads: {methods: [:tasks_number, :last_visit, :user_type]}
       })
     end
   end

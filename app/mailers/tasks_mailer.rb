@@ -1,7 +1,7 @@
 class TasksMailer < ApplicationMailer
   before_action do
     if params[:startup_admins_ids]
-      @startup_admins = StartupAdmin.where(id: params[:startup_admins_ids])&.with_allowed_email_notifications
+      @startup_admins = TeamLead.where(id: params[:startup_admins_ids])&.with_allowed_email_notifications
       @member = Member.find_by_id(params[:member_id])
       @task = Task.find_by_id(params[:task_id])
     elsif params[:users_ids]

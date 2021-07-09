@@ -14,9 +14,9 @@ RSpec.describe SubCategoriesController, type: :controller do
   let!(:admin_2)                       { create(:admin, accelerator_id: accelerator.id) }
     let!(:startup)                     { create(:startup, accelerator_id: accelerator.id, admins_startups_attributes: [{admin_id: admin.id}]) }
     let!(:members)                     { create_list(:member, 3, startup_id: startup.id, accelerator_id: accelerator.id) }
-    let!(:startup_admin)               { create(:startup_admin, accelerator_id: accelerator.id, startup_id: startup.id) }
+    let!(:team_lead)                   { create(:team_lead, accelerator_id: accelerator.id, startup_id: startup.id) }
     let!(:startup_2)                   { create(:startup, accelerator_id: accelerator.id, admins_startups_attributes: [{admin_id: admin_2.id}]) }
-    let!(:startup_admin_2)             { create(:startup_admin, accelerator_id: accelerator.id, startup_id: startup_2.id) }
+    let!(:team_lead_2)                 { create(:team_lead, accelerator_id: accelerator.id, startup_id: startup_2.id) }
   let!(:assessment)                    { create(:assessment) }
     let!(:category)                    { create(:category, assessment_id: assessment.id) }
       let!(:sub_category)              { create(:sub_category, category_id: category.id) }
@@ -97,9 +97,9 @@ RSpec.describe SubCategoriesController, type: :controller do
         expect(response).to have_http_status(:success)
       end
 
-      it "return success messege and risk_value for current startup_admin" do
+      it "return success messege and risk_value for current team_lead" do
         request.headers.merge!({ "Accelerator-Id": "#{accelerator.id}"})
-        sign_in startup_admin
+        sign_in team_lead
         post :update_progress, params: params.merge(params_3)
         sub_category_progress.reload
         assessment_progress.reload
@@ -110,16 +110,16 @@ RSpec.describe SubCategoriesController, type: :controller do
         expect(response).to have_http_status(:success)
       end
 
-      it "if there is startup_id and startup_admin try to update progress with this id, its only update his progress" do
+      it "if there is startup_id and team_lead try to update progress with this id, its only update his progress" do
         request.headers.merge!({ "Accelerator-Id": "#{accelerator.id}"})
-        sign_in startup_admin
+        sign_in team_lead
         post :update_progress, params: params.merge(params_2).merge(params_3)
         sub_category_progress.reload
         assessment_progress.reload
         expect(response.body).to eq({ message: "Progress updates successfully", assessment_risk: assessment_progress.risk_value.to_f }.to_json)
         expect(response.content_type).to eq('application/json; charset=utf-8')
-        expect(sub_category_progress.startup_id).to eq(startup_admin.startup_id)
-        expect(SubCategoryProgress.find_by_startup_id(startup_admin_2.startup_id)).to eq(nil)
+        expect(sub_category_progress.startup_id).to eq(team_lead.startup_id)
+        expect(SubCategoryProgress.find_by_startup_id(team_lead_2.startup_id)).to eq(nil)
         expect(sub_category_progress.current_stage_id).to eq(stage_2.id)
         expect(assessment_progress.risk_value).to eq(100)
         expect(response).to have_http_status(:success)

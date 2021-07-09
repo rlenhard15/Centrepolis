@@ -1,4 +1,4 @@
-class StartupAdminPolicy < ApplicationPolicy
+class TeamLeadPolicy < ApplicationPolicy
   class Scope
     attr_reader :user, :scope
 
