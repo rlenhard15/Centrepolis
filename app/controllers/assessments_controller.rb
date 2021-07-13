@@ -34,7 +34,7 @@ class AssessmentsController < ApplicationController
   def index
     @assessments = policy_scope(Assessment)
 
-    render json: @assessments.with_assessment_progresses(@startup_id)
+    render json: @assessments.order(id: :desc).with_assessment_progresses(@startup_id)
   end
 
   api :GET, 'api/assessments/:id', "Request for a certain assessment and related categories, sub_categories and stages"

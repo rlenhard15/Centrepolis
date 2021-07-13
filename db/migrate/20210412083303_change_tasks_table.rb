@@ -8,7 +8,7 @@ class ChangeTasksTable < ActiveRecord::Migration[6.0]
 
       if user && admin
         TaskUser.create(task_id: t.id, user_id: user.id)
-        TaskUser.create(task_id: t.id, user_id: admin.id)
+        TaskUser.create(task_id: t.id, user_id: admin.id, creator: true)
       end
     end
 
