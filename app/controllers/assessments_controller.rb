@@ -34,7 +34,7 @@ class AssessmentsController < ApplicationController
   def index
     @assessments = policy_scope(Assessment)
 
-    render json: @assessments.order(id: :desc).with_assessment_progresses(@startup_id)
+    render json: assessments_changed_order
   end
 
   api :GET, 'api/assessments/:id', "Request for a certain assessment and related categories, sub_categories and stages"
@@ -87,6 +87,14 @@ class AssessmentsController < ApplicationController
   }
 
   DESC
+
+  def assessments_changed_order
+    assessments_new_order ||= [
+      @assessments.where(id: 1).with_assessment_progresses(@startup_id).first,
+      @assessments.where(id: 3).with_assessment_progresses(@startup_id).first,
+      @assessments.where(id: 2).with_assessment_progresses(@startup_id).first
+    ]
+  end
 
   def show
     render json: @assessment.as_json(methods: :description_with_child_models)
