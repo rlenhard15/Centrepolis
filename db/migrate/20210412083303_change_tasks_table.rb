@@ -3,13 +3,8 @@ class ChangeTasksTable < ActiveRecord::Migration[6.0]
     tasks = Task.all
 
     tasks.each do |t|
-      user = Member.find_by_id(t.user_id)
-      admin = Admin.find_by_id(t.created_by)
-      puts "user.id: #{user.id} admin_id: #{admin.id}"
-      if user && admin
-        TaskUser.create(task_id: t.id, user_id: user.id)
-        TaskUser.create(task_id: t.id, user_id: admin.id, creator: true)
-      end
+      TaskUser.create(task_id: t.id, user_id: t.user_id)
+      TaskUser.create(task_id: t.id, user_id: t.created_by, creator: true)
     end
 
     remove_column :tasks, :created_by
