@@ -336,4 +336,78 @@ namespace :update_assessments do
 
     puts "Insert new level to Market Risk below Customer Segment is done"
   end
+
+  task update_risk_levels_14: :environment do
+    new_sub_category_market_risk = SubCategory.where(title: 'VALUE CHAIN-CRL (go to market partners distributors, reps, resellers, logistics)').first
+
+    i = 1
+    new_stages_new_sub_category_market_risk = ['Unknown', 'Limited understanding, not yet established', 'Value chain partners identified, no formal agreements in place', 'In discussion with value chain partners', 'Value chain partner agreements formalized']
+    new_stages_new_sub_category_market_risk.each do |stage|
+      new_sub_category_market_risk.stages.create(title: stage, position: i)
+      i = i + 1
+    end
+
+    puts 'VALUE CHAIN-CRL is updated'
+  end
+
+  task update_risk_levels_15: :environment do
+    new_sub_category_market_risk = SubCategory.where(title: 'Marketing/Sales Strategy').first
+    new_stages_new_sub_category_market_risk = [
+      'No strategy',
+      'Tactical ideas but holistic strategy not yet defined',
+      'Outline/strategy identifiable but no execution plan in place',
+      'Execution plan in place',
+      'Execution plan and resources in place'
+    ]
+    new_stages_new_sub_category_market_risk.each do |stage|
+      new_sub_category_market_risk.stages.create(title: stage, position: i)
+      i = i + 1
+    end
+
+    puts "Marketing/Sales Strategy sub_category is updated"
+  end
+
+  task update_risk_levels_16: :environment do
+    new_sub_category_market_risk = SubCategory.where(title: 'Marketing/Sales Strategy').first
+
+    new_stages_new_sub_category_market_risk = [
+      'No strategy',
+      'Tactical ideas but holistic strategy not yet defined',
+      'Outline/strategy identifiable but no execution plan in place',
+      'Execution plan in place',
+      'Execution plan and resources in place'
+    ]
+    i = 1
+    new_stages_new_sub_category_market_risk.each do |stage|
+      new_sub_category_market_risk.stages.create(title: stage, position: i)
+      ++i
+    end
+
+    puts "Marketing/Sales Strategy sub_category is updated"
+  end
+
+
+  task update_risk_levels_17: :environment do
+    market_risk_category = Category.where(title: 'Market Risk').first
+    sub_category = market_risk_category.sub_categories.create({title: 'Technology Readiness'})
+
+    i = 1
+    new_sub_category_prod_design_category_stages = [
+      'Basic principles observed and reported',
+      'Technology concept and/or application formulated',
+      'Proof of concept analyzed and experimented on',
+      'System validation in lab environment',
+      'System validation, testing in operating environment',
+      'Prototype/pilot system verification in operating environment',
+      'Full scale prototype verified in operating environment',
+      'Actual system complete and functioning in operating environment',
+      'Actual system tested and data collected over lifetime of system'
+    ]
+    new_sub_category_prod_design_category_stages.each do |stage|
+      sub_category.stages.create(title: stage, position: i)
+      ++i
+    end
+
+    puts "Product Design Risk category is updated"
+  end
 end
