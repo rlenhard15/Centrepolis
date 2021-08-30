@@ -12,7 +12,7 @@ class Category < ApplicationRecord
         sub_category_id: sc.id,
         sub_category_title: sc.title,
         current_stage_id: sc.current_stage_id,
-        stages: sc.stages
+        stages: sc.stages.order(position: :asc)
       }
     end
   end

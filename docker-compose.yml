@@ -7,11 +7,13 @@ services:
     environment:
       POSTGRES_DB: "db"
       POSTGRES_HOST_AUTH_METHOD: "trust"
+    ports:
+      - "54322:5432"
   mailcatcher:
     image: yappabe/mailcatcher
     ports:
-        - "1025:1025"
-        - "1080:1080"
+      - "1025:1025"
+      - "1080:1080"
   web:
     build: .
     command: bash -c "rm -f tmp/pids/server.pid && bundle exec rails s -p 3000 -b '0.0.0.0'"
