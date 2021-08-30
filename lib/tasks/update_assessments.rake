@@ -368,25 +368,6 @@ namespace :update_assessments do
     puts "Marketing/Sales Strategy sub_category is updated"
   end
 
-  task update_risk_levels_16: :environment do
-    new_sub_category_market_risk = SubCategory.where(title: 'Marketing/Sales Strategy').first
-
-    new_stages_new_sub_category_market_risk = [
-      'No strategy',
-      'Tactical ideas but holistic strategy not yet defined',
-      'Outline/strategy identifiable but no execution plan in place',
-      'Execution plan in place',
-      'Execution plan and resources in place'
-    ]
-    i = 1
-    new_stages_new_sub_category_market_risk.each do |stage|
-      new_sub_category_market_risk.stages.create(title: stage, position: i)
-      i = i + 1
-    end
-
-    puts "Marketing/Sales Strategy sub_category is updated"
-  end
-
 
   task update_risk_levels_17: :environment do
     market_risk_category = Category.where(title: 'Market Risk').first
