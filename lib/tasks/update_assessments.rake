@@ -359,6 +359,7 @@ namespace :update_assessments do
       'Execution plan in place',
       'Execution plan and resources in place'
     ]
+    i = 1
     new_stages_new_sub_category_market_risk.each do |stage|
       new_sub_category_market_risk.stages.create(title: stage, position: i)
       i = i + 1
@@ -380,7 +381,7 @@ namespace :update_assessments do
     i = 1
     new_stages_new_sub_category_market_risk.each do |stage|
       new_sub_category_market_risk.stages.create(title: stage, position: i)
-      ++i
+      i = i + 1
     end
 
     puts "Marketing/Sales Strategy sub_category is updated"
@@ -405,7 +406,7 @@ namespace :update_assessments do
     ]
     new_sub_category_prod_design_category_stages.each do |stage|
       sub_category.stages.create(title: stage, position: i)
-      ++i
+      i = i + 1
     end
 
     puts "Product Design Risk category is updated"
