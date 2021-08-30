@@ -369,7 +369,7 @@ namespace :update_assessments do
   end
 
 
-  task update_risk_levels_17: :environment do
+  task update_risk_levels_16: :environment do
     market_risk_category = Category.where(title: 'Market Risk').first
     sub_category = market_risk_category.sub_categories.create({title: 'Technology Readiness'})
 
