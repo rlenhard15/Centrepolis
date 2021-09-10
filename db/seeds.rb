@@ -1,6 +1,6 @@
 records = [
   {
-    name: "CRL (Commercial Readiness Level)",
+    name: "CRL Risk",
     categories: [
       {
         title: 'IP Risk',
@@ -9,25 +9,36 @@ records = [
             title: 'Development Status',
             stages: [
               {title: 'Idea only'},
-              {title: 'Basic tests showing potential'},
-              {title: 'Prototype developed'},
-              {title: 'Beta testing'},
+              {title: 'POC - proof of concept'},
+              {title: '1st line Alpha prototype developed'},
+              {title: 'Production Intent Beta Type Developed'},
               {title: 'Fully functional prototypes with customers'},
-              {title: 'Sales to paying customers'}
+              {title: 'In production with customer sales'}
             ]
           },
           {
             title: 'IP Advantage/Value',
             stages: [
               {title: 'Unknown	Little or no value'},
-              {title: 'Limited advantage and difficult to defend'},
-              {title: 'Proprietary know how/trade secrets'},
-              {title: 'Some valuable and defensible IP'},
-              {title: 'Significant and highly defensible IP'}
+              {title: 'Limited Advantage and may be difficult to defend'},
+              {title: 'IP filed for, not yet issued'},
+              {title: 'Some valuable, defensible issued IP'},
+              {title: 'Significant, highly defensible and issued IP'}
             ]
           },
           {
-            title: 'Product Development Ownership:',
+            title: 'Competitive Technologies:',
+            stages: [
+              {title: 'Competitive technologies Unknown'},
+              {title: 'Some knowledge, no formal IP research conducted'},
+              {title: 'Informal IP research conducted'},
+              {title: 'Formal IP research conducted of competing technologies'},
+              {title: 'Complete thorough IP research conducted internally'},
+              {title: 'Comprehensive IP search conducted and validated by 3rd party (patent attorney)'}
+            ]
+          },
+          {
+            title: 'IP Development Ownership',
             stages: [
               {title: 'Fully outsourced'},
               {title: 'Partially outsourced with no development agreement in place'},
@@ -36,18 +47,6 @@ records = [
               {title: 'Developed mostly in-house with some contracts with development partners'},
               {title: 'Developed fully in-house'}
             ]
-          },
-          {
-            title: 'Competitive Technologies:',
-            stages: [
-              {title: 'Significant direct, indirect, and potential competing technologies'},
-              {title: 'Limited direct and significant'},
-              {title: 'Indirect competing technologies'},
-              {title: 'Limited direct, but strong potential competitive technologies'},
-              {title: 'Limited direct and indirect competing technologies'},
-              {title: 'No direct and limited indirect competing technologies'},
-              {title: 'No competing technologies'}
-            ]
           }
         ]
       },
@@ -55,25 +54,36 @@ records = [
         title: 'Market Risk',
         sub_categories: [
           {
-            title: 'Value to Customer:',
+            title: 'Value to Customer',
             stages: [
-              {title: 'Unknown'},
-              {title: 'Unclear or low'},
-              {title: 'Recognizable but low value'},
-              {title: 'Value clear but not quantifiable'},
-              {title: 'Value clear, somewhat moderate'},
-              {title: 'Clear, quantifiable, high ROI'}
+              {title: 'Unclear, no formal customer discovery'},
+              {title: 'Limited customer discovery to determine value'},
+              {title: 'Some customer discovery; better understanding of value'},
+              {title: 'Significant customer discovery, value clear, not quantifiable'},
+              {title: 'Significant customer discovery, value quantifiable of your technology solution'},
+              {title: 'Value Proposition Quantifiable and validated by the customers'}
+            ]
+          },
+          {
+            title: 'Competitive Landscape',
+            stages: [
+              {title: 'Limited to no understanding of competitive landscape'},
+              {title: 'Some knowledge, no formal research conducted'},
+              {title: 'Informal research conducted to valid competitive landscape'},
+              {title: 'Formal research conducted to understand competitive landscape'},
+              {title: 'Complete thorough research/analysis conducted of both direct and indirect'},
+              {title: 'Comprehensive search conducted & indirect/direct validated by 3rd party sources'}
             ]
           },
           {
             title: 'Market Size',
             stages: [
-              {title: 'No Market'},
-              {title: 'Stagnating or diminishing market'},
-              {title: 'Very small market'},
-              {title: 'Small market'},
-              {title: 'Moderate growing market'},
-              {title: 'Large growing market'}
+              {title: 'No Understanding of Market Potential'},
+              {title: 'Limited Understanding of Market Potential'},
+              {title: 'High level of research conducted to determine market size'},
+              {title: 'Some understanding of addressable market and early adopting market'},
+              {title: 'Validation based of market size determined based on data sources'},
+              {title: 'Strong addressable market segmentation with target group very well defined'}
             ]
           },
           {
@@ -81,32 +91,30 @@ records = [
             stages: [
               {title: 'Target group not defined'},
               {title: 'Target group vaguely or too broadly defined'},
-              {title: 'Target group defined but difficult to recognize or approach'},
+              {title: 'Target group defined but customers difficult to recognize or approach'},
               {title: 'Target group defined but no market segmentation'},
               {title: 'Target group defined and market segmented'},
-              {title: 'Strong addressable market segmentation with target group very well defined'}
+              {title: 'Comprehensive market segmentation with addressable early adopting groups well defined'}
             ]
           },
           {
             title: 'Marketing/Sales Strategy',
             stages: [
-              {title: 'No Strategy'},
-              {title: 'Tactical ideas but holistic strategy unclear'},
-              {title: 'Outline / strategy identifiable but clear gaps exist'},
-              {title: 'Strategy clearly recognizable with only modest gaps'},
-              {title: 'Generally clear, consistent and complete strategy'},
-              {title: 'Very convincing and promising strategy'}
+              {title: 'No strategy'},
+              {title: 'Tactical ideas but holistic strategy not yet defined'},
+              {title: 'Outline/strategy identifiable but no execution plan in place'},
+              {title: 'Execution plan in place'},
+              {title: 'Execution plan and resources in place'}
             ]
           },
           {
-            title: 'Competition (Direct & Indirect)',
+            title: 'Value Chain-CRL',
             stages: [
-              {title: 'Not addressed'},
-              {title: 'Identified with little diligence or assessment'},
-              {title: 'Significant & active competition'},
-              {title: 'Moderate competition active or expected'},
-              {title: 'Weak competition active or expected; limited entry barriers'},
-              {title: 'Weak competition active or expected with significant entry barriers'}
+              {title: 'Unknown'},
+              {title: 'Limited understanding, not yet established'},
+              {title: 'Value chain partners identified, no formal agreements in place'},
+              {title: 'In discussion with value chain partners'},
+              {title: 'Value chain partner agreements formalized'}
             ]
           }
         ]
@@ -160,75 +168,107 @@ records = [
         ]
       },
       {
-        title: 'Management Team Risk',
+        title: 'Team Risk',
         sub_categories: [
           {
             title: 'Management Team',
             stages: [
-              {title: 'No notable experience'},
-              {title: 'Technology or domain experience only'},
-              {title: 'Technology / domain expert along with sales / marketing expertise'},
-              {title: 'Team with notable experience, but gaps exists'},
-              {title: 'Solid team with notable experience'},
+              {title: 'Limited to no experience in these areas'},
+              {title: 'Mgmt team has experience in at least one of these areas'},
+              {title: 'Mgmt team has experience in at least 2 of these areas'},
+              {title: 'Mgmt team has experience in these areas but gaps exist'},
               {title: 'Very strong team with notable experience and prior successful startups'}
             ]
           },
           {
             title: 'Alliance/Partners',
             stages: [
-              {title: 'Unknown'},
-              {title: 'Alliance partners identified'},
-              {title: 'Talks with potential partners commenced'},
-              {title: 'Negotiations with all necessary partners commenced'},
-              {title: 'Some alliances with partners closed but others still outstanding'},
-              {title: 'All necessary alliances closed with A-List partners'}
+              {title: 'Not sure of partners I need'},
+              {title: 'Understanding of partner needs, not yet formalized'},
+              {title: 'Some partners in place but gaps still exist'},
+              {title: 'Most partners in place, formal agreements not yet secured'},
+              {title: 'Some alliance agreements in place, others still outstanding'},
+              {title: 'All necessary partners and agreements in place'}
             ]
           },
           {
             title: 'Advisory Board',
             stages: [
-              {title: 'Not addressed'},
+              {title: 'No current advisory board in place, not sure of if advisors are needed'},
               {title: 'Advisors identified'},
               {title: 'Some advisors approached but uncommitted'},
-              {title: 'Some advisors committed'},
-              {title: 'Some strong advisors committed'},
-              {title: 'A-List technology & business advisors committed'}
+              {title: 'Some advisors committed, negotiations taking place'},
+              {title: 'Some advisors committed and agreements in place'},
+              {title: 'A list of technology & business advisors committed'}
             ]
           },
           {
-            title: 'Implementation Plan',
+            title: 'Talent',
             stages: [
-              {title: 'Not addressed'},
-              {title: 'Incomplete'},
-              {title: 'Difficult to assess due to significant gaps'},
-              {title: 'Fairly realistic but planning incomplete'},
-              {title: 'Realistic with thorough planning'},
-              {title: 'Highly realistic, easy to follow, thoroughly planned'}
+              {title: 'Not yet addressed'},
+              {title: 'Critical talent being evaluated'},
+              {title: 'Critical talent identified'},
+              {title: 'Critical talent risk of talent flight evaluated'},
+              {title: 'Risk mitigation plan in place to avoid talent flight'}
             ]
-          }
+          },
+          {
+            title: 'Strategic Plan',
+            stages: [
+              {title: 'Not yet initiated'},
+              {title: 'Initiated, not yet formalized in business plan'},
+              {title: 'Some elements in place, ie., exec summary, pitch deck, business plan but not yet complete'},
+              {title: 'Business strategy documented but gaps exist in execution of plan'},
+              {title: 'Business plan complete and resources in place'}
+            ]
+          },
         ]
       }
     ]
   },
   {
-    name: "MRL",
+    name: "TRL Risk",
+    categories: [
+      {
+         title: 'General',
+         sub_categories: [
+           {
+             title: 'General',
+             stages: [
+               {title: 'Basic Principles Observed and Reported'},
+               {title: 'Technology Concept and/or Application Formulate'},
+               {title: 'Proof of concept analyzed and experimented on'},
+               {title: 'System validation in lab environment'},
+               {title: 'System validation, testing in operating environment'},
+               {title: 'Prototype/pilot system verification in operating environment'},
+               {title: 'Full Scale prototype verified in operating environment'},
+               {title: 'Actual system complete and functioning in operating environment'},
+               {title: 'Actual system tested and data collected over lifetime of system'}
+             ]
+           }
+         ]
+       }
+     ]
+  },
+  {
+    name: "MRL Risk",
     categories: [
       {
         title: 'Product Design Risk',
         sub_categories: [
           {
-            title: 'Customer Use:',
+            title: 'Customer Use',
             stages: [
               {title: 'Not identified or specified'},
               {title: 'Limited details on customer use designed into product'},
-              {title: 'Detailed customer use specs designed ino product'},
+              {title: 'Detailed customer use specs designed into product'},
               {title: 'Prototypes shared with limited customers for feedback'},
               {title: 'Prototypes shared with significant number of customers for feedback'},
               {title: 'Customer tested product directly for use specs to validate product design'}
             ]
           },
           {
-            title: 'Cost:',
+            title: 'Cost',
             stages: [
               {title: 'Unknown'},
               {title: 'High level cost estimation of materials & components'},
@@ -239,7 +279,7 @@ records = [
             ]
           },
           {
-            title: 'Durability/Reliability:',
+            title: 'Durability/Reliability',
             stages: [
               {title: 'Not measured or estimated'},
               {title: 'Evaluated internally through simulation(s) or prototype(s)'},
@@ -250,7 +290,7 @@ records = [
             ]
           },
           {
-            title: 'Performance:',
+            title: 'Performance',
             stages: [
               {title: 'Not measured or estimated'},
               {title: 'Evaluated internally through simulation(s) or prototype(s)'},
@@ -259,6 +299,17 @@ records = [
               {title: 'Evaluated extensively by customer(s)'},
               {title: 'Tested extensively to life internally, external partner and/or customer'}
             ]
+          },
+          {
+            title: 'CRL-Regulatory Requirements',
+            stages: [
+              {title: 'Unknown'},
+              {title: 'Limited understanding, not yet established'},
+              {title: 'Evaluating, not clear on requirements'},
+              {title: 'Identified regulatory requirements, not yet implemented'},
+              {title: 'Implemented part of the plan'},
+              {title: 'All regulatory requirements addressed and implemented'}
+            ]
            }
           ]
           },
@@ -266,7 +317,7 @@ records = [
               title: 'Manufacturing Risk',
               sub_categories: [
                 {
-                  title: 'Materials:',
+                  title: 'Materials',
                   stages: [
                     {title: 'Not fully evaluated'},
                     {title: 'Limited material testing, evaluation, or alternatives considered'},
@@ -276,7 +327,7 @@ records = [
                   ]
                 },
                 {
-                  title: 'Tooling:',
+                  title: 'Tooling',
                   stages: [
                     {title: 'No understanding of tooling being used or required to make product'},
                     {title: 'Limited understanding of tooling being used or required to make product'},
@@ -286,7 +337,7 @@ records = [
                   ]
                 },
                 {
-                  title: 'Manufacturing Equipment:',
+                  title: 'Manufacturing Equipment',
                   stages: [
                     {title: 'No understanding of mfg equip being used or required to make product'},
                     {title: 'Limited understanding of mfg equip being used or required to make product'},
@@ -296,7 +347,7 @@ records = [
                   ]
                 },
                 {
-                  title: 'Manufacturing Process Validation:',
+                  title: 'Manufacturing Process Validation',
                   stages: [
                     {title: 'No knowledge of Production and Workflow Process'},
                     {title: 'Limited knowledge of Production and Workflow Process'},
@@ -321,17 +372,17 @@ records = [
              title: 'Supply Chain Risk',
              sub_categories: [
                {
-                 title: 'Supplier Identifaction:',
+                 title: 'Supplier Identifaction',
                  stages: [
                    {title: 'No suppliers identified but needed'},
                    {title: 'Supplier search started but not complete'},
                    {title: 'Suppliers identified but not multiple sources'},
-                   {title: 'Multiple suppliers identified for each material/component'},
+                   {title: 'Multiple suppliers identified for each material or component'},
                    {title: 'Multiple suppliers identified for each material/component, contacted and in discussions'}
                  ]
                },
                {
-                 title: 'Supplier Evaluation:',
+                 title: 'Supplier Evaluation',
                  stages: [
                    {title: 'Not evaluated or no formal process for evaluation'},
                    {title: 'Limited evaluation of suppliers but no formal process for evaluation'},
@@ -341,7 +392,7 @@ records = [
                  ]
                },
                {
-                 title: 'Supplier Agreements:',
+                 title: 'Supplier Agreements',
                  stages: [
                    {title: 'No formal supplier agreements in place'},
                    {title: 'Limited suppliers agreements in place (NDA’s, PO’s, contracts)'},
@@ -351,10 +402,10 @@ records = [
                  ]
                },
                {
-                 title: 'Supply Chain Plan:',
+                 title: 'Supply Chain Plan',
                  stages: [
                    {title: 'No supply chain plan or supplier risk assessment in place'},
-                   {title: 'Weak supply chain plan or limited supplier risk assessment in place'},
+                   {title: 'Undeveloped supply chain plan or limited supplier risk assessment in place'},
                    {title: 'Supply chain strategy and risk mitigation includes multiple sources under contract for each component'},
                    {title: 'Supply chain strategy and risk mitigation includes lead time guarantees for each component'},
                    {title: 'Detailed supply chain strategy followed, supply chain quality tracing in place, ERP systems connected'}
@@ -363,31 +414,7 @@ records = [
               ]
             }
           ]
-        },
-  {
-         name: "TRL",
-         categories: [
-           {
-             title: 'Technology Risk',
-             sub_categories: [
-               {
-                 title: 'Basic Tech Research',
-                 stages: [
-                   {title: 'Basic Principles Observed and Reporte'},
-                   {title: 'Technology Concept and/or Application Formulate'},
-                   {title: 'Proof of concept analyzed and experimented on'},
-                   {title: 'System validation in lab environmen'},
-                   {title: 'System validation, testing in operating environmen'},
-                   {title: 'Prototype/pilot system verification in operating environmen'},
-                   {title: 'Full Scale prototype verified in operating environmen'},
-                   {title: 'Actual system complete and functioning in operating environmen'},
-                   {title: 'Actual system tested and data collected over lifetime of syste'}
-                 ]
-               }
-             ]
-           }
-         ]
-       }
+        }
 ]
 
 records.each do |assesment|
