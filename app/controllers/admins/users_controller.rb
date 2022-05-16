@@ -91,7 +91,6 @@ module Admins
     param :search, String, desc: "String for search by first_name or last_name of users"
     param :page, Integer, desc: "Page for users iteration (5 items per page)"
 
-
     description <<-DESC
 
     === Request headers
@@ -142,6 +141,8 @@ module Admins
 
     api :POST, 'api/users', 'Only SuperAdmin, Admin, StartupAdmin can create account for certain type of user and invite his on email'
     param :user, Hash, required: true do
+      param :first_name, String, desc: 'First Name', required: false
+      param :last_name, String, desc: 'Last Name', required: false
       param :email, String, desc: 'Unique email for user', required: true
       param :type, String, desc: 'Type for user (valid values are Admin, StartupAdmin or Member)', required: true
       param :startup_id, Integer, desc: "Id of a startup (required only for SuperAdmin and Admin)", required: true
@@ -175,14 +176,16 @@ module Admins
     DESC
 
     def create
-      @user = UsersService::CreateUser.call(user_params, user_accelerator_id, current_user)
-
-      authorize @user if @user
-
-      if @user.save
-        render json: @user, status: :created
+      @user, @user_startup = UsersService::CreateUser.call(user_params, user_accelerator_id, current_user)
+      if MemberPolicy.can_do_it(current_user, @user.accelerator_id, [@user_startup.startups_id])
+        if @user.save
+          render json: @user, status: :created
+        else
+          puts [@user.errors].inspect
+          render json: @user.errors, status: :unprocessable_entity
+        end
       else
-        render json: @user.errors, status: :unprocessable_entity
+        raise Pundit::NotAuthorizedError
       end
     end
 
@@ -321,20 +324,25 @@ module Admins
         "message": "Successfully destroyed"
       }
 
-      DESC
+    DESC
 
-      def destroy
-        if @user.destroy
-          UsersService::UsersEmailNotification.call(@user, current_user)
-          render json: {
-            message: 'Successfully destroyed'
-          }, status: :ok
-        else
-          render json: @user.errors, status: :unprocessable_entity
-        end
+    def destroy
+      users_startup = UsersStartup.where(user_id: @user.id, startups_id: startup_id).first
+      if users_startup.nil?
+        render json: {
+          message: 'Successfully destroyed'
+        }, status: :ok
+      elsif users_startup.destroy
+        UsersService::UsersEmailNotification.call(@user, current_user)
+        render json: {
+          message: 'Successfully destroyed'
+        }, status: :ok
+      else
+        render json: @user.errors, status: :unprocessable_entity
       end
+    end
 
-  private
+    private
 
     def set_user
       raise Pundit::NotAuthorizedError unless @user = User.where(id: params[:id], accelerator_id: user_accelerator_id).first
@@ -354,8 +362,13 @@ module Admins
       params.require(:user).permit(:current_password, :password)
     end
 
+    def startup_id
+      params.require(:startup_id)
+      params[:startup_id]
+    end
+
     def search_params
-      params[:search]&.downcase  || ''
+      params[:search]&.downcase || ''
     end
 
     def page_params
@@ -371,7 +384,7 @@ module Admins
     end
 
     def user_params
-      params.require(:user).permit(:email, :startup_id, :type)
+      params.require(:user).permit(:email, :startup_id, :type, :first_name, :last_name)
     end
   end
 end

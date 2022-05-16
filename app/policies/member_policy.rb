@@ -6,6 +6,7 @@ class MemberPolicy < ApplicationPolicy
       @user = user
       @scope = scope
     end
+
     def resolve
       return scope.none unless user
 
@@ -13,8 +14,6 @@ class MemberPolicy < ApplicationPolicy
         scope.all
       elsif user.admin?
         scope.where(startup_id: user.startup_ids)
-      elsif user.startup_admin?
-        scope.where(startup_id: user.startup_id)
       else
         scope.none
       end
@@ -22,26 +21,26 @@ class MemberPolicy < ApplicationPolicy
   end
 
   def index?
-    super_admin? || admin? || startup_admin?
+    super_admin? || admin? || can_startup_admin_do_it(user, record.startup_ids)
   end
 
   def create?
-    can_do_it?
+    can_do_it(user, record.accelerator_id, record.startup_ids)
   end
 
-  def can_do_it?
-    can_super_admin_do_it? || can_admin_do_it? || can_startup_admin_do_it?
+  def self.can_do_it(user, accelerator_id, startup_ids = [])
+    can_super_admin_do_it(user, accelerator_id) || can_admin_do_it(user, startup_ids) || can_startup_admin_do_it(user, startup_ids)
   end
 
-  def can_super_admin_do_it?
-    super_admin? && Accelerator.ids.include?(record.accelerator_id)
+  def self.can_super_admin_do_it(user, accelerator_id)
+    user.super_admin? && Accelerator.ids.include?(accelerator_id)
   end
 
-  def can_admin_do_it?
-    admin? && user.startup_ids.include?(record.startup_id)
+  def self.can_admin_do_it(user, startup_ids)
+    user.admin? && (user.startup_ids & startup_ids).any?
   end
 
-  def can_startup_admin_do_it?
-    startup_admin? && user.startup_id == record.startup_id
+  def self.can_startup_admin_do_it(user, startup_ids)
+    (user.leads_teams & startup_ids).any?
   end
 end

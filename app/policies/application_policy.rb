@@ -34,10 +34,6 @@ class ApplicationPolicy
     user.admin?
   end
 
-  def startup_admin?
-    user.startup_admin?
-  end
-
   def member?
     user.member?
   end

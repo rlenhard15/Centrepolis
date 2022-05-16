@@ -47,7 +47,7 @@ module Admins
     def index
       authorize current_user, policy_class: TeamLeadPolicy
 
-      @startup_admins = policy_scope(User).startup_admins.with_name.for_accelerator(user_accelerator_id).page(page_params)
+      @startup_admins = policy_scope(TeamLead).with_name.for_accelerator(user_accelerator_id).page(page_params)
 
       render json: {
         current_page: @startup_admins.current_page,

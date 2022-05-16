@@ -14,8 +14,6 @@ class AssessmentPolicy < ApplicationPolicy
         scope.all
       elsif user.admin?
         scope.all
-      elsif user.startup_admin?
-        scope.all
       elsif user.member?
         scope.all
       end

@@ -15,11 +15,11 @@ Rails.application.routes.draw do
     end
     resources :tasks do
       put :mark_task_as_completed, on: :member
+      get :send_task_reminder, on: :member
     end
     resources :startups, only: %i[index create show update destroy]
     resources :members, only: :index, module: 'admins'
     resources :admins, only: %i[index], module: 'admins'
-    resources :startup_admins, only: :index, module: 'admins'
     resources :users, only: %i[create index destroy], module: 'admins' do
       collection do
         get :profile

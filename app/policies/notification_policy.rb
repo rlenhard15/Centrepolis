@@ -14,8 +14,6 @@ class NotificationPolicy < ApplicationPolicy
         scope.where(user_id: user.id)
       elsif user.admin?
         scope.where(user_id: user.id)
-      elsif user.startup_admin?
-        scope.where(user_id: user.id)
       elsif user.member?
         scope.where(user_id: user.id)
       end
@@ -27,11 +25,11 @@ class NotificationPolicy < ApplicationPolicy
   end
 
   def mark_as_readed_all?
-    super_admin? || admin? || startup_admin? || member?
+    super_admin? || admin? || member?
   end
 
   def index?
-    super_admin? || admin? || startup_admin? || member?
+    super_admin? || admin? || member?
   end
 
   def can_super_admin_do_it
@@ -40,10 +38,6 @@ class NotificationPolicy < ApplicationPolicy
 
   def can_admin_do_it
     admin? && user.id == record.user_id
-  end
-
-  def can_startup_admin_do_it
-    startup_admin? && user.id == record.user_id
   end
 
   def can_member_do_it

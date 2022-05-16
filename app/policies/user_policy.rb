@@ -13,40 +13,42 @@ class UserPolicy < ApplicationPolicy
       if user.super_admin?
         scope.all
       elsif user.admin?
-        scope.where(startup_id: user.startup_ids)
-      elsif user.startup_admin?
-        scope.where(startup_id: user.startup_id)
+        scope.joins(:users_startup).where('users_startups.startups_id': user.startup_ids)
       elsif user.member?
-        scope.none
+        scope.joins(:users_startup).where('users_startups.startups_id': user.leads_teams)
       end
     end
   end
 
   def create?
-    super_admin? || admin? || startup_admin?
+    super_admin? || admin? || super_admin?
   end
 
   def destroy?
     super_admin? || can_admin_do_it?
   end
 
+  def startup_admin
+    raise ArgumentError.new("OH NO")
+  end
+
   def index?
-    super_admin? || admin? || startup_admin?
+    super_admin? || admin? || member?
   end
 
   def change_password?
-    super_admin? || admin? || startup_admin? || member?
+    super_admin? || admin? || member?
   end
 
   def update_email_notification?
-    super_admin? || admin? || startup_admin? || member?
+    super_admin? || admin? || member?
   end
 
   def update_profile?
-    super_admin? || admin? || startup_admin? || member?
+    super_admin? || admin? || member?
   end
 
   def can_admin_do_it?
-    admin? && user.startup_ids.include?(record.startup_id)
+    admin? && (user.startup_ids & record.startup_ids).any?
   end
 end

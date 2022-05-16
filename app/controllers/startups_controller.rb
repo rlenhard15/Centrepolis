@@ -302,14 +302,13 @@ class StartupsController < ApplicationController
 
   def show
     if current_user.super_admin? || current_user.admin?
-      render json: @startup.as_json(methods: [:assessments_risk_list, :admins], include: {
-        members: {methods: [:tasks_number, :last_visit, :user_type]},
+      render json: @startup.as_json(methods: [:assessments_risk_list, :admins, :members], include: {
         team_leads: {methods: [:tasks_number, :last_visit, :user_type]}
       })
     else
       render json: @startup.as_json(methods: :assessments_risk_list, include: {
         members: {methods: [:tasks_number, :last_visit, :user_type]},
-        team_leads: {methods: [:tasks_number, :last_visit, :user_type]}
+        team_leads: {methods: [:tasks_number, :last_visit, :user_type]},
       })
     end
   end

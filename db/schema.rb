@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2021_07_08_100953) do
+ActiveRecord::Schema.define(version: 2022_05_16_133219) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -20,13 +20,6 @@ ActiveRecord::Schema.define(version: 2021_07_08_100953) do
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
     t.string "hostname"
-  end
-
-  create_table "admins_startups", force: :cascade do |t|
-    t.integer "startup_id"
-    t.integer "admin_id"
-    t.datetime "created_at", precision: 6, null: false
-    t.datetime "updated_at", precision: 6, null: false
   end
 
   create_table "assessment_progresses", force: :cascade do |t|
@@ -104,6 +97,7 @@ ActiveRecord::Schema.define(version: 2021_07_08_100953) do
     t.integer "status", default: 0
     t.integer "priority"
     t.datetime "due_date"
+    t.bigint "startup_id"
   end
 
   create_table "users", force: :cascade do |t|
@@ -118,7 +112,6 @@ ActiveRecord::Schema.define(version: 2021_07_08_100953) do
     t.string "last_name"
     t.string "type"
     t.integer "accelerator_id"
-    t.integer "startup_id"
     t.integer "sign_in_count", default: 0, null: false
     t.datetime "current_sign_in_at"
     t.datetime "last_sign_in_at"
@@ -130,4 +123,13 @@ ActiveRecord::Schema.define(version: 2021_07_08_100953) do
     t.index ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true
   end
 
+  create_table "users_startups", force: :cascade do |t|
+    t.bigint "user_id"
+    t.bigint "startups_id"
+    t.boolean "is_team_lead"
+    t.index ["startups_id"], name: "index_users_startups_on_startups_id"
+    t.index ["user_id"], name: "index_users_startups_on_user_id"
+  end
+
+  add_foreign_key "tasks", "startups"
 end

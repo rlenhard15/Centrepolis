@@ -13,21 +13,20 @@ class TaskPolicy < ApplicationPolicy
       if user.super_admin?
         scope.joins(:users)
       elsif user.admin?
-        scope.joins(:users).where("users.startup_id IN (?) ", user.startup_ids)
-      elsif user.startup_admin?
-        scope.joins(:users).where("tasks.id IN (?)", user.task_ids)
+        scope.joins(users: [:users_startup]).where("users_startups.startups_id IN (?) ", user.startup_ids)
       elsif user.member?
-        scope.joins(:users).where("users.id = ?", user.id)
+        scope.joins(users: [:users_startup])
+             .where("users.id = ? OR users_startups.startups_id IN ?", user.id, user.leads_teams)
       end
     end
   end
 
   def index?
-    super_admin? || admin? || startup_admin? || member?
+    super_admin? || admin? || member?
   end
 
   def create?
-    super_admin? || admin? || startup_admin?
+    super_admin? || admin? || can_startup_admin_do_it?
   end
 
   def destroy?
@@ -42,12 +41,20 @@ class TaskPolicy < ApplicationPolicy
     can_do_it?
   end
 
+  def send_task_reminder?
+    can_super_admin_do_it? || can_admin_do_it? || can_startup_admin_do_it?
+  end
+
   def show?
     can_do_it?
   end
 
+  def can_startup_admin_do_it?
+    user.leads_teams&.include?(record.startup_id)
+  end
+
   def can_do_it?
-    can_super_admin_do_it? || can_admin_do_it? || can_startup_admin_do_it? || can_member_do_it?
+    can_super_admin_do_it? || can_admin_do_it? || can_member_do_it?
   end
 
   def can_super_admin_do_it?
@@ -55,14 +62,11 @@ class TaskPolicy < ApplicationPolicy
   end
 
   def can_admin_do_it?
-    admin? && user.startup_ids.include?(record&.startup_users_for_task&.first&.startup_id)
-  end
-
-  def can_startup_admin_do_it?
-    startup_admin? && user.id == record.users&.where("users.id = ?", user.id)&.first&.id
+    puts [admin?, user.startup_ids, record&.startup_id].inspect
+    admin? && user.startup_ids.include?(record&.startup_id)
   end
 
   def can_member_do_it?
-    member? && user.task_ids&.include?(record.id)
+    user.task_ids&.include?(record.id) || user.leads_teams&.include?(record.startup_id)
   end
 end

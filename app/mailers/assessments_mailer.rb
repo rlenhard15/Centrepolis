@@ -25,7 +25,7 @@ class AssessmentsMailer < ApplicationMailer
   end
 
   def email_progress_updated_to_startup_users
-    @startup_users = User.where(startup_id: @startup.id).not_current_user(@current_user.id).with_allowed_email_notifications
+    @startup_users = User.join(:users_startup).where('users_startups.startup_id': @startup.id).not_current_user(@current_user.id).with_allowed_email_notifications
 
     if !@startup_users.empty?
       if @sub_category_progress && @assessment_progress && @startup

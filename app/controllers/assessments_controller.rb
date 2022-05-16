@@ -110,9 +110,9 @@ class AssessmentsController < ApplicationController
     if current_user.admin?
       (policy_scope(Startup)&.ids & [params[:startup_id].to_i]).first
     elsif current_user.super_admin?
-      (policy_scope(Startup)&.for_accelerator(user_accelerator_id)&.ids & [params[:startup_id].to_i]).first
+      (policy_scope(Startup)&.for_accelerator(user_accelerator_id) & [params[:startup_id].to_i]).first
     else
-      current_user.startup_id
+      (policy_scope(Startup)&.for_accelerator(user_accelerator_id)&.with_user(user.id)&.ids & [params[:startup_id].to_i]).first
     end
   end
 

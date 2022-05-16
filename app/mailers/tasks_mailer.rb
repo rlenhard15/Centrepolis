@@ -6,8 +6,8 @@ class TasksMailer < ApplicationMailer
       @task = Task.find_by_id(params[:task_id])
     elsif params[:users_ids]
       @users = User.where(id: params[:users_ids])&.with_allowed_email_notifications
-      @startup = Startup.find_by_id(@users&.first&.startup&.id)
       @task = Task.find_by_id(params[:task_id])
+      @startup = Startup.find_by_id(@task.startup_id)
     end
   end
 
@@ -24,6 +24,13 @@ class TasksMailer < ApplicationMailer
     if !@users.empty? && @task
       users_emails = @users.map(&:email)
       mail(to: users_emails, subject: "You have been assigned to a task on RAMP Client Business Planning support tool")
+    end
+  end
+
+  def email_task_reminder
+    if !@users.empty? && @task
+      users_emails = @users.map(&:email)
+      mail(to: users_emails, subject: "This is a reminder to complete your task on RAMP Client Business Planning support tool")
     end
   end
 end

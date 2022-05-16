@@ -1,7 +1,7 @@
 class TasksController < ApplicationController
   before_action :set_task_for_show, only: :show
   before_action :set_startup, only: [:index]
-  before_action :set_task, only: [:update, :mark_task_as_completed, :destroy]
+  before_action :set_task, only: [:update, :mark_task_as_completed, :send_task_reminder, :destroy]
 
   api :GET, 'api/tasks', "Tasks list for startup"
 
@@ -317,6 +317,30 @@ class TasksController < ApplicationController
     end
   end
 
+  api :GET, 'api/tasks/:id/send_task_reminder', "Send Reminder to complete the task"
+  param :id, Integer, desc: "id of task",  required: true
+
+  description <<-DESC
+
+  === Request headers
+    SuperAdmin or Admin or StartupAdmin(who assigned to the task) or Member can perform this action
+    Authentication - string - required
+      Example of Authentication header : "Bearer TOKEN_FETCHED_FROM_SERVER_DURING_REGISTRATION"
+    Accelerator-Id - integer - required
+      Example of Accelerator-Id header : 1
+
+  === Success response body
+  {
+     "success": true
+  }
+
+  DESC
+
+  def send_task_reminder
+    TasksService::EmailTaskReminder.call(@task, current_user)
+    render json: { success: true }
+  end
+
   api :PUT, 'api/tasks/:id/mark_task_as_completed', "Update task status to completed"
   param :id, Integer, desc: "id of task",  required: true
 
@@ -388,7 +412,7 @@ class TasksController < ApplicationController
     end
 
     def for_startup
-      @startup = (current_user.member? || current_user.startup_admin?) ? current_user.startup : policy_scope(Startup).where(id: params[:startup_id], accelerator_id: user_accelerator_id).first
+      @startup = (current_user.member?) ? current_user.startup : policy_scope(Startup).where(id: params[:startup_id], accelerator_id: user_accelerator_id).first
     end
 
     def task_members_params
@@ -431,6 +455,6 @@ class TasksController < ApplicationController
 
     # Only allow a trusted parameter "white list" through.
     def tasks_params
-      params.require(:task).permit(:title, :stage_id, :priority, :due_date, task_users_attributes: [ :user_id ])
+      params.require(:task).permit(:title, :stage_id, :priority, :due_date, :startup_id, task_users_attributes: [ :user_id ])
     end
 end

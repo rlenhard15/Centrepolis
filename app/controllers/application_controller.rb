@@ -5,9 +5,9 @@ class ApplicationController < ActionController::API
 
   rescue_from(Pundit::NotAuthorizedError) do
     render json:
-      {
-        notice: 'You do not have permission to perform this action'
-      }, status: 403
+             {
+               notice: 'You do not have permission to perform this action'
+             }, status: 403
   end
 
   def accelerator_id
@@ -28,7 +28,7 @@ class ApplicationController < ActionController::API
     elsif current_user.super_admin?
       (policy_scope(Startup)&.for_accelerator(user_accelerator_id)&.ids & [params[:startup_id].to_i]).first
     else
-      current_user.startup_id
+      (policy_scope(Startup)&.for_accelerator(user_accelerator_id)&.with_user(user.id)&.ids & [params[:startup_id].to_i]).first
     end
   end
 

@@ -25,29 +25,46 @@ class UsersService::CreateUser < ApplicationService
   end
 
   def create_admin
-    Admin.new(
+    existing = User.where(email: email).first
+    if existing
+      User.update(existing.id, { type: 'Admin' })
+    end
+    user = existing || Admin.create(
       email: user_params[:email],
+      first_name: user_params[:first_name],
+      last_name: user_params[:last_name],
       accelerator_id: user_accelerator_id,
-      password: user_random_password
+      password: user_random_password,
+      type: 'Admin'
     )
+    user_startup = user.users_startups.create(
+      is_team_lead: user_type == 'TeamLead',
+      startups_id: user_params[:startup_id]
+    )
+    [user, user_startup]
   end
 
   def create_user_for_startup
-    User.new({
-      email: user_params[:email],
+    email = user_params[:email].downcase.strip
+    existing = User.where(email: email).first
+    puts user_params[:first_name]
+    user = existing || User.create(
+      email: email,
+      first_name: user_params[:first_name],
+      last_name: user_params[:last_name],
       accelerator_id: user_accelerator_id,
       password: user_random_password,
-      startup_id: get_user_startup_id,
-      type: user_type
-    })
+      type: 'Member'
+    )
+    user_startup = user.users_startups.create(
+      is_team_lead: user_type == 'TeamLead',
+      startups_id: user_params[:startup_id]
+    )
+    [user, user_startup]
   end
 
   def user_random_password
     Devise.friendly_token.first(8)
-  end
-
-  def get_user_startup_id
-    startup_id = current_user.startup_admin? ? current_user.startup_id : user_params[:startup_id]
   end
 
 end
