@@ -13,7 +13,7 @@ class TaskPolicy < ApplicationPolicy
       if user.super_admin?
         scope.joins(:users)
       elsif user.admin?
-        scope.joins(users: [:users_startup]).where("users_startups.startups_id IN (?) ", user.startup_ids)
+        scope.joins(users: [:users_startup]).where("startup_id IN (?) ", user.accelerator.startup_ids)
       elsif user.member?
         scope.joins(users: [:users_startup])
              .where("users.id = ? OR users_startups.startups_id IN ?", user.id, user.leads_teams)
@@ -62,8 +62,8 @@ class TaskPolicy < ApplicationPolicy
   end
 
   def can_admin_do_it?
-    puts [admin?, user.startup_ids, record&.startup_id].inspect
-    admin? && user.startup_ids.include?(record&.startup_id)
+    puts user.accelerator.startup_ids.inspect
+    admin? && user.accelerator.startup_ids.include?(record&.startup_id)
   end
 
   def can_member_do_it?

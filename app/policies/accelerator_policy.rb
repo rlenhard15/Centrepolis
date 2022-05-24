@@ -1,4 +1,4 @@
-class TeamLeadPolicy < ApplicationPolicy
+class AcceleratorPolicy < ApplicationPolicy
   class Scope
     attr_reader :user, :scope
 
@@ -12,8 +12,6 @@ class TeamLeadPolicy < ApplicationPolicy
 
       if user.super_admin?
         scope.all
-      elsif user.admin?
-        scope.where(accelerator_id: user.accelerator_id)
       else
         scope.none
       end
@@ -21,11 +19,10 @@ class TeamLeadPolicy < ApplicationPolicy
   end
 
   def index?
-    super_admin? || admin?
+    super_admin?
   end
 
   def create?
-    puts record.inspect
-    admin? && user.accelerator_id == record.accelerator_id
+    super_admin?
   end
 end

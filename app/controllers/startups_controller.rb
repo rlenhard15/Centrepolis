@@ -139,7 +139,7 @@ class StartupsController < ApplicationController
 
   def create
     startup_params_create = startup_admins_params
-    @startup = Startup.new(startup_params_create.merge({accelerator_id: user_accelerator_id}))
+    @startup = Startup.new({ name: startup_params_create[:name], accelerator_id: user_accelerator_id })
 
     authorize @startup
 
@@ -154,7 +154,7 @@ class StartupsController < ApplicationController
   end
 
   api :GET, 'api/startups/:id', "Request for a certain startup"
-  param :id, Integer, desc: "id of startup",  required: true
+  param :id, Integer, desc: "id of startup", required: true
 
   description <<-DESC
 
@@ -301,20 +301,15 @@ class StartupsController < ApplicationController
   DESC
 
   def show
-    if current_user.super_admin? || current_user.admin?
-      render json: @startup.as_json(methods: [:assessments_risk_list, :admins, :members], include: {
-        team_leads: {methods: [:tasks_number, :last_visit, :user_type]}
-      })
-    else
-      render json: @startup.as_json(methods: :assessments_risk_list, include: {
-        members: {methods: [:tasks_number, :last_visit, :user_type]},
-        team_leads: {methods: [:tasks_number, :last_visit, :user_type]},
-      })
-    end
+    render json: @startup.as_json(methods: :assessments_risk_list, include: {
+      members: { methods: [:tasks_number, :last_visit, :user_type] },
+      team_leads: { methods: [:tasks_number, :last_visit, :user_type] },
+      admins: { methods: [:tasks_number, :last_visit, :user_type] }
+    })
   end
 
   api :PUT, 'api/startups/:id', "Update info of a certain startup and assign admins to the startups"
-  param :id, Integer, desc: "id of startup",  required: true
+  param :id, Integer, desc: "id of startup", required: true
 
   param :startup, Hash, required: true do
     param :name, String, desc: "Name of the startup", required: false
@@ -376,7 +371,7 @@ class StartupsController < ApplicationController
   end
 
   api :DELETE, 'api/startups/:id', "Delete a startup the startups"
-  param :id, Integer, desc: "id of startup",  required: true
+  param :id, Integer, desc: "id of startup", required: true
 
   description <<-DESC
 
@@ -422,15 +417,15 @@ class StartupsController < ApplicationController
     if startup_params[:admins_startups_attributes] || current_user.admin?
       admins_ids_for_startup = startup_params[:admins_startups_attributes].map { |admin| admin[:admin_id] } if current_user.super_admin?
       if !@startup
-        @admins = current_user.super_admin? ? policy_scope(User).where({id: admins_ids_for_startup || 0, type: "Admin", accelerator_id: user_accelerator_id}) : [current_user]
+        @admins = current_user.super_admin? ? policy_scope(User).where({ id: admins_ids_for_startup || 0, type: "Admin", accelerator_id: user_accelerator_id }) : [current_user]
       else
-        @admins = current_user.super_admin? ? policy_scope(User).where({id: admins_ids_for_startup, type: "Admin", accelerator_id: user_accelerator_id}).where.not(id: @startup.admin_ids) : nil
+        @admins = current_user.super_admin? ? policy_scope(User).where({ id: admins_ids_for_startup, type: "Admin", accelerator_id: user_accelerator_id }).where.not(id: @startup.admin_ids) : nil
       end
 
       validated_admins_ids_hash = []
 
       @admins&.each do |admin|
-        validated_admins_ids_hash.push({admin_id: admin&.id})
+        validated_admins_ids_hash.push({ admin_id: admin&.id })
       end
       startup_params_hash = startup_params.to_h
       startup_params_hash[:admins_startups_attributes] = validated_admins_ids_hash
@@ -440,6 +435,6 @@ class StartupsController < ApplicationController
   end
 
   def startup_params
-    params.require(:startup).permit(:name, admins_startups_attributes: [ :admin_id ])
+    params.require(:startup).permit(:name, admins_startups_attributes: [:admin_id])
   end
 end

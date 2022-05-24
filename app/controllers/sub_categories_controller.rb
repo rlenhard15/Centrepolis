@@ -30,8 +30,23 @@ class SubCategoriesController < ApplicationController
   DESC
 
   def update_progress
+    old_stage = @sub_category_progress.current_stage
     if @sub_category_progress.update(current_stage_id: params[:current_stage_id]) && @assessment_progress.update(risk_value: assessment_risk_value)
-
+      stage = @sub_category_progress.current_stage
+      tasks = Task.where(startup_id: @sub_category_progress.startup_id, sub_category_id: @sub_category_progress.sub_category_id)
+      tasks.each do |task|
+        puts [task.stage.position, stage.position, old_stage.position].inspect
+        if task.stage.position <= stage.position && old_stage.position < task.stage.position
+          puts('UPDATING')
+          if task.update(status: 1)
+            TasksService::EmailTaskCompleted.call(task, current_user)
+          else
+            render json: [task.errors], status: :unprocessable_entity
+          end
+        elsif task.status == 'completed' && stage.position < task.stage.position
+          task.update(status: 0)
+        end
+      end
       AssessmentsService::SendEmailUpdateProgress.call(@sub_category_progress, @assessment_progress, current_user)
 
       render json: {

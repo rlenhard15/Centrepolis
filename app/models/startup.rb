@@ -1,7 +1,6 @@
 class Startup < ApplicationRecord
   has_many :users_startup, foreign_key: 'startups_id'
   has_many :members, :through => :users_startup, source: :user
-  has_many :admins, -> {where('users.type' => 'Admin')}, through: :users_startup, source: :user
   belongs_to :accelerator
   has_many :sub_category_progresses, dependent: :destroy
   has_many :assessment_progresses, dependent: :destroy
@@ -9,8 +8,8 @@ class Startup < ApplicationRecord
 
   paginates_per 10
 
-  def admins_for_startup
-    admins.where("users.type = ?", "Admin")
+  def admins
+    User.where(accelerator_id: accelerator_id, type: 'Admin')
   end
 
   scope :for_accelerator, ->(accelerator_id) { where(accelerator_id: accelerator_id)}

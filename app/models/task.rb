@@ -3,7 +3,7 @@ class Task < ApplicationRecord
   has_many :task_users, dependent: :destroy
   has_many :users, through: :task_users
   has_many :notifications, dependent: :destroy
-  has_many :users_startups, through: :users, source: :users_startup
+  has_many :users_startups
 
   after_create :create_notifications
 
@@ -24,7 +24,7 @@ class Task < ApplicationRecord
     )
   }
 
-  scope :tasks_for_startup, ->(startup_id) { where("users_startups.startups_id = ?", startup_id) }
+  scope :tasks_for_startup, ->(startup_id) { where("startup_id = ?", startup_id) }
 
   def created_by
     users.where("task_users.creator IS true").first

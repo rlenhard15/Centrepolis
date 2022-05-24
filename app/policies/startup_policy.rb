@@ -13,11 +13,9 @@ class StartupPolicy < ApplicationPolicy
       if user.super_admin?
         scope.all
       elsif user.admin?
-        scope.where(id: user.startup_ids)
-      elsif user.startup_admin?
-        scope.where(id: user.startup_id)
+        scope.where(accelerator_id: user.accelerator_id)
       elsif user.member?
-        scope.where(id: user.startup_id)
+        scope.where(id: user.startup_ids)
       end
     end
   end
@@ -27,7 +25,7 @@ class StartupPolicy < ApplicationPolicy
   end
 
   def show?
-    super_admin? || can_admin_do_show? || can_startup_admin_do_it? || can_member_do_it?
+    super_admin? || can_admin_do_show? || can_member_do_it?
   end
 
   def index?
@@ -42,19 +40,19 @@ class StartupPolicy < ApplicationPolicy
     super_admin? || admin?
   end
 
+  def can_startup_admin_do_it?
+    user.leads_teams.include?(record.id)
+  end
+
   def can_admin_do_show?
-    admin? && user.startup_ids.include?(record.id)
+    admin? && user.accelerator_id == record.accelerator_id
   end
 
   def can_admin_do_it?
     admin? && user.accelerator_id == record.accelerator_id
   end
 
-  def can_startup_admin_do_it?
-    startup_admin? && user.startup_id == record.id
-  end
-
   def can_member_do_it?
-    member? && user.startup_id == record.id
+    member? && user.startup_ids.include?(record.id)
   end
 end

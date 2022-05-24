@@ -5,6 +5,10 @@ class SubCategoryProgress < ApplicationRecord
   validates :startup_id, uniqueness: { scope: :sub_category_id }
   validate :correct_values_for_current_stage_id
 
+  def current_stage
+    Stage.where(id: current_stage_id).first
+  end
+
   private
 
   def correct_values_for_current_stage_id
@@ -14,4 +18,5 @@ class SubCategoryProgress < ApplicationRecord
   def valid_sub_category_stage
     sub_category&.stages&.ids&.include? current_stage_id || current_stage_id.nil?
   end
+
 end

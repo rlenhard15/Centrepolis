@@ -21,7 +21,8 @@ class UserPolicy < ApplicationPolicy
   end
 
   def create?
-    super_admin? || admin? || super_admin?
+    puts record.inspect
+    super_admin? || admin?
   end
 
   def destroy?
@@ -49,6 +50,6 @@ class UserPolicy < ApplicationPolicy
   end
 
   def can_admin_do_it?
-    admin? && (user.startup_ids & record.startup_ids).any?
+    admin? && user.accelerator_id == record.accelerator_id
   end
 end

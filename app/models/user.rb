@@ -7,7 +7,7 @@ class User < ApplicationRecord
   has_many :task_users, dependent: :destroy
   has_many :tasks, through: :task_users
   has_many :notifications, dependent: :destroy
-  has_many :users_startup, foreign_key: "user_id", dependent: :destroy
+  has_many :users_startup, dependent: :destroy
 
   paginates_per 5
 
@@ -77,6 +77,10 @@ class User < ApplicationRecord
 
   def leads_teams
     UsersStartup.where(user_id: id, is_team_lead: true).map(&:startups_id)
+  end
+
+  def is_assigned_to_startup(startup_id)
+    UsersStartup.where(user_id: id, startup_id: startup_id).first?
   end
 
   def frontend_hostname

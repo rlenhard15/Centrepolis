@@ -21,11 +21,11 @@ class TasksService::EmailTaskCompleted < ApplicationService
   end
 
   def startup_admins_for_task
-    @startup_admins_ids ||= task.users&.where(type: 'TeamLead').map(&:id)
+    @startup_admins_ids ||= task.users_startups.where(is_team_lead: true)&.map(&:user_id)
   end
 
   def task_completed
-    task.status == 'completed'
+    task.status == 1
   end
 
 end

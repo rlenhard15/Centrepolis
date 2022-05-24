@@ -1,6 +1,6 @@
 class Admin < User
   belongs_to :accelerator, foreign_key: "accelerator_id"
-  has_many :users_startups
+  has_many :users_startups, foreign_key: 'user_id'
   has_many :startups, through: :users_startup
   paginates_per 10
 

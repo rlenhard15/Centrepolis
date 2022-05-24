@@ -25,6 +25,7 @@ class UsersService::CreateUser < ApplicationService
   end
 
   def create_admin
+    email = user_params[:email].downcase.strip
     existing = User.where(email: email).first
     if existing
       User.update(existing.id, { type: 'Admin' })
@@ -37,17 +38,15 @@ class UsersService::CreateUser < ApplicationService
       password: user_random_password,
       type: 'Admin'
     )
-    user_startup = user.users_startups.create(
-      is_team_lead: user_type == 'TeamLead',
-      startups_id: user_params[:startup_id]
-    )
-    [user, user_startup]
+    if user.type != 'Admin'
+        user.update({ type: 'Admin' })
+    end
+    [user, get_user_startup(user)]
   end
 
   def create_user_for_startup
     email = user_params[:email].downcase.strip
     existing = User.where(email: email).first
-    puts user_params[:first_name]
     user = existing || User.create(
       email: email,
       first_name: user_params[:first_name],
@@ -56,11 +55,19 @@ class UsersService::CreateUser < ApplicationService
       password: user_random_password,
       type: 'Member'
     )
-    user_startup = user.users_startups.create(
-      is_team_lead: user_type == 'TeamLead',
-      startups_id: user_params[:startup_id]
+    [user, get_user_startup(user)]
+  end
+
+  def get_user_startup(user)
+    existing_startup = UsersStartup.where(startups_id: user_params[:startup_id], user_id: user.id).first
+    user_startup = existing_startup || user.users_startups.create(
+        is_team_lead: user_type == 'TeamLead',
+        startups_id: user_params[:startup_id]
     )
-    [user, user_startup]
+    if not existing_startup.nil?
+      existing_startup.update(is_team_lead: user_type == 'TeamLead')
+    end
+    user_startup
   end
 
   def user_random_password

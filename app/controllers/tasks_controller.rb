@@ -361,7 +361,7 @@ class TasksController < ApplicationController
   DESC
 
   def mark_task_as_completed
-    if @task.update(status: 'completed')
+    if @task.update(status: 1)
       TasksService::EmailTaskCompleted.call(@task, current_user)
       render json: { new_task_status: @task.status }
     else
@@ -455,6 +455,6 @@ class TasksController < ApplicationController
 
     # Only allow a trusted parameter "white list" through.
     def tasks_params
-      params.require(:task).permit(:title, :stage_id, :priority, :due_date, :startup_id, task_users_attributes: [ :user_id ])
+      params.require(:task).permit(:title, :stage_id, :priority, :due_date, :startup_id, :sub_category_id, task_users_attributes: [:user_id ])
     end
 end
