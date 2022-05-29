@@ -11,7 +11,7 @@ class ApplicationController < ActionController::API
   end
 
   def accelerator_id
-    @accelerator_id ||= request.headers['Accelerator-Id'].to_i
+    @accelerator_id ||= params[:accelerator_id]
   end
 
   def user_accelerator_id

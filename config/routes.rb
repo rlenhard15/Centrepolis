@@ -17,6 +17,7 @@ Rails.application.routes.draw do
       put :mark_task_as_completed, on: :member
       get :send_task_reminder, on: :member
     end
+    resources :accelerators, only: %i[index create]
     resources :startups, only: %i[index create show update destroy]
     resources :members, only: :index, module: 'admins'
     resources :admins, only: %i[index], module: 'admins'

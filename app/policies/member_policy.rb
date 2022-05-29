@@ -29,11 +29,11 @@ class MemberPolicy < ApplicationPolicy
   end
 
   def self.can_do_it(user, accelerator_id, startup_ids = [])
-    can_super_admin_do_it(user, accelerator_id) || can_admin_do_it(user, accelerator_id) || can_startup_admin_do_it(user, startup_ids)
+    can_super_admin_do_it(user) || can_admin_do_it(user, accelerator_id) || can_startup_admin_do_it(user, startup_ids)
   end
 
-  def self.can_super_admin_do_it(user, accelerator_id)
-    user.super_admin? && Accelerator.ids.include?(accelerator_id)
+  def self.can_super_admin_do_it(user)
+    user.super_admin?
   end
 
   def self.can_admin_do_it(user, accelerator_id)

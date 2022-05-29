@@ -177,7 +177,7 @@ module Admins
 
     def create
       @user, @user_startup = UsersService::CreateUser.call(user_params, user_accelerator_id, current_user)
-      if MemberPolicy.can_do_it(current_user, @user.accelerator_id, [@user_startup.startups_id])
+      if MemberPolicy.can_do_it(current_user, @user.accelerator_id, @user_startup.nil? ? [] : [@user_startup.startups_id])
         if @user.save
           render json: @user, status: :created
         else
@@ -384,7 +384,7 @@ module Admins
     end
 
     def user_params
-      params.require(:user).permit(:email, :startup_id, :type, :first_name, :last_name)
+      params.require(:user).permit(:email, :startup_id, :type, :first_name, :last_name, :accelerator_id)
     end
   end
 end

@@ -1,10 +1,9 @@
-module Accelerator
-  class AcceleratorController < ApplicationController
+class AcceleratorsController < ApplicationController
 
-    api :GET, 'api/accelerators', "Only SuperAdmin can see list of the admins and their startups"
-    param :page, Integer, desc: "Page for admins iteration (10 items per page)"
+  api :GET, 'api/accelerators', "Only SuperAdmin can see list of the admins and their startups"
+  param :page, Integer, desc: "Page for admins iteration (10 items per page)"
 
-    description <<-DESC
+  description <<-DESC
 
     === Request headers
       Only SuperAdmin can perform this action
@@ -45,24 +44,38 @@ module Accelerator
       ]
     }
 
-    DESC
+  DESC
 
-    def index
-      authorize current_user, policy_class: AcceleratorPolicy
+  def index
+    authorize current_user, policy_class: AcceleratorPolicy
 
-      @accelerators = policy_scope(Accelerator)
+    @accelerators = policy_scope(Accelerator)
 
-      render json: {
-        current_page: @accelerators.current_page,
-        total_pages: @accelerators.total_pages,
-        admins: @accelerators.as_json
-      }
-    end ∫≥≥≥
+    render json: {
+      accelerators: @accelerators.as_json
+    }
+  end
 
-    private
+  def create
+    accelerator_params_create = accelerator_create_params
+    @accelerator = Accelerator.new({ name: accelerator_params_create[:name] })
 
-    def page_params
-      params[:page] || 1
+    authorize @accelerator
+
+    if @accelerator.save
+      render json: @accelerator.as_json(methods: :admins), status: :created
+    else
+      render json: @accelerator.errors, status: :unprocessable_entity
     end
+  end
+
+  private
+
+  def accelerator_create_params
+    params.permit(:name)
+  end
+
+  def page_params
+    params[:page] || 1
   end
 end

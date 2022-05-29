@@ -20,7 +20,7 @@ class UsersService::CreateUser < ApplicationService
     elsif user_type == 'TeamLead' || user_type == 'Member'
       create_user_for_startup
     else
-      return nil
+      nil
     end
   end
 
@@ -34,14 +34,19 @@ class UsersService::CreateUser < ApplicationService
       email: user_params[:email],
       first_name: user_params[:first_name],
       last_name: user_params[:last_name],
-      accelerator_id: user_accelerator_id,
+      accelerator_id: user_params[:accelerator_id] || user_accelerator_id,
       password: user_random_password,
       type: 'Admin'
     )
     if user.type != 'Admin'
         user.update({ type: 'Admin' })
     end
-    [user, get_user_startup(user)]
+
+    user_startup = nil
+    if @current_user.type != 'SuperAdmin'
+      user_startup = get_user_startup(user)
+    end
+    [user, user_startup]
   end
 
   def create_user_for_startup
@@ -51,7 +56,7 @@ class UsersService::CreateUser < ApplicationService
       email: email,
       first_name: user_params[:first_name],
       last_name: user_params[:last_name],
-      accelerator_id: user_accelerator_id,
+      accelerator_id: user_params[:accelerator_id] || user_accelerator_id,
       password: user_random_password,
       type: 'Member'
     )

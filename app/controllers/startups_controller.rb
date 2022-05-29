@@ -86,7 +86,7 @@ class StartupsController < ApplicationController
   def index
     authorize current_user, policy_class: StartupPolicy
 
-    @startups = policy_scope(Startup).for_accelerator(user_accelerator_id).page(page_params)
+    @startups = policy_scope(Startup).page(page_params)
 
     render json: {
       current_page: @startups.current_page,
@@ -404,7 +404,8 @@ class StartupsController < ApplicationController
   private
 
   def set_startup
-    raise Pundit::NotAuthorizedError unless @startup = (policy_scope(Startup).where(id: params[:id], accelerator_id: user_accelerator_id)).first
+    @startup = (policy_scope(Startup).first)
+    raise Pundit::NotAuthorizedError unless @startup
 
     authorize @startup
   end
@@ -435,6 +436,6 @@ class StartupsController < ApplicationController
   end
 
   def startup_params
-    params.require(:startup).permit(:name, admins_startups_attributes: [:admin_id])
+    params.require(:startup).permit(:name, :accelerator_id, admins_startups_attributes: [:admin_id])
   end
 end
