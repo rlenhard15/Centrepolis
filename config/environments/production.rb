@@ -63,7 +63,7 @@ Rails.application.configure do
   config.action_mailer.smtp_settings = {
     :user_name => ENV['SENDGRID_USER_NAME'],
     :password => ENV['SENDGRID_PASSWORD'],
-    :domain => 'lean-rocket-lab.herokuapp.com',
+    :domain => 'centropolis-react.herokuapp.com',
     :address => 'smtp.sendgrid.net',
     :port => 587,
     :authentication => :plain,

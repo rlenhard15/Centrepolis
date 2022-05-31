@@ -80,7 +80,4 @@ test:
 #     url: <%= ENV['DATABASE_URL'] %>
 #
 production:
-  <<: *default
-  database: back_end_task_complete_service_production
-  username: back_end_task_complete_service
-  password: <%= ENV['BACK_END_TASK_COMPLETE_SERVICE_DATABASE_PASSWORD'] %>
+  url: <%= ENV['DATABASE_URL'] %>
