@@ -49,11 +49,11 @@ module Users
 
     private
 
-    def valid_accelerator_id user
+    def valid_accelerator_id(user)
       if !user.super_admin?
-        user&.accelerator_id == accelerator_id
+        user.accelerator_id == accelerator_id
       else
-        Accelerator.ids.include?(accelerator_id)
+        true
       end
     end
 
