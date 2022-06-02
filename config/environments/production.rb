@@ -61,7 +61,7 @@ Rails.application.configure do
   config.action_mailer.default :charset => "utf-8"
 
   config.action_mailer.default_options = {
-    from: "noreply@centrepolisaccelerator.com"
+    from: "noreply@ramptool.us"
   }
 
   config.action_mailer.smtp_settings = {
