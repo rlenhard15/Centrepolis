@@ -345,7 +345,7 @@ module Admins
     private
 
     def set_user
-      raise Pundit::NotAuthorizedError unless @user = User.where(id: params[:id], accelerator_id: user_accelerator_id).first
+      raise Pundit::NotAuthorizedError unless @user = User.where(id: params[:id]).first
 
       authorize @user, policy_class: UserPolicy
     end
