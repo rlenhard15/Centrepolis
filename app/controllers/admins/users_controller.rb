@@ -375,10 +375,6 @@ module Admins
       params[:page] || 1
     end
 
-    def set_startup
-      raise Pundit::NotAuthorizedError unless @startup_id = startup_id_for_current_user
-    end
-
     def set_profile
       @profile = UsersService::UserProfile.call(current_user)
     end

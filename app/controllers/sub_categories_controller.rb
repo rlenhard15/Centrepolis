@@ -68,18 +68,6 @@ class SubCategoriesController < ApplicationController
     raise Pundit::NotAuthorizedError unless set_startup
   end
 
-  def set_startup
-    @startup = startup_for_current_user
-  end
-
-  def startup_for_current_user
-    if current_user.admin?
-      policy_scope(Startup).find_by_id(params[:startup_id])
-    else
-      current_user.startup
-    end
-  end
-
   def set_assessment_progress
     @assessment_progress = @startup.assessment_progresses.where(
       assessment_id: @assessment.id

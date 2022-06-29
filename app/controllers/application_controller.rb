@@ -11,7 +11,11 @@ class ApplicationController < ActionController::API
   end
 
   def accelerator_id
-    @accelerator_id ||= params[:accelerator_id]
+    @accelerator_id ||= params[:accelerator_id].to_i
+  end
+
+  def startup_id
+    @startup_id ||= params[:startup_id].to_i
   end
 
   def user_accelerator_id
@@ -22,14 +26,13 @@ class ApplicationController < ActionController::API
     end
   end
 
-  def startup_id_for_current_user
-    if current_user.admin?
-      (policy_scope(Startup)&.ids & [params[:startup_id].to_i]).first
-    elsif current_user.super_admin?
-      (policy_scope(Startup)&.for_accelerator(user_accelerator_id)&.ids & [params[:startup_id].to_i]).first
-    else
-      (policy_scope(Startup)&.for_accelerator(user_accelerator_id)&.with_user(user.id)&.ids & [params[:startup_id].to_i]).first
-    end
+  def set_startup
+    raise Pundit::NotAuthorizedError unless startup_ids_for_current_user.include?(startup_id)
+    @startup = policy_scope(Startup).find(@startup_id)
+  end
+
+  def startup_ids_for_current_user
+    policy_scope(Startup)&.ids
   end
 
 end

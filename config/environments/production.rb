@@ -67,7 +67,7 @@ Rails.application.configure do
   config.action_mailer.smtp_settings = {
     :user_name => ENV['MAILGUN_USER_NAME'],
     :password => ENV['MAILGUN_PASSWORD'],
-    :domain => 'ramtool.us',
+    :domain => 'ramptool.us',
     :address => 'smtp.mailgun.org',
     :authentication => :plain,
     :enable_starttls_auto => true

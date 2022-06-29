@@ -404,7 +404,7 @@ class StartupsController < ApplicationController
   private
 
   def set_startup
-    @startup = (policy_scope(Startup).first)
+    @startup = policy_scope(Startup).find(params[:id])
     raise Pundit::NotAuthorizedError unless @startup
 
     authorize @startup

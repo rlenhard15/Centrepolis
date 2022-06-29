@@ -80,10 +80,6 @@ class CategoriesController < ApplicationController
 
   private
 
-  def set_startup
-    raise Pundit::NotAuthorizedError unless @startup_id = startup_id_for_current_user
-  end
-
   def set_category
     @category = policy_scope(Category).for_assessment(params[:assessment_id]).find(params[:id])
   end

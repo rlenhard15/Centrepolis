@@ -407,14 +407,6 @@ class TasksController < ApplicationController
       params[:page] || 1
     end
 
-    def set_startup
-      raise Pundit::NotAuthorizedError unless for_startup
-    end
-
-    def for_startup
-      @startup = (current_user.member?) ? current_user.startup : policy_scope(Startup).where(id: params[:startup_id], accelerator_id: user_accelerator_id).first
-    end
-
     def task_members_params
       if tasks_params[:task_users_attributes]
         user_ids_for_task = tasks_params[:task_users_attributes].map { |user| user[:user_id] }
