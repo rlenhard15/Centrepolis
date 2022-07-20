@@ -8,6 +8,6 @@ class ApplicationRecord < ActiveRecord::Base
   def send_email
     UsersMailer.with(
       user_id: self.id
-    ).email_for_restore_password.deliver_later
+    ).email_for_restore_password.deliver_now
   end
 end

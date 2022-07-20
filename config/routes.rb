@@ -6,6 +6,7 @@ Rails.application.routes.draw do
     # post '/users/sign_up', to: 'users/registrations#create'
     post '/users/password', to: 'users/passwords#create'
     put '/users/password', to: 'users/passwords#update'
+    get '/users/resend_invite', to: 'users/invites#show'
   end
 
   scope :api, defaults: { format: :json } do
