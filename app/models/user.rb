@@ -108,7 +108,7 @@ class User < ApplicationRecord
   def send_email
     UsersMailer.with(
       user_id: self.id
-    ).email_for_restore_password.deliver_later
+    ).email_for_restore_password.deliver_now
   end
 
   def send_email_about_delete_account
