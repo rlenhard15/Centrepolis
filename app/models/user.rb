@@ -84,7 +84,7 @@ class User < ApplicationRecord
   end
 
   def frontend_hostname
-    ENV[accelerator.hostname]
+    ENV[accelerator.hostname] || ENV['ADMIN_PANEL_HOST']
   end
 
   def self.set_user_by_password_token(attributes = {})
