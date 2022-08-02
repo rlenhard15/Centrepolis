@@ -57,6 +57,10 @@ module Users
       end
     end
 
+    def accelerator_id
+      @accelerator_id ||= request.headers['Accelerator-Id'].to_i
+    end
+
     # DELETE /resource/sign_out
     # def destroy
     #   super
