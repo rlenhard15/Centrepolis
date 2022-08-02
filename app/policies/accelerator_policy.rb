@@ -13,13 +13,13 @@ class AcceleratorPolicy < ApplicationPolicy
       if user.super_admin?
         scope.all
       else
-        scope.none
+        scope.where(id: user.accelerator_id)
       end
     end
   end
 
   def index?
-    super_admin?
+    true
   end
 
   def create?

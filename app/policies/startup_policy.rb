@@ -29,7 +29,7 @@ class StartupPolicy < ApplicationPolicy
   end
 
   def index?
-    super_admin? || admin?
+    true
   end
 
   def create?
